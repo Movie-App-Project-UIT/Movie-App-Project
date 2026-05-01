@@ -74,3 +74,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 1
 Cập nhật tối ưu mã nguồn ngày 25 lượt 2
 Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 01/05/2026 - ID: 9c03047ea0
+[test: Bổ sung unit test] - Log ngày 01/05/2026 - ID: 9e94b67851
