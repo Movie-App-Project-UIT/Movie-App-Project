@@ -148,3 +148,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [test: Bổ sung unit test] - Log ngày 02/05/2026 - ID: e2d3e3fcc3
 [chore: Cập nhật các thư viện phụ thuộc] - Log ngày 02/05/2026 - ID: c908aa597a
 [feat: Thêm chức năng mới cho module] - Log ngày 03/05/2026 - ID: e29a836037
+[style: Chuẩn hóa format code] - Log ngày 03/05/2026 - ID: 438595bc4c
