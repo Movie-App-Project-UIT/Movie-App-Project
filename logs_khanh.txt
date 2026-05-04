@@ -152,3 +152,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [style: Chuẩn hóa format code] - Log ngày 03/05/2026 - ID: 086821ea59
 [docs: Cập nhật tài liệu dự án] - Log ngày 03/05/2026 - ID: f2a31f78db
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 03/05/2026 - ID: f3944ed9f5
+[refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 04/05/2026 - ID: a984011fa4
