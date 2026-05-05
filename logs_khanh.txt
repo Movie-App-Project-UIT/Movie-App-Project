@@ -84,3 +84,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 03/05/2026 - ID: 2af1cdc978
 [style: Chuẩn hóa format code] - Log ngày 04/05/2026 - ID: e6b063ff94
 [docs: Cập nhật tài liệu dự án] - Log ngày 04/05/2026 - ID: 5551195caa
+[test: Bổ sung unit test] - Log ngày 05/05/2026 - ID: c91fd65486
