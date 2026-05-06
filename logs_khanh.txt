@@ -157,3 +157,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 05/05/2026 - ID: c95a3d5670
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 05/05/2026 - ID: a8ee634cfe
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 06/05/2026 - ID: 8f56b49c2e
+[refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 06/05/2026 - ID: 7d43f2331c
