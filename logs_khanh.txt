@@ -94,3 +94,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [chore: Cập nhật các thư viện phụ thuộc] - Log ngày 09/05/2026 - ID: 7fb35f8e25
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 09/05/2026 - ID: 5da2449881
 [refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 09/05/2026 - ID: c5c5e96f5b
+[refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 09/05/2026 - ID: 87c928daab
