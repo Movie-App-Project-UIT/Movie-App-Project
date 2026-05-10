@@ -167,3 +167,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [feat: Thêm chức năng mới cho module] - Log ngày 08/05/2026 - ID: a2e32e3dbc
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 08/05/2026 - ID: b39efa3659
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 09/05/2026 - ID: e51827c8f9
+[style: Chuẩn hóa format code] - Log ngày 10/05/2026 - ID: 4d60be35d0
