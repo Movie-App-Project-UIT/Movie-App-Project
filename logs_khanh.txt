@@ -107,3 +107,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [feat: Thêm chức năng mới cho module] - Log ngày 13/05/2026 - ID: 9c064fe2de
 [feat: Thêm chức năng mới cho module] - Log ngày 13/05/2026 - ID: d955d3532b
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 13/05/2026 - ID: 46be092935
+[docs: Cập nhật tài liệu dự án] - Log ngày 14/05/2026 - ID: 8a999ff58e
