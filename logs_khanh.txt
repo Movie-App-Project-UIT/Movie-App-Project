@@ -192,3 +192,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 18/05/2026 - ID: 307c225a33
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 18/05/2026 - ID: 8183b72648
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 19/05/2026 - ID: 5fb2e24381
+[docs: Cập nhật tài liệu dự án] - Log ngày 19/05/2026 - ID: 76767f54b5
