@@ -120,3 +120,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [feat: Thêm chức năng mới cho module] - Log ngày 18/05/2026 - ID: 6c1f619920
 [chore: Cập nhật các thư viện phụ thuộc] - Log ngày 19/05/2026 - ID: 467e7fe3b7
 [chore: Cập nhật các thư viện phụ thuộc] - Log ngày 19/05/2026 - ID: 5e61c4c2e6
+[docs: Cập nhật tài liệu dự án] - Log ngày 20/05/2026 - ID: 11109a69bd
