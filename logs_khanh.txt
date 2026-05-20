@@ -123,3 +123,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [docs: Cập nhật tài liệu dự án] - Log ngày 20/05/2026 - ID: 11109a69bd
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 20/05/2026 - ID: f691b76c8b
 [refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 20/05/2026 - ID: a2262881db
+[test: Bổ sung unit test] - Log ngày 20/05/2026 - ID: dfcc05b6a9
