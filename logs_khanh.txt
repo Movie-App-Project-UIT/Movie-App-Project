@@ -126,3 +126,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [test: Bổ sung unit test] - Log ngày 20/05/2026 - ID: dfcc05b6a9
 [style: Chuẩn hóa format code] - Log ngày 21/05/2026 - ID: fc3a0c508e
 [feat: Thêm chức năng mới cho module] - Log ngày 21/05/2026 - ID: 49991c42f1
+[fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 21/05/2026 - ID: fca18985b5
