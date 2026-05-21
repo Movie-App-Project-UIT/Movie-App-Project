@@ -199,3 +199,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [test: Bổ sung unit test] - Log ngày 20/05/2026 - ID: 44b4a0723a
 [docs: Cập nhật tài liệu dự án] - Log ngày 20/05/2026 - ID: d895df3045
 [perf: Cải thiện hiệu năng truy vấn] - Log ngày 20/05/2026 - ID: dd1de5f238
+[style: Chuẩn hóa format code] - Log ngày 21/05/2026 - ID: f2f8dd5dfe
