@@ -203,3 +203,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [refactor: Tái cấu trúc mã nguồn tối ưu hơn] - Log ngày 21/05/2026 - ID: 7d0b702f39
 [docs: Cập nhật tài liệu dự án] - Log ngày 22/05/2026 - ID: d0024fd1f9
 [style: Chuẩn hóa format code] - Log ngày 22/05/2026 - ID: 9a9e07953a
+[fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 22/05/2026 - ID: ee1c8a2183
