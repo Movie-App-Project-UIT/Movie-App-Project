@@ -212,3 +212,4 @@ Cập nhật tối ưu mã nguồn ngày 25 lượt 3
 [feat: Thêm chức năng mới cho module] - Log ngày 25/05/2026 - ID: 02a23263b5
 [fix: Sửa lỗi logic xử lý dữ liệu] - Log ngày 25/05/2026 - ID: f7dc8535df
 [feat: Thêm chức năng mới cho module] - Log ngày 25/05/2026 - ID: 5714e0be6a
+[style: Chuẩn hóa format code] - Log ngày 25/05/2026 - ID: 1a668c4fc1
