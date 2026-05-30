@@ -1,0 +1,5 @@
+Tải MySql và setup trước
+Vào file theo đường dẫn: src/main/resource/application.properties
+Có 2 dòng đánh dấu sửa ở trong đó
+Điền vào username và pass của mình trong MySQL
+Xong rồi thì chạy server, các thuộc tính sẽ tự tạo trong MySQL
