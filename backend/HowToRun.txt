@@ -1,0 +1,119 @@
+================================================================
+  HUONG DAN CHAY DU AN — Movie App Server (Spring Boot)
+  Database Schema: MovieApp v2.4 | MySQL 8.0+
+================================================================
+
+BUOC 1: CHUAN BI CO SO DU LIEU MySQL
+--------------------------------------
+1. Mo MySQL Workbench (hoac HeidiSQL, DBeaver, hoac MySQL CLI).
+
+2. Chay lenh sau de tao database (CHI CAN TAO DATABASE,
+   KHONG CAN TAO BANG — file schema.sql hoac Hibernate se tu lo):
+
+      CREATE DATABASE IF NOT EXISTS movie_app_db
+      CHARACTER SET utf8mb4
+      COLLATE utf8mb4_unicode_ci;
+
+   [TUY CHON] Neu muon tao bang ngay voi du lieu mau co san,
+   chay them file script:
+      animevn-db/schema.sql
+   (file nay da co san trong workspace cung voi project nay)
+
+3. Kiem tra lai cau hinh trong:
+      src/main/resources/application.properties
+
+   Dam bao cac thong so nay dung voi MySQL tren may ban:
+      spring.datasource.username = root
+      spring.datasource.password = 123456   <-- DOI THANH MAT KHAU MYSQL CUA BAN neu khac
+
+
+BUOC 2: CAU HINH FIREBASE AUTHENTICATION
+-----------------------------------------
+1. Truy cap Firebase Console: https://console.firebase.google.com
+2. Vao du an cua ban > Project Settings > Service Accounts
+3. Bam "Generate new private key" -> tai ve file .json
+4. Doi ten file thanh: firebase-service-account.json
+5. Thay the file template o:
+      src/main/resources/firebase-service-account.json
+   bang noi dung file .json vua tai ve.
+
+   [LUU Y] File nay chua thong tin bi mat, TUYET DOI KHONG
+   commit len Git. Da co san .gitignore mau de bo qua file nay.
+
+
+BUOC 3: MO PROJECT BANG IDE
+-----------------------------
+IntelliJ IDEA (khuyen dung):
+  1. Mo IntelliJ IDEA
+  2. File > Open > Chon thu muc: backend/
+  3. Doi IntelliJ load xong Maven (thay bieu tuong xoay o goc duoi phai)
+  4. IntelliJ se tu dong tai ve tat ca dependencies trong pom.xml
+
+Eclipse / Spring Tool Suite:
+  1. File > Import > Maven > Existing Maven Projects
+  2. Browse den thu muc: backend/
+  3. Finish
+
+
+BUOC 4: CHAY UNG DUNG
+-----------------------
+Cach 1 — Dung IDE (don gian nhat):
+  > Mo file: MovieAppServerApplication.java
+  > Bam nut [Run] (tam giac mau xanh) hoac nhan Shift+F10
+  > Doi den khi Console hien thi dong:
+      "Started MovieAppServerApplication in X.XXX seconds"
+  > Server da chay tai: http://localhost:8080
+
+Cach 2 — Dung Terminal / CMD:
+  > Di chuyen vao thu muc backend/
+  > Chay lenh:
+      mvn spring-boot:run
+
+
+HIBERNATE TU DONG MAP ENTITY -> BANG MySQL
+-------------------------------------------
+Nho cai dat trong application.properties:
+
+    spring.jpa.hibernate.ddl-auto=update
+
+Khi ung dung khoi dong:
+  - Neu bang CHUA TON TAI trong DB  -> Hibernate tu dong TAO bang
+  - Neu bang DA TON TAI             -> Hibernate chi CAP NHAT cau truc
+                                       (them cot moi neu co), KHONG XOA du lieu
+  - SQL duoc in ra Console de de theo doi
+
+Khi ban them mot class @Entity moi (vi du: User.java),
+Hibernate se tu dong tao bang tuong ung trong movie_app_db.
+
+
+CAU TRUC THU MUC PROJECT
+--------------------------
+backend/
+  pom.xml                              <- Quan ly dependency (Maven)
+  HowToRun.txt                         <- File nay
+  src/
+    main/
+      java/com/example/movie_app_server/
+        MovieAppServerApplication.java <- Diem khoi chay chinh
+        config/                        <- @Configuration (Firebase, CORS, Security...)
+        controller/                    <- @RestController (API endpoints)
+        service/                       <- @Service (xu ly logic nghiep vu)
+        repository/                    <- JpaRepository (truy van database)
+        entity/                        <- @Entity (anh xa bang MySQL)
+          enums/                       <- Enum dung trong Entity
+      resources/
+        application.properties         <- Cau hinh app + ket noi DB
+        firebase-service-account.json  <- Firebase credentials (TU DIEN)
+    test/
+      ...                              <- Unit test / Integration test
+
+DEPENDENCIES DA CAI SAN
+-------------------------
+  spring-boot-starter-web         REST API (HTTP, JSON)
+  spring-boot-starter-data-jpa    JPA / Hibernate (ORM, ket noi DB)
+  mysql-connector-j               Driver ket noi MySQL
+  lombok                          Giam code thua (@Getter, @Setter, @Builder...)
+  spring-boot-starter-validation  Validate request body (@NotNull, @Email...)
+  spring-boot-starter-test        JUnit 5, Mockito (testing)
+
+================================================================
