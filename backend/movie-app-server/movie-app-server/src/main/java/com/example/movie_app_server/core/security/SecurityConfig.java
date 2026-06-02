@@ -42,8 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
 
                         // 2. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)
-                        // Bắt buộc phải có Role là ADMIN mới được vào
-                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        // TODO: Tạm thời cho phép tất cả để test API TMDB không cần Frontend. Sau này sẽ bật lại .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        .requestMatchers("/api/v1/admin/**").permitAll()
 
                         // 3. CÁC API YÊU CẦU ĐĂNG NHẬP (User bình thường, ví dụ: bình luận, xem phim VIP)
                         .anyRequest().authenticated()
