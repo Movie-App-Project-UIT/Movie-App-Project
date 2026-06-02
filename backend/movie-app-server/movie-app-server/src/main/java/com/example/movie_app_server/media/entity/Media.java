@@ -53,6 +53,12 @@ public class Media {
     @Column(name = "video_url", length = 500)
     private String videoUrl;
 
+    @Column(name = "trailer_url", length = 500)
+    private String trailerUrl;
+
+    @Column(name = "duration")
+    private Integer duration;
+
     // --- MỐI QUAN HỆ DANH MỤC ---
 
     @ManyToOne(fetch = FetchType.LAZY)
