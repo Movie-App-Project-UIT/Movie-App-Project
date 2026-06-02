@@ -1,0 +1,7 @@
+Tải MySql và setup trước (Đặt username & pass = root)
+Vào đường dẫn File -> Run -> Edit Config -> Modify Options -> Environment Variables (Tick có)
+t sẽ gửi 1 file text chứa các biến trong đó
+Copy rồi đưa vào cái TextField chỗ Environment Variables nhấn Apply Ok
+Sau đó tạo 1 file đặt tên là firebase-service-account.json ở mục src/main/resources
+T sẽ gửi phần Json để copy vào file
+Xong rồi thì chạy server, các thuộc tính sẽ tự tạo trong MySQL
