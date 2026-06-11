@@ -90,11 +90,8 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Bạn vừa bấm Quên mật khẩu", Toast.LENGTH_SHORT).show();
-
-                // TODO: Sau này bạn tạo xong màn hình Quên Mật Khẩu thì mở ngoặc đoạn này ra để chuyển trang
-                // Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-                // startActivity(intent);
+                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -102,10 +99,6 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Hiển thị thông báo test
-                Toast.makeText(LoginActivity.this, "Bạn vừa bấm Đăng ký", Toast.LENGTH_SHORT).show();
-
-
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
             }
