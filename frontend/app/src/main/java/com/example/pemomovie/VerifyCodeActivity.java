@@ -37,8 +37,35 @@ public class VerifyCodeActivity extends AppCompatActivity {
                     return;
                 }
 
-                Intent intent = new Intent(VerifyCodeActivity.this, NewPasswordActivity.class);
-                startActivity(intent);
+                String email = getIntent().getStringExtra("email");
+                if (email == null) {
+                    Toast.makeText(VerifyCodeActivity.this, "Lỗi: Không tìm thấy email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                btnVerify.setEnabled(false);
+                com.example.pemomovie.api.ApiClient.getApiService().verifyCode(new com.example.pemomovie.dto.VerifyCodeRequest(email, otp))
+                        .enqueue(new retrofit2.Callback<com.example.pemomovie.dto.MessageResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.example.pemomovie.dto.MessageResponse> call, retrofit2.Response<com.example.pemomovie.dto.MessageResponse> response) {
+                                btnVerify.setEnabled(true);
+                                if (response.isSuccessful()) {
+                                    Intent intent = new Intent(VerifyCodeActivity.this, NewPasswordActivity.class);
+                                    intent.putExtra("email", email);
+                                    intent.putExtra("code", otp);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(VerifyCodeActivity.this, "Mã xác thực không đúng!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(retrofit2.Call<com.example.pemomovie.dto.MessageResponse> call, Throwable t) {
+                                btnVerify.setEnabled(true);
+                                Toast.makeText(VerifyCodeActivity.this, "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
         tvResend.setOnClickListener(new View.OnClickListener() {
