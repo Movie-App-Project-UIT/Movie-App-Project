@@ -50,7 +50,8 @@ public class TmdbService {
             return existingMedia.get(); // Nếu có rồi thì trả về luôn, hoặc có thể code thêm logic update
         }
 
-        String url = tmdbBaseUrl + "/movie/" + tmdbId + "?language=vi-VN&append_to_response=credits,videos";
+        // Bổ sung &include_video_language=vi,en,null
+        String url = tmdbBaseUrl + "/movie/" + tmdbId + "?language=vi-VN&append_to_response=credits,videos&include_video_language=vi,en,null";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + tmdbToken);

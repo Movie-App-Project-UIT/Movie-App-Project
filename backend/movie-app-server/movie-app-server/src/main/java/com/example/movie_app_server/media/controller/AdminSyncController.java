@@ -11,6 +11,7 @@ import com.example.movie_app_server.media.service.TmdbSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/admin/sync")
@@ -22,7 +23,7 @@ public class AdminSyncController {
     private final EpisodeRepository episodeRepository;
 
     @PostMapping("/movie")
-    public ResponseEntity<String> syncMovie(@RequestBody SyncMovieRequest request) {
+    public ResponseEntity<String> syncMovie(@Valid @RequestBody SyncMovieRequest request) {
         // UPDATED: Used the instance variable 'syncService' instead of the class name
         Media savedMedia = syncService.syncMovieFromTmdb(
                 request.getTmdbId(),
@@ -39,7 +40,7 @@ public class AdminSyncController {
     @PutMapping("/movie/{mediaId}/video")
     public ResponseEntity<String> updateMovieVideo(
             @PathVariable Long mediaId,
-            @RequestBody UpdateVideoRequest request) {
+            @Valid @RequestBody UpdateVideoRequest request) {
 
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim"));
@@ -52,7 +53,7 @@ public class AdminSyncController {
     }
 
     @PostMapping("/tv")
-    public ResponseEntity<String> syncTvSeries(@RequestBody SyncMovieRequest request) {
+    public ResponseEntity<String> syncTvSeries(@Valid @RequestBody SyncMovieRequest request) {
         Media savedMedia = syncService.syncTvSeriesFromTmdb(request.getTmdbId());
         return ResponseEntity.ok("Đã đồng bộ Phim Bộ: " + savedMedia.getTitle() + " cùng toàn bộ các Phần và Tập!");
     }
@@ -60,7 +61,7 @@ public class AdminSyncController {
     @PutMapping("/episode/{episodeId}/video")
     public ResponseEntity<String> updateEpisodeVideo(
             @PathVariable Long episodeId,
-            @RequestBody UpdateEpisodeVideoRequest request) {
+            @Valid @RequestBody UpdateEpisodeVideoRequest request) {
 
         Episode episode = episodeRepository.findById(episodeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tập phim"));

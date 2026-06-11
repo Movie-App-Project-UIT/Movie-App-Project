@@ -106,4 +106,8 @@ public class Media {
     @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Credit> credits = new ArrayList<>();
+
+    @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Subtitle> subtitles = new ArrayList<>();
 }

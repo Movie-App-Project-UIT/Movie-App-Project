@@ -1,5 +1,6 @@
 package com.example.movie_app_server.user.service;
 
+import com.example.movie_app_server.media.service.ImageKitService;
 import com.example.movie_app_server.user.dto.UserProfileDto;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.entity.enums.Role;
@@ -8,6 +9,7 @@ import com.example.movie_app_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service xử lý các nghiệp vụ liên quan đến tài khoản người dùng.
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ImageKitService imageKitService;
 
     /**
      * Hàm đồng bộ thông tin User từ Firebase xuống MySQL.
@@ -57,5 +60,21 @@ public class UserService {
         return userRepository.findByFirebaseUid(firebaseUid)
                 .map(user -> user.getRole() == Role.ADMIN || user.getTier() == Tier.PREMIUM)
                 .orElse(false);
+    }
+
+    @Transactional
+    public String updateAvatar(String firebaseUid, MultipartFile file) throws Exception {
+        // 1. Đẩy file vật lý lên ImageKit để lấy link siêu tốc
+        String newAvatarUrl = imageKitService.uploadImage(file);
+
+        // 2. Tìm tài khoản trong DB
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        // 3. Cập nhật đường link mới và lưu lại
+        user.setAvatarUrl(newAvatarUrl);
+        userRepository.save(user);
+
+        return newAvatarUrl;
     }
 }

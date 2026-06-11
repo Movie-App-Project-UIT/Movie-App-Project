@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
 /**
@@ -37,5 +39,16 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileDto> getMyProfile() {
         return ResponseEntity.ok(userService.getUserProfile(getCurrentUserUid()));
+    }
+
+    @PostMapping("/avatar")
+    public ResponseEntity<String> uploadAvatar(@RequestParam("file") MultipartFile file) throws Exception {
+        // Lấy mã Firebase UID của người đang gọi API
+        String uid = getCurrentUserUid();
+
+        // Cập nhật và lấy đường link ảnh mới trả về cho App Android hiển thị ngay lập tức
+        String newAvatarUrl = userService.updateAvatar(uid, file);
+
+        return ResponseEntity.ok(newAvatarUrl);
     }
 }

@@ -82,6 +82,14 @@ public class MediaService {
                         .build())
                 .toList();
 
+        List<com.example.movie_app_server.media.dto.SubtitleDto> subtitles = media.getSubtitles().stream()
+                .map(sub -> com.example.movie_app_server.media.dto.SubtitleDto.builder()
+                        .id(sub.getId())
+                        .language(sub.getLanguage())
+                        .fileUrl(sub.getFileUrl())
+                        .build())
+                .toList();
+
         return MediaDetailResponse.builder()
                 .id(media.getId())
                 .title(media.getTitle())
@@ -91,6 +99,7 @@ public class MediaService {
                 .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath() : null)
                 .directors(directors)
                 .cast(cast)
+                .subtitles(subtitles)
                 .build();
     }
 

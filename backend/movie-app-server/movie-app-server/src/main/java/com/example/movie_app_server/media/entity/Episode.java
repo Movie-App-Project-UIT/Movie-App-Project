@@ -52,4 +52,8 @@ public class Episode {
     @JsonIgnore
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "episode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Subtitle> subtitles = new ArrayList<>();
 }

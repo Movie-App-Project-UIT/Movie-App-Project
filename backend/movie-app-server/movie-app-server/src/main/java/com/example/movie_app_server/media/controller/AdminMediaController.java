@@ -4,9 +4,11 @@ import com.example.movie_app_server.media.entity.Media;
 import com.example.movie_app_server.media.service.TmdbService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/admin/media")
+@Slf4j
 public class AdminMediaController {
 
     private final TmdbService tmdbService;
@@ -21,7 +23,7 @@ public class AdminMediaController {
             Media media = tmdbService.fetchAndSaveMovie(tmdbId);
             return ResponseEntity.ok(media);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Lỗi khi fetch phim từ TMDB", e);
             return ResponseEntity.internalServerError().build();
         }
     }
