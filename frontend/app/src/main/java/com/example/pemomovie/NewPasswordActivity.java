@@ -31,13 +31,37 @@ public class NewPasswordActivity extends AppCompatActivity {
                     etConfirmPassword.requestFocus();
                     return;
                 }
-                Toast.makeText(NewPasswordActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
 
+                String email = getIntent().getStringExtra("email");
+                String code = getIntent().getStringExtra("code");
+                if (email == null || code == null) {
+                    Toast.makeText(NewPasswordActivity.this, "Lỗi: Dữ liệu không hợp lệ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                Intent intent = new Intent(NewPasswordActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                btnChange.setEnabled(false);
+                com.example.pemomovie.api.ApiClient.getApiService().resetPassword(new com.example.pemomovie.dto.ResetPasswordRequest(email, code, password))
+                        .enqueue(new retrofit2.Callback<com.example.pemomovie.dto.MessageResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.example.pemomovie.dto.MessageResponse> call, retrofit2.Response<com.example.pemomovie.dto.MessageResponse> response) {
+                                btnChange.setEnabled(true);
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(NewPasswordActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(NewPasswordActivity.this, LoginActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(NewPasswordActivity.this, "Đổi mật khẩu thất bại, mã có thể đã hết hạn!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
 
-                startActivity(intent);
+                            @Override
+                            public void onFailure(retrofit2.Call<com.example.pemomovie.dto.MessageResponse> call, Throwable t) {
+                                btnChange.setEnabled(true);
+                                Toast.makeText(NewPasswordActivity.this, "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
     }

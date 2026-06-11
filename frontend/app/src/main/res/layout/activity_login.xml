@@ -79,19 +79,28 @@
             android:layout_marginTop="16dp" />
 
         <!-- Ô nhập Mật khẩu -->
-        <EditText
-            android:id="@+id/etPassword"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="********"
-            android:textColorHint="#888888"
-            android:textColor="#FFFFFF"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:inputType="textPassword"
             app:layout_constraintTop_toBottomOf="@id/tvPasswordLabel"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            app:hintEnabled="false"
+            app:passwordToggleEnabled="true"
+            app:passwordToggleTint="#FFFFFF">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_input_field"
+                android:hint="********"
+                android:textColorHint="#888888"
+                android:textColor="#FFFFFF"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Hàng ngang: Nhớ mật khẩu & Quên mật khẩu -->
         <LinearLayout
@@ -100,7 +109,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/etPassword"
+            app:layout_constraintTop_toBottomOf="@id/tilPassword"
             android:layout_marginTop="16dp">
 
             <CheckBox
@@ -108,9 +117,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nhớ mật khẩu"
-                android:textColor="#999999"
+                android:textColor="#FFFFFF"
                 android:textSize="14sp"
-                android:buttonTint="#999999"/>
+                android:checked="true"
+                android:buttonTint="#814EEB"/>
 
             <!-- Một View trống đẩy 2 chữ ra 2 mép -->
             <View

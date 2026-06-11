@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 "/api/v1/lookups", "/api/v1/lookups/**",
                                 "/api/v1/reviews/media/**"
                         ).permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
                         // 2. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)

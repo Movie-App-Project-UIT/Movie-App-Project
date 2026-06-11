@@ -1,0 +1,30 @@
+package com.example.pemomovie.api;
+
+import com.example.pemomovie.dto.SyncUserRequest;
+import com.example.pemomovie.dto.UserProfileDto;
+import com.example.pemomovie.dto.EmailRequest;
+import com.example.pemomovie.dto.ResetPasswordRequest;
+import com.example.pemomovie.dto.VerifyCodeRequest;
+import com.example.pemomovie.dto.MessageResponse;
+
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+
+public interface ApiService {
+    @POST("/api/v1/users/sync")
+    Call<UserProfileDto> syncUser(@Body SyncUserRequest request);
+
+    @GET("/api/v1/users/me")
+    Call<UserProfileDto> getMyProfile();
+
+    @POST("/api/v1/auth/forgot-password")
+    Call<MessageResponse> forgotPassword(@Body EmailRequest request);
+
+    @POST("/api/v1/auth/verify-code")
+    Call<MessageResponse> verifyCode(@Body VerifyCodeRequest request);
+
+    @POST("/api/v1/auth/reset-password")
+    Call<MessageResponse> resetPassword(@Body ResetPasswordRequest request);
+}
