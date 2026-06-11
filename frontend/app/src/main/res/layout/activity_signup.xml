@@ -11,11 +11,9 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
-        <!-- Logo ở trên cùng -->
-        <!-- Tôi đã chỉnh kích thước logo về 120dp để có đủ chỗ trống cho 4 ô nhập liệu bên dưới -->
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="220dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:src="@drawable/logo_pemo"
             android:adjustViewBounds="true"
@@ -31,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="ĐĂNG KÝ"
             android:textColor="#FFFFFF"
-            android:textSize="36sp"
+            android:textSize="35sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/ivLogo"
             app:layout_constraintStart_toStartOf="parent"
@@ -158,7 +156,7 @@
             android:background="@drawable/bg_btn_login"
             android:text="Đăng ký"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="20dp"
             android:textStyle="bold"
             android:textAllCaps="false"
             app:layout_constraintTop_toBottomOf="@id/etConfirmPassword"
