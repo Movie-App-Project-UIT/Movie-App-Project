@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ReviewController {
 
     // API: POST /api/v1/reviews -> Đăng bình luận mới
     @PostMapping
-    public ResponseEntity<Review> postReview(@RequestBody ReviewRequestDto req) {
+    public ResponseEntity<Review> postReview(@Valid @RequestBody ReviewRequestDto req) {
         return ResponseEntity.ok(reviewService.createReview(
                 getUid(), req.getMediaId(), req.getEpisodeId(), req.getParentId(), req.getContent()));
     }

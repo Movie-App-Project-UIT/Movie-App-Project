@@ -16,4 +16,5 @@ public class MediaDetailResponse {
 
     private List<CreditDto> directors;
     private List<CreditDto> cast;
+    private List<SubtitleDto> subtitles;
 }

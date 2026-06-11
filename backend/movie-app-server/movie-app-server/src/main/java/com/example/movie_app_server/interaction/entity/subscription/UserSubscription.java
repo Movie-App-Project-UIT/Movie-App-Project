@@ -1,6 +1,6 @@
-package com.example.movie_app_server.subscription.entity;
+package com.example.movie_app_server.interaction.entity.subscription;
 
-import com.example.movie_app_server.subscription.entity.enums.SubscriptionStatus;
+import com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus;
 import com.example.movie_app_server.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

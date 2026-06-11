@@ -1,4 +1,4 @@
-package com.example.movie_app_server.subscription.entity;
+package com.example.movie_app_server.interaction.entity.subscription;
 
 import jakarta.persistence.*;
 import lombok.*;
