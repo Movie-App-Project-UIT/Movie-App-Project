@@ -6,14 +6,14 @@
 
     <application
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PeMoMovie">
+        android:theme="@style/Theme.PeMoMovie"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.SplashActivity"
             android:exported="true">
@@ -23,26 +23,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
-
-        <activity android:name=".SignUpActivity"
-            android:exported="false"/>
-
-        <activity android:name=".ForgotPasswordActivity"
-            android:exported="false"/>
-
-        <activity android:name=".VerifyCodeActivity"
-            android:exported="false"/>
-
-        <activity android:name=".NewPasswordActivity"
-            android:exported="false"/>
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VerifyCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NewPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
