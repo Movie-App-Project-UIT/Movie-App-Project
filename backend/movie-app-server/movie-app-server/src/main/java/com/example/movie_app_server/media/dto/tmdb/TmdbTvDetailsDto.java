@@ -23,6 +23,12 @@ public class TmdbTvDetailsDto {
     private Float voteAverage;
 
     private List<TmdbSeasonBasicDto> seasons; // Chứa danh sách các phần
+    private TmdbVideosDto videos;
+
+    private java.util.List<TmdbGenreResponseDto.TmdbGenreDto> genres;
+
+    @JsonProperty("production_countries")
+    private java.util.List<TmdbMovieDetailsDto.TmdbProductionCountryDto> productionCountries;
 
     @Data
     public static class TmdbSeasonBasicDto {

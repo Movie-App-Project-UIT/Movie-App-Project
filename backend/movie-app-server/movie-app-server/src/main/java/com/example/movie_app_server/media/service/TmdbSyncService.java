@@ -27,6 +27,8 @@ public class TmdbSyncService {
 
     private final TmdbClient tmdbClient;
     private final MediaRepository mediaRepository;
+    private final com.example.movie_app_server.media.repository.GenreRepository genreRepository;
+    private final com.example.movie_app_server.media.repository.CountryRepository countryRepository;
 
     @Transactional
     // UPDATED: Added videoUrl and isPremium parameters
@@ -37,6 +39,15 @@ public class TmdbSyncService {
 
         TmdbMovieDetailsDto movieDto = tmdbClient.getMovieDetails(tmdbId);
         TmdbCreditsResponseDto creditsDto = tmdbClient.getMovieCredits(tmdbId);
+
+        String trailerUrl = null;
+        if (movieDto.getVideos() != null && movieDto.getVideos().getResults() != null) {
+            trailerUrl = movieDto.getVideos().getResults().stream()
+                    .filter(v -> "YouTube".equals(v.getSite()) && "Trailer".equals(v.getType()))
+                    .findFirst()
+                    .map(v -> "https://www.youtube.com/embed/" + v.getKey())
+                    .orElse(null);
+        }
 
         Media media = Media.builder()
                 .tmdbId(movieDto.getId())
@@ -49,8 +60,22 @@ public class TmdbSyncService {
                 .voteAverage(movieDto.getVoteAverage())
                 .mediaType(MediaType.MOVIE)
                 .videoUrl(videoUrl) // UPDATED: Apply videoUrl
+                .trailerUrl(trailerUrl) // Thêm trailerUrl
                 .isPremium(isPremium) // UPDATED: Apply isPremium
                 .build();
+
+        // Map Genres
+        if (movieDto.getGenres() != null) {
+            for (var gDto : movieDto.getGenres()) {
+                genreRepository.findByTmdbGenreId(gDto.getId()).ifPresent(media.getGenres()::add);
+            }
+        }
+
+        // Map Country
+        if (movieDto.getProductionCountries() != null && !movieDto.getProductionCountries().isEmpty()) {
+            var firstCountry = movieDto.getProductionCountries().get(0);
+            countryRepository.findByIsoCode(firstCountry.getIso31661()).ifPresent(media::setCountry);
+        }
 
         List<Credit> creditEntities = new ArrayList<>();
 
@@ -92,6 +117,15 @@ public class TmdbSyncService {
         TmdbTvDetailsDto tvDto = tmdbClient.getTvDetails(tmdbId);
         TmdbCreditsResponseDto creditsDto = tmdbClient.getTvCredits(tmdbId);
 
+        String trailerUrl = null;
+        if (tvDto.getVideos() != null && tvDto.getVideos().getResults() != null) {
+            trailerUrl = tvDto.getVideos().getResults().stream()
+                    .filter(v -> "YouTube".equals(v.getSite()) && "Trailer".equals(v.getType()))
+                    .findFirst()
+                    .map(v -> "https://www.youtube.com/embed/" + v.getKey())
+                    .orElse(null);
+        }
+
         Media media = Media.builder()
                 .tmdbId(tvDto.getId())
                 .title(tvDto.getName())
@@ -102,8 +136,22 @@ public class TmdbSyncService {
                         ? LocalDate.parse(tvDto.getFirstAirDate()) : null)
                 .voteAverage(tvDto.getVoteAverage())
                 .mediaType(MediaType.TV_SERIES)
+                .trailerUrl(trailerUrl) // Thêm trailerUrl
                 .isPremium(false)
                 .build();
+
+        // Map Genres
+        if (tvDto.getGenres() != null) {
+            for (var gDto : tvDto.getGenres()) {
+                genreRepository.findByTmdbGenreId(gDto.getId()).ifPresent(media.getGenres()::add);
+            }
+        }
+
+        // Map Country
+        if (tvDto.getProductionCountries() != null && !tvDto.getProductionCountries().isEmpty()) {
+            var firstCountry = tvDto.getProductionCountries().get(0);
+            countryRepository.findByIsoCode(firstCountry.getIso31661()).ifPresent(media::setCountry);
+        }
 
         List<Credit> creditEntities = new ArrayList<>();
         if (creditsDto.getCrew() != null) {

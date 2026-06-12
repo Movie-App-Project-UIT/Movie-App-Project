@@ -20,4 +20,18 @@ public class TmdbMovieDetailsDto {
 
     @JsonProperty("vote_average")
     private Float voteAverage;
+
+    private TmdbVideosDto videos;
+
+    private java.util.List<TmdbGenreResponseDto.TmdbGenreDto> genres;
+
+    @JsonProperty("production_countries")
+    private java.util.List<TmdbProductionCountryDto> productionCountries;
+
+    @Data
+    public static class TmdbProductionCountryDto {
+        @JsonProperty("iso_3166_1")
+        private String iso31661;
+        private String name;
+    }
 }
