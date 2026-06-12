@@ -35,7 +35,7 @@ public class TmdbClient {
 
     // 1. Gọi API lấy chi tiết phim (Đã bỏ đoạn ?api_key=...)
     public TmdbMovieDetailsDto getMovieDetails(Integer tmdbId) {
-        String url = baseUrl + "/movie/" + tmdbId + "?language=vi-VN";
+        String url = baseUrl + "/movie/" + tmdbId + "?language=vi-VN&append_to_response=videos&include_video_language=vi,en";
 
         ResponseEntity<TmdbMovieDetailsDto> response = restTemplate.exchange(
                 url,
@@ -62,7 +62,7 @@ public class TmdbClient {
     // --- CÁC HÀM CÀO PHIM BỘ (TV SERIES) ---
 
     public TmdbTvDetailsDto getTvDetails(Integer tmdbId) {
-        String url = baseUrl + "/tv/" + tmdbId + "?language=vi-VN";
+        String url = baseUrl + "/tv/" + tmdbId + "?language=vi-VN&append_to_response=videos&include_video_language=vi,en";
         return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), TmdbTvDetailsDto.class).getBody();
     }
 
@@ -75,5 +75,22 @@ public class TmdbClient {
     public TmdbSeasonDetailsDto getSeasonDetails(Integer tmdbId, Integer seasonNumber) {
         String url = baseUrl + "/tv/" + tmdbId + "/season/" + seasonNumber + "?language=vi-VN";
         return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), TmdbSeasonDetailsDto.class).getBody();
+    }
+
+    // --- CÁC HÀM CÀO CONFIGURATION (GENRE, COUNTRY) ---
+
+    public com.example.movie_app_server.media.dto.tmdb.TmdbGenreResponseDto getMovieGenres() {
+        String url = baseUrl + "/genre/movie/list?language=vi-VN";
+        return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), com.example.movie_app_server.media.dto.tmdb.TmdbGenreResponseDto.class).getBody();
+    }
+
+    public com.example.movie_app_server.media.dto.tmdb.TmdbGenreResponseDto getTvGenres() {
+        String url = baseUrl + "/genre/tv/list?language=vi-VN";
+        return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), com.example.movie_app_server.media.dto.tmdb.TmdbGenreResponseDto.class).getBody();
+    }
+
+    public com.example.movie_app_server.media.dto.tmdb.TmdbCountryDto[] getCountries() {
+        String url = baseUrl + "/configuration/countries?language=vi-VN";
+        return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), com.example.movie_app_server.media.dto.tmdb.TmdbCountryDto[].class).getBody();
     }
 }

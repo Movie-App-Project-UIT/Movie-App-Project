@@ -15,4 +15,7 @@ public class Country {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
+
+    @Column(name = "iso_code", unique = true, length = 10)
+    private String isoCode;
 }
