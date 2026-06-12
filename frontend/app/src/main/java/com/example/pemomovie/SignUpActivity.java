@@ -2,12 +2,21 @@ package com.example.pemomovie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.dto.SyncUserRequest;
+import com.example.pemomovie.dto.UserProfileDto;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -67,17 +76,71 @@ public class SignUpActivity extends AppCompatActivity {
 
             Toast.makeText(SignUpActivity.this, "Đang xử lý...", Toast.LENGTH_SHORT).show();
 
+            Log.d("SignUpActivity", "Bắt đầu đăng ký Firebase cho email: " + email);
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(SignUpActivity.this, "Lỗi đăng ký: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.d("SignUpActivity", "Đăng ký Firebase thành công! UID: " + mAuth.getCurrentUser().getUid());
+
+                            // Gọi hàm đồng bộ thông tin tài khoản xuống MySQL Database ngay lập tức
+                            syncUserWithBackend(email, username, "");
+                        }
+                        else {
+                            Exception exception = task.getException();
+                            String errMsg = exception != null ? exception.getMessage() : "Lỗi không xác định";
+                            Log.e("SignUpActivity", "Đăng ký thất bại: " + errMsg, exception);
+                            
+                            String vietnameseErrMsg = errMsg;
+                            if (errMsg.contains("already in use") || errMsg.contains("collision")) {
+                                vietnameseErrMsg = "Địa chỉ email này đã được đăng ký bởi một tài khoản khác!";
+                            } else if (errMsg.contains("network") || errMsg.contains("timeout")) {
+                                vietnameseErrMsg = "Kết nối mạng thất bại. Vui lòng kiểm tra internet của máy ảo.";
+                            }
+                            
+                            showErrorDialog(vietnameseErrMsg);
                         }
                     });
         });
     }
+
+    private void showSuccessDialog(String message) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Thành công")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void showErrorDialog(String message) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Lỗi đăng ký")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void syncUserWithBackend(String email, String username, String avatarUrl) {
+        SyncUserRequest request = new SyncUserRequest(email, username, avatarUrl);
+        ApiClient.getApiService().syncUser(request).enqueue(new Callback<UserProfileDto>() {
+            @Override
+            public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                if (response.isSuccessful()) {
+                    showSuccessDialog("Đăng ký tài khoản thành công!");
+                } else {
+                    showErrorDialog("Đồng bộ dữ liệu máy chủ thất bại: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileDto> call, Throwable t) {
+                showErrorDialog("Lỗi kết nối máy chủ: " + t.getMessage());
+            }
+        });
+    }
+
 }
