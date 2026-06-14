@@ -1,4 +1,4 @@
-package com.example.pemomovie;
+package com.example.pemomovie.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.pemomovie.utils.NavigationHelper;
+import com.example.pemomovie.R;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -37,13 +40,7 @@ public class HomeActivity extends AppCompatActivity {
         movieTitle = findViewById(R.id.movieTitle);
         handler = new Handler(Looper.getMainLooper());
 
-        addBounceEffect(findViewById(R.id.btnPlay));
-        addBounceEffect(findViewById(R.id.btnDetail));
-
-        addBounceEffect(findViewById(R.id.btnHome));
-        addBounceEffect(findViewById(R.id.btnGenres));
-        addBounceEffect(findViewById(R.id.btnFavorites));
-        addBounceEffect(findViewById(R.id.btnWatching));
+        NavigationHelper.setupBottomNavigation(this);
 
         Button btnPlay = findViewById(R.id.btnPlay);
         Button btnDetail = findViewById(R.id.btnDetail);
@@ -54,16 +51,5 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void addBounceEffect(View button) {
-        button.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                v.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).start();
-            } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                v.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
-                v.setSelected(true);
-            }
-            return false;
-        });
-    }
 
 }

@@ -1,4 +1,4 @@
-package com.example.pemomovie.ui;
+package com.example.pemomovie.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pemomovie.LoginActivity;
 import com.example.pemomovie.R;
+import com.example.pemomovie.ui.auth.LoginActivity;
 
 public class SplashActivity extends AppCompatActivity {
     // Hàm onCreate là điểm bắt đầu. Bất cứ khi nào màn hình này được mở lên,

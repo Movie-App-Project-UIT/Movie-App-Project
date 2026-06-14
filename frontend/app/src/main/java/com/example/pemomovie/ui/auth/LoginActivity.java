@@ -1,17 +1,18 @@
-package com.example.pemomovie;
+package com.example.pemomovie.ui.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.pemomovie.R;
 import com.example.pemomovie.api.ApiClient;
 import com.example.pemomovie.dto.SyncUserRequest;
 import com.example.pemomovie.dto.UserProfileDto;
+import com.example.pemomovie.ui.main.HomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
