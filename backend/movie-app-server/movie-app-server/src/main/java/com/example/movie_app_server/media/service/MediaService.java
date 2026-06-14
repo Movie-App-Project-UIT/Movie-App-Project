@@ -49,13 +49,42 @@ public class MediaService {
                 .collect(Collectors.toList());
     }
 
-    // --- LOGIC LỌC PHIM (ĐÃ XÓA HÀM BỊ LẶP) ---
+    // --- LOGIC LỌC PHIM ---
     public Page<MediaItemDto> filterMedia(Long genreId, Long countryId, Long ageRatingId,
                                           Integer releaseYear, Boolean isPlayable, String mediaType, Pageable pageable) {
+        
+        java.time.LocalDate startDate = null;
+        java.time.LocalDate endDate = null;
+        if (releaseYear != null) {
+            startDate = java.time.LocalDate.of(releaseYear, 1, 1);
+            endDate = java.time.LocalDate.of(releaseYear, 12, 31);
+        }
+
         Page<Media> mediaPage = mediaRepository.filterMediaDynamically(
-                genreId, countryId, ageRatingId, releaseYear, isPlayable, mediaType, pageable);
+                genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
 
         return mediaPage.map(this::convertToItemDto);
+    }
+
+    // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
+    public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
+        List<MediaItemDto> topRated = mediaRepository.findTop10ByOrderByVoteAverageDesc().stream()
+                .map(this::convertToItemDto)
+                .collect(Collectors.toList());
+
+        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByOrderByIdDesc().stream()
+                .map(this::convertToItemDto)
+                .collect(Collectors.toList());
+
+        // Hiện tại Trending có thể mượn tạm Top Rated hoặc Recently Added cho đến khi có logic tính views
+        List<MediaItemDto> trending = recentlyAdded; 
+
+        java.util.Map<String, List<MediaItemDto>> response = new java.util.HashMap<>();
+        response.put("trending", trending);
+        response.put("topRated", topRated);
+        response.put("recentlyAdded", recentlyAdded);
+
+        return response;
     }
 
     // --- LOGIC LẤY CHI TIẾT PHIM ---

@@ -17,6 +17,9 @@ public class AuthController {
     @Autowired
     private OtpService otpService;
 
+    @Autowired
+    private com.example.movie_app_server.user.repository.UserRepository userRepository;
+
     private Map<String, String> msg(String message) {
         Map<String, String> m = new HashMap<>();
         m.put("message", message);
@@ -30,7 +33,7 @@ public class AuthController {
             // Check if user exists in Firebase
             FirebaseAuth.getInstance().getUserByEmail(email);
             // Send OTP
-            otpService.generateAndSendOtp(email);
+            otpService.sendForgotPasswordOtp(email);
             return ResponseEntity.ok(msg("Đã gửi mã xác nhận đến email!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(msg("Email không tồn tại trong hệ thống!"));
@@ -64,6 +67,62 @@ public class AuthController {
                 return ResponseEntity.ok(msg("Đổi mật khẩu thành công!"));
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body(msg("Lỗi khi cập nhật mật khẩu!"));
+            }
+        } else {
+            return ResponseEntity.badRequest().body(msg("Mã xác nhận không đúng hoặc đã hết hạn!"));
+        }
+    }
+
+    @PostMapping("/register-send-otp")
+    public ResponseEntity<Map<String, String>> registerSendOtp(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(msg("Email không được để trống!"));
+        }
+        try {
+            // Check if user exists in Firebase. If it DOES NOT throw exception -> email is already used.
+            FirebaseAuth.getInstance().getUserByEmail(email);
+            return ResponseEntity.badRequest().body(msg("Email này đã được sử dụng!"));
+        } catch (Exception e) {
+            // User does not exist, safe to send OTP
+            otpService.sendRegisterOtp(email);
+            return ResponseEntity.ok(msg("Đã gửi mã xác nhận đăng ký đến email!"));
+        }
+    }
+
+    @PostMapping("/register-with-otp")
+    public ResponseEntity<Map<String, String>> registerWithOtp(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String password = payload.get("password");
+        String code = payload.get("code");
+        String username = payload.get("username");
+
+        if (email == null || password == null || code == null) {
+            return ResponseEntity.badRequest().body(msg("Vui lòng điền đầy đủ thông tin!"));
+        }
+
+        if (otpService.verifyOtp(email, code)) {
+            try {
+                // 1. Create user in Firebase
+                com.google.firebase.auth.UserRecord.CreateRequest request = new com.google.firebase.auth.UserRecord.CreateRequest()
+                        .setEmail(email)
+                        .setPassword(password);
+                UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
+
+                // 2. Create user in local DB
+                com.example.movie_app_server.user.entity.User newUser = com.example.movie_app_server.user.entity.User.builder()
+                        .firebaseUid(userRecord.getUid())
+                        .email(email)
+                        .username(username)
+                        .build();
+                userRepository.save(newUser);
+
+                // 3. Clear OTP
+                otpService.clearOtp(email);
+
+                return ResponseEntity.ok(msg("Đăng ký tài khoản thành công!"));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(msg("Lỗi khi tạo tài khoản: " + e.getMessage()));
             }
         } else {
             return ResponseEntity.badRequest().body(msg("Mã xác nhận không đúng hoặc đã hết hạn!"));

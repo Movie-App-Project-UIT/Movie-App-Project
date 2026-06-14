@@ -8,10 +8,16 @@ import com.example.movie_app_server.media.entity.Media;
 import com.example.movie_app_server.media.repository.EpisodeRepository;
 import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.service.TmdbSyncService;
+import com.example.movie_app_server.interaction.entity.Watchlist;
+import com.example.movie_app_server.interaction.entity.enums.NotificationType;
+import com.example.movie_app_server.interaction.repository.WatchlistRepository;
+import com.example.movie_app_server.interaction.service.NotificationService;
+import com.example.movie_app_server.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/sync")
@@ -21,6 +27,8 @@ public class AdminSyncController {
     private final TmdbSyncService syncService;
     private final MediaRepository mediaRepository;
     private final EpisodeRepository episodeRepository;
+    private final NotificationService notificationService;
+    private final WatchlistRepository watchlistRepository;
 
     @PostMapping("/movie")
     public ResponseEntity<String> syncMovie(@Valid @RequestBody SyncMovieRequest request) {
@@ -68,6 +76,20 @@ public class AdminSyncController {
 
         episode.setVideoUrl(request.getVideoUrl());
         episodeRepository.save(episode);
+
+        // Bắn thông báo cho những người dùng theo dõi phim này
+        Media media = episode.getSeason().getMedia();
+        if (media != null && request.getVideoUrl() != null && !request.getVideoUrl().isEmpty()) {
+            List<User> followers = watchlistRepository.findByMediaId(media.getId()).stream()
+                    .map(Watchlist::getUser)
+                    .toList();
+            if (!followers.isEmpty()) {
+                String title = "Tập mới đã ra mắt!";
+                String message = String.format("Phim '%s' vừa cập nhật Tập %d. Xem ngay!", 
+                        media.getTitle(), episode.getEpisodeNumber());
+                notificationService.createNotificationsForUsers(followers, title, message, NotificationType.NEW_EPISODE);
+            }
+        }
 
         return ResponseEntity.ok("Đã cập nhật video cho Tập " + episode.getEpisodeNumber());
     }

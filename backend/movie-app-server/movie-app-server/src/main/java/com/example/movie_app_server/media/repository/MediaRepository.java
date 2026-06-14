@@ -22,12 +22,20 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);
 
+    // --- Homepage API Queries ---
+    // Phim được đánh giá cao nhất (Top Rated)
+    List<Media> findTop10ByOrderByVoteAverageDesc();
+
+    // Phim mới cập nhật (Recently Added)
+    List<Media> findTop10ByOrderByIdDesc();
+
     @Query("SELECT DISTINCT m FROM Media m " +
             "LEFT JOIN m.genres g " +
             "WHERE (:genreId IS NULL OR g.id = :genreId) " +
             "AND (:countryId IS NULL OR m.country.id = :countryId) " +
             "AND (:ageRatingId IS NULL OR m.ageRating.id = :ageRatingId) " +
-            "AND (:releaseYear IS NULL OR YEAR(m.releaseDate) = :releaseYear) " +
+            "AND (CAST(:startDate AS date) IS NULL OR m.releaseDate >= :startDate) " +
+            "AND (CAST(:endDate AS date) IS NULL OR m.releaseDate <= :endDate) " +
             "AND (:mediaType IS NULL OR CAST(m.mediaType AS string) = :mediaType) " + // ĐÃ THÊM DÒNG NÀY
             "AND (:isPlayable IS NULL OR " +
             "  (:isPlayable = true AND (" +
@@ -43,7 +51,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             @Param("genreId") Long genreId,
             @Param("countryId") Long countryId,
             @Param("ageRatingId") Long ageRatingId,
-            @Param("releaseYear") Integer releaseYear,
+            @Param("startDate") java.time.LocalDate startDate,
+            @Param("endDate") java.time.LocalDate endDate,
             @Param("isPlayable") Boolean isPlayable,
             @Param("mediaType") String mediaType, // ĐÃ THÊM THAM SỐ NÀY
             Pageable pageable
