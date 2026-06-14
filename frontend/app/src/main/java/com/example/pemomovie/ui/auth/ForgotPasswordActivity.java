@@ -1,4 +1,4 @@
-package com.example.pemomovie;
+package com.example.pemomovie.ui.auth;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.pemomovie.R;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
     @Override

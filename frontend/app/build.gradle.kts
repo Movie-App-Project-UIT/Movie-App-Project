@@ -70,5 +70,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     //Blur View
-    implementation("com.github.Dimezis:BlurView:2.0.6")
+    implementation("com.github.Dimezis:BlurView:version-2.0.6")
 }
