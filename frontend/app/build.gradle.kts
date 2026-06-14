@@ -68,4 +68,7 @@ dependencies {
     
     // Google Play Services Auth (for Google Sign-In)
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    //Blur View
+    implementation("com.github.Dimezis:BlurView:2.0.6")
 }

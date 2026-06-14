@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- trạng thái nhấn -->
+    <item android:state_selected="true" android:color="#D70466"/>
+    <!-- trạng thái bình thường -->
+    <item android:color="#BABABA"/>
+
+</selector>
