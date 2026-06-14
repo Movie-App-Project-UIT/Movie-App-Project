@@ -65,6 +65,15 @@ public class MediaController {
                 genreId, countryId, ageRatingId, releaseYear, isPlayable, mediaType, PageRequest.of(page, size, sort)));
     }
 
+    /**
+     * API: GET /api/v1/media/home
+     * Lấy dữ liệu cho trang chủ (Trending, Top Rated, Recently Added)
+     */
+    @GetMapping("/home")
+    public ResponseEntity<java.util.Map<String, List<MediaItemDto>>> getHomepageData() {
+        return ResponseEntity.ok(mediaService.getHomepageData());
+    }
+
     private String getUid() {
         return (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

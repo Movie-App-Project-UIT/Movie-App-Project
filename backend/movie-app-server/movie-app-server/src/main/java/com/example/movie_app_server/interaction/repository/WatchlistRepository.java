@@ -23,4 +23,7 @@ public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
 
     // Tìm bản ghi cụ thể để phục vụ chức năng xóa phim khỏi danh sách yêu thích
     Optional<Watchlist> findByUserFirebaseUidAndMediaId(String firebaseUid, Long mediaId);
+
+    // Tìm tất cả người dùng đang theo dõi một bộ phim (phục vụ chức năng Thông báo)
+    List<Watchlist> findByMediaId(Long mediaId);
 }

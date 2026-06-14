@@ -14,4 +14,10 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
     
     // Tìm gói đăng ký đang ACTIVE của user
     Optional<UserSubscription> findFirstByUserAndStatusOrderByEndDateDesc(User user, com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus status);
+
+    // Tìm các gói đăng ký đang ACTIVE và sắp hết hạn trong khoảng thời gian nhất định (phục vụ thông báo)
+    List<UserSubscription> findByStatusAndEndDateBetween(
+            com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus status,
+            java.time.LocalDateTime start,
+            java.time.LocalDateTime end);
 }
