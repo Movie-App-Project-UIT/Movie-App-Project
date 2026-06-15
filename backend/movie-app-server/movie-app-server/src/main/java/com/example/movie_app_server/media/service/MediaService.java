@@ -126,6 +126,14 @@ public class MediaService {
                 .voteAverage(media.getVoteAverage())
                 .posterUrl(media.getPosterPath() != null ? "https://image.tmdb.org/t/p/w500" + media.getPosterPath() : null)
                 .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath() : null)
+                .releaseYear(media.getReleaseDate() != null ? media.getReleaseDate().getYear() : null)
+                .isPremium(media.isPremium())
+                .mediaType(media.getMediaType() != null ? media.getMediaType().name() : null)
+                .genre(media.getGenres() != null && !media.getGenres().isEmpty() ? media.getGenres().iterator().next().getName() : "Không có")
+                .country(media.getCountry() != null ? media.getCountry().getName() : "Không có")
+                .language(media.getLanguage() != null ? media.getLanguage() : "Đang cập nhật")
+                .viewCount((int) (Math.random() * 1000) + 100) // Dummy view count
+                .duration(120) // Dummy duration since we don't have it in Media entity
                 .directors(directors)
                 .cast(cast)
                 .subtitles(subtitles)

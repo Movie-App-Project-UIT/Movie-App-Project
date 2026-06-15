@@ -34,4 +34,7 @@ public interface ApiService {
 
     @GET("/api/v1/media/home")
     Call<Map<String, List<MediaItemDto>>> getHomepageData();
+
+    @GET("/api/v1/media/{id}")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> getMediaDetail(@retrofit2.http.Path("id") Long id);
 }

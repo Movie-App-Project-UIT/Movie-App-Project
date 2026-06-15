@@ -32,8 +32,11 @@ Dự án ứng dụng xem phim với Backend viết bằng Spring Boot và Front
 ### 3. Khởi động Backend
 - Mở thư mục `backend/movie-app-server/` bằng IntelliJ IDEA hoặc Eclipse.
 - Chạy file `MovieAppServerApplication.java`.
-- Server sẽ khởi động mặc định ở cổng `8080`. Chú ý: trong lần chạy đầu tiên, hệ thống sẽ mất chút thời gian để tự động tải/tạo dữ liệu phim vào Database (do `spring.jpa.hibernate.ddl-auto=create`).
-- Khi chạy thử nếu chưa có dữ liệu thì hãy chạy như bình thường, sau đó hãy comment lại @Component trong file `MockDataSeeder.java` để không bị tạo dữ liệu giả mỗi lần restart.
+- Server sẽ khởi động mặc định ở cổng `8080`. Chú ý:
+  + Hiện tại `spring.jpa.hibernate.ddl-auto=update` nên dữ liệu sẽ KHÔNG bị mất khi khởi động lại Backend.
+  + Hệ thống đã được cấu hình tự động lấy phim từ TMDB (`TmdbDataSeeder` có quyền ưu tiên cao nhất `@Order(1)`). Nếu DB đã có phim, hệ thống sẽ bỏ qua việc tải thêm.
+  + Để lấy lại dữ liệu mới nhất (bao gồm cả ngôn ngữ, thể loại chuẩn), hãy xóa (Drop) Database `movieapp` trong MySQL rồi chạy lại Backend.
+  + Nếu kết nối mạng / VPN bình thường, phim thật từ TMDB sẽ được nạp. Nếu lỗi, `MockDataSeeder` sẽ nạp 4 phim giả để dự phòng.
 
 ---
 

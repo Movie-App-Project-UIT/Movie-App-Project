@@ -22,6 +22,9 @@ public class TmdbTvDetailsDto {
     @JsonProperty("vote_average")
     private Float voteAverage;
 
+    @JsonProperty("original_language")
+    private String originalLanguage;
+
     private List<TmdbSeasonBasicDto> seasons; // Chứa danh sách các phần
     private TmdbVideosDto videos;
 

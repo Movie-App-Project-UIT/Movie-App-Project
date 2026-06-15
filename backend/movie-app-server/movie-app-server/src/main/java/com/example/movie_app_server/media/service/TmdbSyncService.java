@@ -59,6 +59,7 @@ public class TmdbSyncService {
                         ? LocalDate.parse(movieDto.getReleaseDate()) : null)
                 .voteAverage(movieDto.getVoteAverage())
                 .mediaType(MediaType.MOVIE)
+                .language(movieDto.getOriginalLanguage() != null ? new java.util.Locale(movieDto.getOriginalLanguage()).getDisplayLanguage(new java.util.Locale("vi", "VN")) : null)
                 .videoUrl(videoUrl) // UPDATED: Apply videoUrl
                 .trailerUrl(trailerUrl) // Thêm trailerUrl
                 .isPremium(isPremium) // UPDATED: Apply isPremium
@@ -136,6 +137,7 @@ public class TmdbSyncService {
                         ? LocalDate.parse(tvDto.getFirstAirDate()) : null)
                 .voteAverage(tvDto.getVoteAverage())
                 .mediaType(MediaType.TV_SERIES)
+                .language(tvDto.getOriginalLanguage() != null ? new java.util.Locale(tvDto.getOriginalLanguage()).getDisplayLanguage(new java.util.Locale("vi", "VN")) : null)
                 .trailerUrl(trailerUrl) // Thêm trailerUrl
                 .isPremium(false)
                 .build();
