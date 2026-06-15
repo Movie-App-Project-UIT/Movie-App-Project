@@ -21,7 +21,7 @@ Dự án ứng dụng xem phim với Backend viết bằng Spring Boot và Front
 - Cấu hình tài khoản đăng nhập MySQL trong file `backend/movie-app-server/movie-app-server/src/main/resources/application.properties`:
   ```properties
   spring.datasource.username=root
-  spring.datasource.password=123456
+  spring.datasource.password=123456 hoặc tùy chỉnh mật khẩu MySQL của bạn
   ```
 
 ### 2. Dữ liệu phim (Data Seeder)
@@ -33,6 +33,7 @@ Dự án ứng dụng xem phim với Backend viết bằng Spring Boot và Front
 - Mở thư mục `backend/movie-app-server/` bằng IntelliJ IDEA hoặc Eclipse.
 - Chạy file `MovieAppServerApplication.java`.
 - Server sẽ khởi động mặc định ở cổng `8080`. Chú ý: trong lần chạy đầu tiên, hệ thống sẽ mất chút thời gian để tự động tải/tạo dữ liệu phim vào Database (do `spring.jpa.hibernate.ddl-auto=create`).
+- Khi chạy thử nếu chưa có dữ liệu thì hãy chạy như bình thường, sau đó hãy comment lại @Component trong file `MockDataSeeder.java` để không bị tạo dữ liệu giả mỗi lần restart.
 
 ---
 
