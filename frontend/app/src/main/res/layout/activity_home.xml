@@ -8,108 +8,125 @@
     android:background="#050814"
     tools:context=".ui.main.HomeActivity">
 
-    <!--Banner-->
-    <FrameLayout
-        android:id="@+id/banner"
-        android:layout_width="match_parent"
-        android:layout_height="490dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/bannerImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/yn" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/banner_overlay"/>
-
-        <!--tên phim hiển thị giữa poster-->
-        <com.example.pemomovie.custom.GlowTextView
-            android:id="@+id/movieTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your Name"
-            android:textSize="40sp"
-            android:fontFamily="@font/meddon"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="80dp"/>
-
-        <!---->
-        <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPlay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phát"
-                android:textSize="16sp"
-                app:icon="@drawable/ic_play"
-                android:background="@color/btn_p_d_selector"
-                app:iconPadding="10dp"
-                app:iconTint="@color/white"
-                android:layout_marginRight="20dp"/>
-
-            <Button
-                android:id="@+id/btnDetail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/btn_p_d_selector"
-                android:textSize="16sp"
-                android:text="Chi tiết"/>
-        </LinearLayout>
-
-        <!--Header chứa btnProfile + btnNotification-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/headerhome"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
-            <ImageButton
-                android:id="@+id/btnProfile"
-                android:src="@drawable/ic_avatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <ImageButton
-                android:id="@+id/btnNotification"
-                android:src="@drawable/ic_notification"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="20dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
-
-    <!--List section-->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sectionListHome"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="15dp"
-        app:layout_constraintTop_toBottomOf="@+id/banner"/>
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavInclude">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--Banner-->
+            <FrameLayout
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="520dp">
+
+                <ImageView
+                    android:id="@+id/bannerImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/yn" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/banner_overlay"/>
+
+                <!--tên phim hiển thị giữa poster-->
+                <com.example.pemomovie.custom.GlowTextView
+                    android:id="@+id/movieTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Name"
+                    android:textSize="40sp"
+                    android:fontFamily="@font/meddon"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="80dp"/>
+
+                <!---->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phát"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic_play"
+                        android:background="@color/btn_p_d_selector"
+                        app:iconPadding="10dp"
+                        app:iconTint="@color/white"
+                        android:layout_marginRight="20dp"/>
+
+                    <Button
+                        android:id="@+id/btnDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/btn_p_d_selector"
+                        android:textSize="16sp"
+                        android:text="Chi tiết"/>
+                </LinearLayout>
+
+                <!-- removed headerhome -->
+            </FrameLayout>
+
+            <!--List section-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/sectionListHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="20dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <!--Bottom Nav-->
     <include
+        android:id="@+id/bottomNavInclude"
         layout="@layout/layout_bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Fixed Profile Button -->
+    <ImageView
+        android:id="@+id/btnProfile"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_avatar"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="32dp"
+        android:elevation="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Fixed Notification Button -->
+    <ImageButton
+        android:id="@+id/btnNotification"
+        android:src="@drawable/ic_notification"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="32dp"
+        android:elevation="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

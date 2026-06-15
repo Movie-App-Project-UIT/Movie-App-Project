@@ -6,6 +6,10 @@ import com.example.pemomovie.dto.EmailRequest;
 import com.example.pemomovie.dto.ResetPasswordRequest;
 import com.example.pemomovie.dto.VerifyCodeRequest;
 import com.example.pemomovie.dto.MessageResponse;
+import com.example.pemomovie.dto.MediaItemDto;
+
+import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -27,4 +31,7 @@ public interface ApiService {
 
     @POST("/api/v1/auth/reset-password")
     Call<MessageResponse> resetPassword(@Body ResetPasswordRequest request);
+
+    @GET("/api/v1/media/home")
+    Call<Map<String, List<MediaItemDto>>> getHomepageData();
 }
