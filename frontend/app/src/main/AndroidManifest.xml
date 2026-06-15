@@ -53,6 +53,15 @@
             android:name=".ui.main.FavoriteActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.PlayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.main.MovieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.main.ProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

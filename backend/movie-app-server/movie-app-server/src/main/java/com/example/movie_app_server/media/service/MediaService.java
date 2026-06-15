@@ -76,8 +76,8 @@ public class MediaService {
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        // Hiện tại Trending có thể mượn tạm Top Rated hoặc Recently Added cho đến khi có logic tính views
-        List<MediaItemDto> trending = recentlyAdded; 
+        // Đổi trending thành topRated theo yêu cầu của user
+        List<MediaItemDto> trending = topRated; 
 
         java.util.Map<String, List<MediaItemDto>> response = new java.util.HashMap<>();
         response.put("trending", trending);
