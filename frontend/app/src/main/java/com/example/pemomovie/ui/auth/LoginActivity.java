@@ -124,7 +124,10 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        syncUserWithBackend(email, "", "");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "";
+                        String photo = (user != null && user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : "";
+                        syncUserWithBackend(email, name, photo);
                     } else {
                         Toast.makeText(LoginActivity.this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }

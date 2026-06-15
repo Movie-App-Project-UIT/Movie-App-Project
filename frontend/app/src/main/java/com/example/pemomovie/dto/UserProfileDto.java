@@ -1,8 +1,11 @@
 package com.example.pemomovie.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserProfileDto {
     private String id;
     private String email;
+    @SerializedName("username")
     private String name;
     private String avatarUrl;
     private boolean isPremium;
