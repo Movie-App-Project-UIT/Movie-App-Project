@@ -35,5 +35,69 @@ public class DetailActivity extends AppCompatActivity {
         txtIMDb.getPaint().setShader(textShader);
 
         com.example.pemomovie.utils.NavigationHelper.setupBottomNavigation(this);
+        
+        Long movieId = getIntent().getLongExtra("MOVIE_ID", -1);
+        if (movieId != -1) {
+            loadMovieDetails(movieId);
+        }
+    }
+
+    private void loadMovieDetails(Long movieId) {
+        com.example.pemomovie.api.ApiClient.getApiService().getMediaDetail(movieId).enqueue(new retrofit2.Callback<com.example.pemomovie.dto.MediaDetailResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.pemomovie.dto.MediaDetailResponse> call, retrofit2.Response<com.example.pemomovie.dto.MediaDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    com.example.pemomovie.dto.MediaDetailResponse detail = response.body();
+                    bindDataToUi(detail);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.example.pemomovie.dto.MediaDetailResponse> call, Throwable t) {
+                // handle error
+            }
+        });
+    }
+
+    private void bindDataToUi(com.example.pemomovie.dto.MediaDetailResponse detail) {
+        android.widget.ImageView ivBackdrop = findViewById(R.id.ivBackdrop);
+        TextView txtIMDb = findViewById(R.id.txt_IMDb);
+        TextView txtVIP = findViewById(R.id.txt_VIP);
+        TextView tvTitle = findViewById(R.id.tvTitle);
+        TextView tvYear = findViewById(R.id.tvYear);
+        TextView tvStartRanking = findViewById(R.id.tvStartRanking);
+        TextView tvDuration = findViewById(R.id.tvDuration);
+        TextView tvView = findViewById(R.id.tvView);
+        TextView tvMediaType = findViewById(R.id.tvMediaType);
+        TextView tvCountry = findViewById(R.id.tvCountry);
+        TextView tvGenre = findViewById(R.id.tvGenre);
+        TextView tvDesc = findViewById(R.id.tvDesc);
+
+        tvTitle.setText(detail.getTitle());
+        tvYear.setText(detail.getReleaseYear() != null ? String.valueOf(detail.getReleaseYear()) : "N/A");
+        tvStartRanking.setText(String.format(java.util.Locale.US, "%.1f/10", detail.getVoteAverage()));
+        txtIMDb.setText(String.format(java.util.Locale.US, "IMDb %.1f", detail.getVoteAverage()));
+        tvDuration.setText(detail.getDuration() != null ? detail.getDuration() + " phút" : "N/A");
+        tvView.setText(detail.getViewCount() != null ? detail.getViewCount() + " lượt xem" : "N/A");
+        tvMediaType.setText(detail.getGenre());
+        tvCountry.setText(detail.getCountry());
+        tvGenre.setText(detail.getLanguage());
+        tvDesc.setText(detail.getOverview());
+
+        if (detail.isPremium()) {
+            txtVIP.setVisibility(android.view.View.VISIBLE);
+        } else {
+            txtVIP.setVisibility(android.view.View.GONE);
+        }
+
+        if (detail.getBackdropUrl() != null) {
+            com.bumptech.glide.Glide.with(this)
+                    .load(detail.getBackdropUrl())
+                    .into(ivBackdrop);
+        } else if (detail.getPosterUrl() != null) {
+            com.bumptech.glide.Glide.with(this)
+                    .load(detail.getPosterUrl())
+                    .into(ivBackdrop);
+        }
     }
 }

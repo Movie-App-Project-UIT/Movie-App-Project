@@ -7,6 +7,8 @@ import com.example.movie_app_server.media.entity.Country;
 import com.example.movie_app_server.media.entity.Genre;
 import com.example.movie_app_server.media.repository.CountryRepository;
 import com.example.movie_app_server.media.repository.GenreRepository;
+import com.example.movie_app_server.media.repository.MediaRepository;
+import com.example.movie_app_server.media.service.TmdbSyncService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -15,7 +17,10 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.core.annotation.Order;
+
 @Component
+@Order(1)
 @RequiredArgsConstructor
 @Slf4j
 public class TmdbDataSeeder implements CommandLineRunner {
@@ -23,12 +28,15 @@ public class TmdbDataSeeder implements CommandLineRunner {
     private final TmdbClient tmdbClient;
     private final GenreRepository genreRepository;
     private final CountryRepository countryRepository;
+    private final MediaRepository mediaRepository;
+    private final TmdbSyncService tmdbSyncService;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("Starting TMDB Data Seeder...");
         syncGenres();
         syncCountries();
+        syncPopularMovies();
         log.info("TMDB Data Seeder completed.");
     }
 
@@ -95,6 +103,27 @@ public class TmdbDataSeeder implements CommandLineRunner {
             log.info("Countries synced successfully.");
         } catch (Exception e) {
             log.error("Failed to sync countries from TMDB: {}", e.getMessage());
+        }
+    }
+
+    private void syncPopularMovies() {
+        if (mediaRepository.count() > 0) return;
+        try {
+            log.info("Bắt đầu tự động lấy danh sách phim phổ biến từ TMDB...");
+            var popularMovies = tmdbClient.getPopularMovies();
+            if (popularMovies != null && popularMovies.getResults() != null) {
+                for (int i = 0; i < Math.min(10, popularMovies.getResults().size()); i++) {
+                    var tmdbId = popularMovies.getResults().get(i).getId();
+                    try {
+                        tmdbSyncService.syncMovieFromTmdb(tmdbId, "https://www.w3schools.com/html/mov_bbb.mp4", false);
+                    } catch (Exception e) {
+                        log.warn("Không thể đồng bộ phim {}: {}", tmdbId, e.getMessage());
+                    }
+                }
+            }
+            log.info("Hoàn tất lấy phim phổ biến từ TMDB.");
+        } catch (Exception e) {
+            log.error("Lỗi khi cào phim phổ biến: {}", e.getMessage());
         }
     }
 }

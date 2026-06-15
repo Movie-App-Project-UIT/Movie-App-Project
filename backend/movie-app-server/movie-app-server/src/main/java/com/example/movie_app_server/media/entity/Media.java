@@ -59,6 +59,9 @@ public class Media {
     @Column(name = "duration")
     private Integer duration;
 
+    @Column(name = "language", length = 50)
+    private String language;
+
     // --- MỐI QUAN HỆ DANH MỤC ---
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -21,6 +21,9 @@ public class TmdbMovieDetailsDto {
     @JsonProperty("vote_average")
     private Float voteAverage;
 
+    @JsonProperty("original_language")
+    private String originalLanguage;
+
     private TmdbVideosDto videos;
 
     private java.util.List<TmdbGenreResponseDto.TmdbGenreDto> genres;
