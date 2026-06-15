@@ -19,6 +19,8 @@ import retrofit2.Response;
 
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class SignUpActivity extends AppCompatActivity {
     
@@ -51,7 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
             String confirmPassword = etConfirmPassword.getText().toString().trim();
 
             if (username.isEmpty()) {
-                etUsername.setError("Vui lòng nhập tên đăng nhập");
+                etUsername.setError("Vui lòng nhập tên hiển thị");
                 etUsername.requestFocus();
                 return;
             }
@@ -80,7 +82,16 @@ public class SignUpActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            Log.d("SignUpActivity", "Đăng ký Firebase thành công! UID: " + mAuth.getCurrentUser().getUid());
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d("SignUpActivity", "Đăng ký Firebase thành công! UID: " + user.getUid());
+
+                            // Cập nhật Tên hiển thị lên hệ thống Firebase
+                            if (user != null) {
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(username)
+                                        .build();
+                                user.updateProfile(profileUpdates);
+                            }
 
                             // Gọi hàm đồng bộ thông tin tài khoản xuống MySQL Database ngay lập tức
                             syncUserWithBackend(email, username, "");

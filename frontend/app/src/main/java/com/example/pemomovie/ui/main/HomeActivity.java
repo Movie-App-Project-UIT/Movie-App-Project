@@ -181,7 +181,8 @@ public class HomeActivity extends AppCompatActivity {
 
         layoutBtnProfile.setOnClickListener(v -> {
             popupWindow.dismiss();
-            Toast.makeText(HomeActivity.this, "Chức năng Hồ sơ đang được phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+            startActivity(intent);
         });
 
         layoutBtnLogout.setOnClickListener(v -> {

@@ -1,0 +1,261 @@
+package com.example.pemomovie.ui.main;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.bumptech.glide.Glide;
+import com.example.pemomovie.R;
+import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.dto.SyncUserRequest;
+import com.example.pemomovie.dto.UserProfileDto;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class EditProfileActivity extends AppCompatActivity {
+
+    private TextView txtDisplayName, txtEmail;
+    private ImageView imgAvatar;
+    
+    // Lưu tạm dữ liệu để đồng bộ API
+    private String currentEmail = "";
+    private String currentAvatarUrl = "";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_edit_profile);
+
+        // Xử lý Insets padding cho toàn bộ màn hình để không bị lẹm vào thanh điều hướng
+        View rootView = ((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        if (rootView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                // Set padding cho layout gốc: đẩy toàn bộ giao diện (kể cả nút) lên trên thanh điều hướng
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
+
+        // Ánh xạ các View hiển thị thông tin
+        txtDisplayName = findViewById(R.id.txtDisplayName);
+        txtEmail = findViewById(R.id.txtEmail);
+        imgAvatar = findViewById(R.id.imgAvatar);
+
+        // Ánh xạ các hàng để khi Click sẽ mở Bottom Sheet
+        ConstraintLayout btnEditDisplayName = findViewById(R.id.btnEditDisplayName);
+        ConstraintLayout btnChangePassword = findViewById(R.id.btnChangePassword);
+
+        if (btnEditDisplayName != null) {
+            btnEditDisplayName.setOnClickListener(v -> showEditNameDialog());
+        }
+        if (btnChangePassword != null) {
+            btnChangePassword.setOnClickListener(v -> showEditPasswordDialog());
+        }
+
+        // Bắt sự kiện nút Lưu thay đổi ở đáy màn hình
+        View btnSave = findViewById(R.id.btnSave);
+        if (btnSave != null) {
+            btnSave.setOnClickListener(v -> saveChangesToDatabase());
+        }
+
+        // Xử lý nút Back quay lại
+        ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+
+        // Bắt đầu tải dữ liệu người dùng
+        loadUserProfile();
+    }
+
+    private void saveChangesToDatabase() {
+        String newName = txtDisplayName != null ? txtDisplayName.getText().toString() : "";
+        if (newName.isEmpty() || newName.equals("User")) {
+            Toast.makeText(this, "Vui lòng cập nhật tên hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SyncUserRequest request = new SyncUserRequest(currentEmail, newName, currentAvatarUrl);
+        ApiClient.getApiService().syncUser(request).enqueue(new Callback<UserProfileDto>() {
+            @Override
+            public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                if (response.isSuccessful()) {
+                    // Cập nhật lại Tên hiển thị trên Firebase để đồng bộ với Dropdown
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        com.google.firebase.auth.UserProfileChangeRequest profileUpdates = new com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                                .setDisplayName(newName)
+                                .build();
+                        user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+                            Toast.makeText(EditProfileActivity.this, "Đã lưu thay đổi hồ sơ", Toast.LENGTH_SHORT).show();
+                            finish(); // Trở về màn hình trước (ProfileActivity)
+                        });
+                    } else {
+                        Toast.makeText(EditProfileActivity.this, "Đã lưu thay đổi hồ sơ", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Không thể lưu hồ sơ", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileDto> call, Throwable t) {
+                Toast.makeText(EditProfileActivity.this, "Lỗi kết nối máy chủ: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadUserProfile() {
+        ApiClient.getApiService().getMyProfile().enqueue(new Callback<UserProfileDto>() {
+            @Override
+            public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserProfileDto profile = response.body();
+
+                    if (txtDisplayName != null) {
+                        String name = profile.getName();
+                        if (name == null || name.trim().isEmpty()) {
+                            txtDisplayName.setText("User");
+                        } else {
+                            txtDisplayName.setText(name);
+                        }
+                    }
+
+                    if (txtEmail != null && profile.getEmail() != null) {
+                        currentEmail = profile.getEmail();
+                        txtEmail.setText(profile.getEmail());
+                    }
+
+                    if (imgAvatar != null && profile.getAvatarUrl() != null && !profile.getAvatarUrl().isEmpty()) {
+                        currentAvatarUrl = profile.getAvatarUrl();
+                        Glide.with(EditProfileActivity.this)
+                                .load(profile.getAvatarUrl())
+                                .placeholder(R.drawable.ic_avatar)
+                                .into(imgAvatar);
+                    }
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Không thể tải thông tin hồ sơ", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileDto> call, Throwable t) {
+                Toast.makeText(EditProfileActivity.this, "Lỗi kết nối máy chủ: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 1. Hiển thị Bottom Sheet đổi Tên hiển thị
+    private void showEditNameDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
+        View view = getLayoutInflater().inflate(R.layout.layout_bottom_sheet_edit_name, null);
+        dialog.setContentView(view);
+
+        // Khắc phục lỗi lọt màu nền chính ở đáy (thanh điều hướng)
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setNavigationBarColor(Color.parseColor("#0F1221"));
+        }
+
+        EditText edtDisplayName = view.findViewById(R.id.edtDisplayName);
+        if (txtDisplayName != null) {
+            edtDisplayName.setText(txtDisplayName.getText().toString());
+        }
+
+        view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnSubmitName).setOnClickListener(v -> {
+            String newName = edtDisplayName.getText().toString().trim();
+            if (!newName.isEmpty()) {
+                if (txtDisplayName != null) {
+                    txtDisplayName.setText(newName);
+                }
+                Toast.makeText(this, "Đã lưu tên hiển thị", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(this, "Vui lòng nhập tên hiển thị", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+    // 2. Hiển thị Bottom Sheet đổi Mật khẩu
+    private void showEditPasswordDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
+        View view = getLayoutInflater().inflate(R.layout.layout_bottom_sheet_edit_password, null);
+        dialog.setContentView(view);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setNavigationBarColor(Color.parseColor("#0F1221"));
+        }
+
+        EditText edtCurrentPassword = view.findViewById(R.id.edtCurrentPassword);
+        EditText edtNewPassword = view.findViewById(R.id.edtNewPassword);
+        EditText edtConfirmPassword = view.findViewById(R.id.edtConfirmPassword);
+
+        view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnSubmitPassword).setOnClickListener(v -> {
+            String currentPw = edtCurrentPassword.getText().toString();
+            String newPw = edtNewPassword.getText().toString();
+            String confirmPw = edtConfirmPassword.getText().toString();
+
+            if (currentPw.isEmpty() || newPw.isEmpty() || confirmPw.isEmpty()) {
+                Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPw.equals(confirmPw)) {
+                Toast.makeText(this, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Gọi Firebase Auth để đổi mật khẩu
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getEmail() != null) {
+                // 1. Xác thực lại (Re-authenticate) bằng mật khẩu hiện tại
+                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPw);
+
+                user.reauthenticate(credential).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // 2. Xác thực thành công, tiến hành đổi mật khẩu mới
+                        user.updatePassword(newPw).addOnCompleteListener(updateTask -> {
+                            if (updateTask.isSuccessful()) {
+                                Toast.makeText(this, "Đã cập nhật mật khẩu mới thành công", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(this, "Lỗi khi cập nhật mật khẩu: " + updateTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        // Xác thực thất bại (mật khẩu hiện tại sai)
+                        Toast.makeText(this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Lỗi xác thực: Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+}
