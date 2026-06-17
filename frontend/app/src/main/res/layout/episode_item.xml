@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btnEpisode"
+    android:layout_width="100dp"
+    android:layout_height="40dp"
+    android:text="Tập 1"
+    android:textColor="@color/white"
+    android:background="@drawable/bg_episode_btn" />

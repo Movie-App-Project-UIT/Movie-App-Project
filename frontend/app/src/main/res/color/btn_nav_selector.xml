@@ -3,6 +3,7 @@
 
     <!-- trạng thái nhấn -->
     <item android:state_selected="true" android:color="#D70466"/>
+    <item android:state_pressed="true" android:color="#D70466"/>
     <!-- trạng thái bình thường -->
     <item android:color="#BABABA"/>
 
