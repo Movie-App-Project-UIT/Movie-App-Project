@@ -1,11 +1,13 @@
 package com.example.movie_app_server.media.service;
 
 import com.example.movie_app_server.common.exception.AppException;
-import com.example.movie_app_server.media.dto.CreditDto;
-import com.example.movie_app_server.media.dto.MediaDetailResponse;
-import com.example.movie_app_server.media.dto.MediaItemDto;
+import com.example.movie_app_server.media.dto.*;
+import com.example.movie_app_server.media.entity.Episode;
 import com.example.movie_app_server.media.entity.Media;
+import com.example.movie_app_server.media.entity.Season;
+import com.example.movie_app_server.media.repository.EpisodeRepository;
 import com.example.movie_app_server.media.repository.MediaRepository;
+import com.example.movie_app_server.media.repository.SeasonRepository;
 import com.example.movie_app_server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class MediaService {
 
     private final MediaRepository mediaRepository;
+    private final SeasonRepository seasonRepository;
+    private final EpisodeRepository episodeRepository;
     private final UserService userService;
 
     // --- HÀM TIỆN ÍCH DÙNG CHUNG ---
@@ -76,8 +80,17 @@ public class MediaService {
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        // Hiện tại Trending có thể mượn tạm Top Rated hoặc Recently Added cho đến khi có logic tính views
-        List<MediaItemDto> trending = recentlyAdded; 
+        // Lấy danh sách Trending: top 10 phim được xem nhiều nhất trong 7 ngày qua
+        List<MediaItemDto> trending = mediaRepository
+                .findTrendingMedia(java.time.LocalDateTime.now().minusDays(7), org.springframework.data.domain.PageRequest.of(0, 10))
+                .stream()
+                .map(this::convertToItemDto)
+                .collect(Collectors.toList());
+
+        // Nếu hệ thống mới chạy chưa có lượt xem nào → dùng danh sách Mới thêm gần đây làm mặc định
+        if (trending.isEmpty()) {
+            trending = recentlyAdded;
+        }
 
         java.util.Map<String, List<MediaItemDto>> response = new java.util.HashMap<>();
         response.put("trending", trending);
@@ -111,12 +124,22 @@ public class MediaService {
                         .build())
                 .toList();
 
-        List<com.example.movie_app_server.media.dto.SubtitleDto> subtitles = media.getSubtitles().stream()
-                .map(sub -> com.example.movie_app_server.media.dto.SubtitleDto.builder()
+        List<SubtitleDto> subtitles = media.getSubtitles().stream()
+                .map(sub -> SubtitleDto.builder()
                         .id(sub.getId())
                         .language(sub.getLanguage())
                         .fileUrl(sub.getFileUrl())
                         .build())
+                .toList();
+
+        // Chuyển đổi danh sách thể loại thành List<String> tên thể loại
+        List<String> genreNames = media.getGenres().stream()
+                .map(g -> g.getName())
+                .toList();
+
+        // Chuyển đổi danh sách Seasons (kèm Episodes) cho phim bộ
+        List<SeasonDto> seasonDtos = media.getSeasons().stream()
+                .map(this::convertToSeasonDto)
                 .toList();
 
         return MediaDetailResponse.builder()
@@ -126,9 +149,17 @@ public class MediaService {
                 .voteAverage(media.getVoteAverage())
                 .posterUrl(media.getPosterPath() != null ? "https://image.tmdb.org/t/p/w500" + media.getPosterPath() : null)
                 .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath() : null)
+                .releaseDate(media.getReleaseDate())
+                .mediaType(media.getMediaType().name())
+                .isPremium(media.isPremium())
+                .trailerUrl(media.getTrailerUrl())
+                .duration(media.getDuration())
+                .countryName(media.getCountry() != null ? media.getCountry().getName() : null)
+                .genres(genreNames)
                 .directors(directors)
                 .cast(cast)
                 .subtitles(subtitles)
+                .seasons(seasonDtos)
                 .build();
     }
 
@@ -148,5 +179,74 @@ public class MediaService {
         }
 
         return media.getVideoUrl();
+    }
+
+    // --- LOGIC LẤY DANH SÁCH SEASONS ---
+    public List<SeasonDto> getSeasonsByMediaId(Long mediaId) {
+        // Kiểm tra phim có tồn tại không
+        if (!mediaRepository.existsById(mediaId)) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
+        return seasonRepository.findByMediaIdOrderBySeasonNumberAsc(mediaId).stream()
+                .map(this::convertToSeasonDto)
+                .toList();
+    }
+
+    public SeasonDto getSeasonById(Long seasonId) {
+        Season season = seasonRepository.findById(seasonId)
+                .orElseThrow(() -> new AppException("Không tìm thấy phần phim", HttpStatus.NOT_FOUND));
+        return convertToSeasonDto(season);
+    }
+
+    // --- LOGIC LẤY DANH SÁCH EPISODES ---
+    public List<EpisodeDto> getEpisodesBySeasonId(Long seasonId) {
+        if (!seasonRepository.existsById(seasonId)) {
+            throw new AppException("Không tìm thấy phần phim", HttpStatus.NOT_FOUND);
+        }
+        return episodeRepository.findBySeasonIdOrderByEpisodeNumberAsc(seasonId).stream()
+                .map(this::convertToEpisodeDto)
+                .toList();
+    }
+
+    public EpisodeDto getEpisodeById(Long episodeId) {
+        Episode episode = episodeRepository.findById(episodeId)
+                .orElseThrow(() -> new AppException("Không tìm thấy tập phim", HttpStatus.NOT_FOUND));
+        return convertToEpisodeDto(episode);
+    }
+
+    // --- HÀM CHUYỂN ĐỔI DÙNG CHUNG ---
+    private SeasonDto convertToSeasonDto(Season season) {
+        List<EpisodeDto> episodeDtos = season.getEpisodes().stream()
+                .map(this::convertToEpisodeDto)
+                .toList();
+
+        return SeasonDto.builder()
+                .id(season.getId())
+                .seasonNumber(season.getSeasonNumber())
+                .title(season.getTitle())
+                .posterUrl(season.getPosterPath() != null ? "https://image.tmdb.org/t/p/w342" + season.getPosterPath() : null)
+                .episodes(episodeDtos)
+                .build();
+    }
+
+    private EpisodeDto convertToEpisodeDto(Episode episode) {
+        List<SubtitleDto> subtitleDtos = episode.getSubtitles().stream()
+                .map(sub -> SubtitleDto.builder()
+                        .id(sub.getId())
+                        .language(sub.getLanguage())
+                        .fileUrl(sub.getFileUrl())
+                        .build())
+                .toList();
+
+        return EpisodeDto.builder()
+                .id(episode.getId())
+                .episodeNumber(episode.getEpisodeNumber())
+                .title(episode.getTitle())
+                .overview(episode.getOverview())
+                .stillUrl(episode.getStillPath() != null ? "https://image.tmdb.org/t/p/w300" + episode.getStillPath() : null)
+                .duration(episode.getDuration())
+                .videoUrl(episode.getVideoUrl())
+                .subtitles(subtitleDtos)
+                .build();
     }
 }

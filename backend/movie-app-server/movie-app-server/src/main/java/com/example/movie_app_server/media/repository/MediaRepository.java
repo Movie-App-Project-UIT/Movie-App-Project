@@ -57,4 +57,11 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             @Param("mediaType") String mediaType, // ĐÃ THÊM THAM SỐ NÀY
             Pageable pageable
     );
+
+    // Lấy danh sách phim Trending (được xem nhiều nhất trong khoảng thời gian gần đây)
+    @Query("SELECT wh.media FROM WatchHistory wh " +
+            "WHERE wh.lastWatchedAt >= :since " +
+            "GROUP BY wh.media " +
+            "ORDER BY COUNT(wh) DESC")
+    List<Media> findTrendingMedia(@Param("since") java.time.LocalDateTime since, Pageable pageable);
 }
