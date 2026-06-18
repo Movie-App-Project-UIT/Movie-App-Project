@@ -46,18 +46,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp">
+        android:paddingStart="16dp"
+        android:layout_marginBottom="5dp">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:text="Mới nhất"/>
+            android:text="Mới nhất"
+            android:background="@drawable/btn_p_d_selector"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:text="Tên"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp"
+            android:background="@drawable/btn_p_d_selector"/>
     </LinearLayout>
 
     <View
@@ -82,7 +85,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginBottom="5dp">
 
         <!-- Nhập bình luận -->
         <EditText

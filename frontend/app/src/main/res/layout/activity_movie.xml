@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Tìm kiếm trên PeMo"
+                android:textSize="14sp"
                 android:background="@drawable/bg_input_field"
                 android:padding="10dp"
                 android:textColorHint="#AAAAAA"

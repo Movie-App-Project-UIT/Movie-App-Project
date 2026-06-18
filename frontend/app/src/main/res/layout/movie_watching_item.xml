@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginStart="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <!-- Poster Phim -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/posterContainer"
+            android:layout_width="130dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgMoviePoster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/yn"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/RoundedImage8" />
+
+            <!-- Lớp overlay tối màu và Nút Play ở giữa poster -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#66000000" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_play"
+                app:tint="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Chi tiết phim bên phải -->
+        <TextView
+            android:id="@+id/txtMovieName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Violet Evergarden"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginStart="12dp"
+            app:layout_constraintStart_toEndOf="@id/posterContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_3dot"
+            android:background="@android:color/transparent"
+            app:tint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/txtMovieName"
+            app:layout_constraintBottom_toBottomOf="@id/txtMovieName"/>
+
+        <TextView
+            android:id="@+id/txtEpisode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tập 1"
+            android:textColor="@color/gray_text_light"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="@id/txtMovieName"
+            app:layout_constraintTop_toBottomOf="@id/txtMovieName"/>
+
+        <!-- Progress Bar & Phần trăm -->
+        <ProgressBar
+            android:id="@+id/progressWatching"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="6dp"
+            android:max="100"
+            android:progress="70"
+            android:progressDrawable="@drawable/custom_progress_bar"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="@id/txtMovieName"
+            app:layout_constraintEnd_toStartOf="@id/txtPercentage"
+            app:layout_constraintTop_toBottomOf="@id/txtEpisode"/>
+
+        <TextView
+            android:id="@+id/txtPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="70%"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/progressWatching"
+            app:layout_constraintBottom_toBottomOf="@id/progressWatching"/>
+
+        <!-- Thời gian còn lại -->
+        <TextView
+            android:id="@+id/txtTimeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Còn 10 phút"
+            android:textColor="@color/gray_text_light"
+            android:textSize="11sp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@id/txtMovieName"
+            app:layout_constraintTop_toBottomOf="@id/progressWatching"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
