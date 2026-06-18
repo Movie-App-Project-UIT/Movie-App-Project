@@ -42,7 +42,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // 2. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)
+                        // 2. WEBHOOK THANH TOÁN (VNPay/MoMo server gọi đến, không có Firebase Token)
+                        .requestMatchers("/api/v1/payments/vnpay-ipn", "/api/v1/payments/momo-ipn", "/api/v1/payments/vnpay-return").permitAll()
+
+                        // 3. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)
                         // TODO: Tạm thời cho phép tất cả để test API TMDB không cần Frontend. Sau này sẽ bật lại .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
                         .requestMatchers("/api/v1/admin/**").permitAll()
 
