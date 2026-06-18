@@ -43,6 +43,10 @@ android {
 }
 
 dependencies {
+    implementation("androidx.activity:activity-ktx:1.8.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.material:material:1.10.0")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
@@ -64,4 +68,16 @@ dependencies {
     
     // Google Play Services Auth (for Google Sign-In)
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    //Blur View
+    implementation("com.github.Dimezis:BlurView:version-2.0.6")
+
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // ExoPlayer 
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
+    implementation("androidx.media3:media3-common:1.3.1")
+
 }

@@ -4,6 +4,7 @@ import com.example.movie_app_server.media.dto.tmdb.TmdbCreditsResponseDto;
 import com.example.movie_app_server.media.dto.tmdb.TmdbMovieDetailsDto;
 import com.example.movie_app_server.media.dto.tmdb.TmdbSeasonDetailsDto;
 import com.example.movie_app_server.media.dto.tmdb.TmdbTvDetailsDto;
+import com.example.movie_app_server.media.dto.tmdb.TmdbMovieListResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -57,6 +58,12 @@ public class TmdbClient {
                 TmdbCreditsResponseDto.class
         );
         return response.getBody();
+    }
+
+    // 3. Gọi API lấy danh sách phim phổ biến
+    public TmdbMovieListResponseDto getPopularMovies() {
+        String url = baseUrl + "/movie/popular?language=vi-VN&page=1";
+        return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), TmdbMovieListResponseDto.class).getBody();
     }
 
     // --- CÁC HÀM CÀO PHIM BỘ (TV SERIES) ---

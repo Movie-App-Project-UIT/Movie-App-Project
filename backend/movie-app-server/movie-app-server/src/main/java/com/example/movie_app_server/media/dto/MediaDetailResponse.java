@@ -15,6 +15,14 @@ public class MediaDetailResponse {
     private Float voteAverage;
     private String posterUrl;
     private String backdropUrl;
+    private Integer releaseYear;
+    private Integer duration;
+    private Integer viewCount;
+    private boolean isPremium;
+    private String mediaType;
+    private String genre;
+    private String country;
+    private String language;
 
     // --- Các trường bổ sung cho màn hình chi tiết ---
     private LocalDate releaseDate;

@@ -1,17 +1,18 @@
-package com.example.pemomovie;
+package com.example.pemomovie.ui.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.pemomovie.R;
 import com.example.pemomovie.api.ApiClient;
 import com.example.pemomovie.dto.SyncUserRequest;
 import com.example.pemomovie.dto.UserProfileDto;
+import com.example.pemomovie.ui.main.HomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -123,7 +124,10 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        syncUserWithBackend(email, "", "");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "";
+                        String photo = (user != null && user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : "";
+                        syncUserWithBackend(email, name, photo);
                     } else {
                         Toast.makeText(LoginActivity.this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
@@ -168,7 +172,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     // Chuyển hướng đến màn hình chính
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
                 } else {

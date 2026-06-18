@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="#050814">
+
+    <!-- Avatar -->
+    <ImageView
+        android:id="@+id/imgAvatarRate"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_avatar"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- Nội dung đánh giá -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Tên và ngày -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtUserNameRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AnThuy"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/txtDateRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15/6/2026"
+                android:textColor="#A0A0A0"
+                android:textSize="11sp"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
+
+        <!-- Rating sao -->
+        <RatingBar
+            android:id="@+id/ratingBarItem"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:isIndicator="true"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Nội dung bình luận -->
+        <TextView
+            android:id="@+id/txtRateComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phim hayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+</LinearLayout>

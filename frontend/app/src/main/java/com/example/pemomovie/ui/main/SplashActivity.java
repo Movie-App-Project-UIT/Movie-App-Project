@@ -1,4 +1,4 @@
-package com.example.pemomovie.ui;
+package com.example.pemomovie.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pemomovie.LoginActivity;
 import com.example.pemomovie.R;
+import com.example.pemomovie.ui.auth.LoginActivity;
 
 public class SplashActivity extends AppCompatActivity {
     // Hàm onCreate là điểm bắt đầu. Bất cứ khi nào màn hình này được mở lên,
@@ -47,17 +47,19 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 // Toàn bộ code trong khối run() này sẽ được thực thi
                 // SAU KHI đếm ngược đủ thời gian quy định ở dưới cùng.
-                // 3. Khai báo Intent (Lệnh chuyển trang)
-                // Cú pháp: Intent(Từ_Màn_Hình_Hiện_Tại.this, Sang_Màn_Hình_Mới.class)
-                // TODO: Chỗ MainActivity.class bên dưới, bạn hãy thay bằng tên màn hình bạn muốn (ví dụ LoginActivity.class)
-                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                // Kiểm tra xem người dùng đã đăng nhập chưa
+                com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                Intent intent;
+                if (currentUser != null) {
+                    // Nếu đã đăng nhập, chuyển thẳng vào HomeActivity
+                    intent = new Intent(SplashActivity.this, HomeActivity.class);
+                } else {
+                    // Nếu chưa đăng nhập, chuyển vào LoginActivity
+                    intent = new Intent(SplashActivity.this, LoginActivity.class);
+                }
 
                 // 4. Bắt đầu thực hiện lệnh chuyển trang
                 startActivity(intent);
-
-                // 5. Kết liễu (Đóng) màn hình Splash lại
-                // Tại sao phải có lệnh này? Vì nếu không có, khi người dùng vào được màn hình chính,
-                // họ bấm nút "Back" (Trở về) trên điện thoại, nó sẽ lại lùi về màn hình Splash.
                 // Hàm finish() giúp huỷ luôn màn hình Splash khỏi bộ nhớ.
                 finish();
             }

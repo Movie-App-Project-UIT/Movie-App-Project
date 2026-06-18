@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050814"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_drag_handle"/>
+    </FrameLayout>
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Đánh giá"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingStart="16dp"/>
+
+        <ImageButton
+            android:id="@+id/btnCloseRate"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_close"/>
+    </LinearLayout>
+
+    <!-- Filter -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Mới nhất"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Tên"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="#333"/>
+
+    <!-- Danh sách đánh giá -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRate"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333"/>
+
+    <!-- Khu vực nhập bình luận + đánh giá -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical">
+
+        <!-- Nhập bình luận -->
+        <EditText
+            android:id="@+id/edtRateComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập bình luận của bạn..."
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            android:background="@drawable/bg_input_field"
+            android:padding="8dp"
+            android:layout_margin="8dp"/>
+
+        <!-- Rating + nút gửi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:numStars="5"
+                android:stepSize="1"
+                android:rating="0"
+                android:progressTint="#FFD700"
+                android:secondaryProgressTint="#FFD700"
+                android:backgroundTint="#444444"
+                android:theme="@style/RatingBarTheme"
+                android:layout_marginStart="8dp"
+                android:scaleX="0.8"
+                android:scaleY="0.8"/>
+
+
+            <Button
+                android:id="@+id/btnSubmitRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gửi đánh giá"
+                android:textSize="14sp"
+                android:background="@drawable/bg_btn_login"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

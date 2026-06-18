@@ -1,4 +1,4 @@
-package com.example.pemomovie;
+package com.example.pemomovie.ui.auth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.pemomovie.R;
 
 public class VerifyCodeActivity extends AppCompatActivity {
     @Override

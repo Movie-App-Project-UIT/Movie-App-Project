@@ -6,4 +6,28 @@
     </style>
 
     <style name="Theme.PeMoMovie" parent="Base.Theme.PeMoMovie" />
+
+    <!-- Style bo tròn avatar thành hình tròn -->
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Style bo góc 8dp cho poster -->
+    <style name="RoundedImage8">
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:navigationBarColor">#0F1221</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet</item>
+    </style>
+
+    <style name="RatingBarTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorControlActivated">#FFD700</item> <!-- màu sao vàng -->
+        <item name="colorControlNormal">#555555</item>    <!-- sao chưa chọn -->
+    </style>
 </resources>
