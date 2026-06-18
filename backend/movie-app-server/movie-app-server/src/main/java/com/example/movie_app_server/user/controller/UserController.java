@@ -34,11 +34,20 @@ public class UserController {
                 getCurrentUserUid(), payload.get("email"), payload.get("username"), payload.get("avatarUrl")));
     }
 
-    // API: GET /api/v1/users/me
-    // Tác dụng: Lấy thông tin cá nhân của người đang đăng nhập (tên, avatar, gói cước VIP hay Free)
     @GetMapping("/me")
     public ResponseEntity<UserProfileDto> getMyProfile() {
         return ResponseEntity.ok(userService.getUserProfile(getCurrentUserUid()));
+    }
+
+    // API: PUT /api/v1/users/me/profile
+    // Tác dụng: Cập nhật thông tin cá nhân (hiện tại là đổi username)
+    @PutMapping("/me/profile")
+    public ResponseEntity<UserProfileDto> updateProfile(@RequestBody Map<String, String> payload) {
+        String newUsername = payload.get("username");
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(userService.updateProfile(getCurrentUserUid(), newUsername));
     }
 
     @PostMapping("/avatar")

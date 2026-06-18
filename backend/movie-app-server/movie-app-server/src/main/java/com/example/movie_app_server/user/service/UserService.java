@@ -29,14 +29,44 @@ public class UserService {
      */
     @Transactional
     public UserProfileDto syncUser(String firebaseUid, String email, String username, String avatarUrl) {
-        User user = userRepository.findByFirebaseUid(firebaseUid)
-                .orElseGet(() -> userRepository.save(User.builder()
-                        .firebaseUid(firebaseUid)
-                        .email(email)
-                        .username(username)
-                        .avatarUrl(avatarUrl)
-                        .build()));
-        return convertToProfileDto(user);
+        java.util.Optional<User> optionalUser = userRepository.findByFirebaseUid(firebaseUid);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            boolean isUpdated = false;
+            if (username != null && !username.equals(user.getUsername())) {
+                user.setUsername(username);
+                isUpdated = true;
+            }
+            if (avatarUrl != null) {
+                String cleanAvatarUrl = avatarUrl.trim();
+                if (cleanAvatarUrl.startsWith("\"") && cleanAvatarUrl.endsWith("\"")) {
+                    cleanAvatarUrl = cleanAvatarUrl.substring(1, cleanAvatarUrl.length() - 1);
+                }
+                if (!cleanAvatarUrl.equals(user.getAvatarUrl())) {
+                    user.setAvatarUrl(cleanAvatarUrl);
+                    isUpdated = true;
+                }
+            }
+            if (isUpdated) {
+                user = userRepository.save(user);
+            }
+            return convertToProfileDto(user);
+        } else {
+            String cleanAvatarUrl = avatarUrl;
+            if (cleanAvatarUrl != null) {
+                cleanAvatarUrl = cleanAvatarUrl.trim();
+                if (cleanAvatarUrl.startsWith("\"") && cleanAvatarUrl.endsWith("\"")) {
+                    cleanAvatarUrl = cleanAvatarUrl.substring(1, cleanAvatarUrl.length() - 1);
+                }
+            }
+            User newUser = userRepository.save(User.builder()
+                    .firebaseUid(firebaseUid)
+                    .email(email)
+                    .username(username)
+                    .avatarUrl(cleanAvatarUrl)
+                    .build());
+            return convertToProfileDto(newUser);
+        }
     }
 
     // Lấy toàn bộ thông tin cá nhân của User dựa vào Firebase UID
@@ -44,6 +74,15 @@ public class UserService {
         User user = userRepository.findByFirebaseUid(firebaseUid)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
         return convertToProfileDto(user);
+    }
+
+    @Transactional
+    public UserProfileDto updateProfile(String firebaseUid, String newUsername) {
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        user.setUsername(newUsername);
+        User saved = userRepository.save(user);
+        return convertToProfileDto(saved);
     }
 
     private UserProfileDto convertToProfileDto(User user) {

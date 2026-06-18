@@ -10,6 +10,7 @@ public class SeasonDto {
     private Long id;
     private Integer seasonNumber;
     private String title;
+    private String overview;
     private String posterUrl;
     private List<EpisodeDto> episodes; // Chứa danh sách các tập bên trong
 }

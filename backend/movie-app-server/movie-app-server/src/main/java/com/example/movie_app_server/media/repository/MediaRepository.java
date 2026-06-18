@@ -17,7 +17,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByMediaType(MediaType mediaType);
 
     // Tìm kiếm phim theo tiêu đề (Không phân biệt chữ hoa / chữ thường)
-    List<Media> findByTitleContainingIgnoreCase(String title);
+    List<Media> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);
@@ -57,4 +57,11 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             @Param("mediaType") String mediaType, // ĐÃ THÊM THAM SỐ NÀY
             Pageable pageable
     );
+
+    // Lấy danh sách phim Trending (được xem nhiều nhất trong khoảng thời gian gần đây)
+    @Query("SELECT wh.media FROM WatchHistory wh " +
+            "WHERE wh.lastWatchedAt >= :since " +
+            "GROUP BY wh.media " +
+            "ORDER BY COUNT(wh) DESC")
+    List<Media> findTrendingMedia(@Param("since") java.time.LocalDateTime since, Pageable pageable);
 }

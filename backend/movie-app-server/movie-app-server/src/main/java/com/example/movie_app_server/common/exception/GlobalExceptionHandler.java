@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     // 1. Xử lý các lỗi nghiệp vụ do chính chúng ta chủ động ném ra (AppException)
@@ -25,7 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception e) {
         // IN LỖI RA CONSOLE CHO DEV ĐỌC VÀ SỬA (Rất quan trọng)
-        e.printStackTrace();
+        log.error("Lỗi hệ thống không lường trước: ", e);
 
         // TRẢ VỀ CHO USER CÂU THÔNG BÁO CHUNG CHUNG (Bảo mật)
         ErrorResponse errorResponse = ErrorResponse.builder()

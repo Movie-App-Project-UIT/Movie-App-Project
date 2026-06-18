@@ -18,11 +18,19 @@ public class WatchlistService {
     private final WatchlistRepository watchlistRepo;
     private final UserRepository userRepo;
     private final MediaRepository mediaRepo;
+    private final com.example.movie_app_server.media.service.MediaService mediaService;
 
     // Lấy danh sách phim trong mục "Yêu thích" của cá nhân user
-    public List<Watchlist> getMyWatchlist(String uid) {
+    public List<com.example.movie_app_server.interaction.dto.WatchlistItemDto> getMyWatchlist(String uid) {
         User user = userRepo.findByFirebaseUid(uid).orElseThrow();
-        return watchlistRepo.findByUserIdOrderByAddedAtDesc(user.getId());
+        List<Watchlist> watchlists = watchlistRepo.findByUserIdOrderByAddedAtDesc(user.getId());
+        return watchlists.stream()
+                .map(w -> com.example.movie_app_server.interaction.dto.WatchlistItemDto.builder()
+                        .id(w.getId())
+                        .addedAt(w.getAddedAt())
+                        .media(mediaService.convertToItemDto(w.getMedia()))
+                        .build())
+                .toList();
     }
 
     /**

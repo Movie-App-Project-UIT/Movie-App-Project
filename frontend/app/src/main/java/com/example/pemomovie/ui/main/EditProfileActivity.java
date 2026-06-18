@@ -1,5 +1,15 @@
 package com.example.pemomovie.ui.main;
 
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +35,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,10 +45,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private TextView txtDisplayName, txtEmail;
     private ImageView imgAvatar;
-    
+
     // Lưu tạm dữ liệu để đồng bộ API
     private String currentEmail = "";
     private String currentAvatarUrl = "";
+    private ActivityResultLauncher<String> pickImageLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +57,19 @@ public class EditProfileActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_profile);
 
-        // Xử lý Insets padding cho toàn bộ màn hình để không bị lẹm vào thanh điều hướng
         View rootView = ((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
         if (rootView != null) {
             ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                // Set padding cho layout gốc: đẩy toàn bộ giao diện (kể cả nút) lên trên thanh điều hướng
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
                 return insets;
             });
         }
 
-        // Ánh xạ các View hiển thị thông tin
         txtDisplayName = findViewById(R.id.txtDisplayName);
         txtEmail = findViewById(R.id.txtEmail);
         imgAvatar = findViewById(R.id.imgAvatar);
 
-        // Ánh xạ các hàng để khi Click sẽ mở Bottom Sheet
         ConstraintLayout btnEditDisplayName = findViewById(R.id.btnEditDisplayName);
         ConstraintLayout btnChangePassword = findViewById(R.id.btnChangePassword);
 
@@ -84,6 +92,21 @@ public class EditProfileActivity extends AppCompatActivity {
             btnBack.setOnClickListener(v -> finish());
         }
 
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        uploadAvatarToBackend(uri);
+                    }
+                });
+
+        ImageView btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
+        if (btnChangeAvatar != null) {
+            btnChangeAvatar.setOnClickListener(v -> {
+                pickImageLauncher.launch("image/*");
+            });
+        }
+
         // Bắt đầu tải dữ liệu người dùng
         loadUserProfile();
     }
@@ -103,9 +126,12 @@ public class EditProfileActivity extends AppCompatActivity {
                     // Cập nhật lại Tên hiển thị trên Firebase để đồng bộ với Dropdown
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        com.google.firebase.auth.UserProfileChangeRequest profileUpdates = new com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                                .setDisplayName(newName)
-                                .build();
+                        UserProfileChangeRequest.Builder profileUpdatesBuilder = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(newName);
+                        if (currentAvatarUrl != null && !currentAvatarUrl.isEmpty()) {
+                            profileUpdatesBuilder.setPhotoUri(Uri.parse(currentAvatarUrl));
+                        }
+                        UserProfileChangeRequest profileUpdates = profileUpdatesBuilder.build();
                         user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
                             Toast.makeText(EditProfileActivity.this, "Đã lưu thay đổi hồ sơ", Toast.LENGTH_SHORT).show();
                             finish(); // Trở về màn hình trước (ProfileActivity)
@@ -147,12 +173,26 @@ public class EditProfileActivity extends AppCompatActivity {
                         txtEmail.setText(profile.getEmail());
                     }
 
-                    if (imgAvatar != null && profile.getAvatarUrl() != null && !profile.getAvatarUrl().isEmpty()) {
-                        currentAvatarUrl = profile.getAvatarUrl();
-                        Glide.with(EditProfileActivity.this)
-                                .load(profile.getAvatarUrl())
-                                .placeholder(R.drawable.ic_avatar)
-                                .into(imgAvatar);
+                    if (imgAvatar != null) {
+                        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().trim().isEmpty()) {
+                            String avatarUrl = profile.getAvatarUrl().trim();
+                            if (avatarUrl.startsWith("\"") && avatarUrl.endsWith("\"")) {
+                                avatarUrl = avatarUrl.substring(1, avatarUrl.length() - 1);
+                            }
+                            currentAvatarUrl = avatarUrl;
+                            int paddingPx = (int) (3 * getResources().getDisplayMetrics().density);
+                            imgAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                            imgAvatar.setBackgroundColor(Color.parseColor("#8C8E92"));
+                            Glide.with(EditProfileActivity.this)
+                                    .load(avatarUrl)
+                                    .placeholder(R.drawable.ic_avatar)
+                                    .circleCrop()
+                                    .into(imgAvatar);
+                        } else {
+                            imgAvatar.setBackgroundColor(Color.parseColor("#A7F3D0"));
+                            imgAvatar.setPadding(0, 0, 0, 0);
+                            imgAvatar.setImageResource(R.drawable.ic_avatar);
+                        }
                     }
                 } else {
                     Toast.makeText(EditProfileActivity.this, "Không thể tải thông tin hồ sơ", Toast.LENGTH_SHORT).show();
@@ -182,8 +222,8 @@ public class EditProfileActivity extends AppCompatActivity {
             edtDisplayName.setText(txtDisplayName.getText().toString());
         }
 
-        view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
-        view.findViewById(R.id.btnSubmitName).setOnClickListener(v -> {
+        findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        findViewById(R.id.btnSubmitName).setOnClickListener(v -> {
             String newName = edtDisplayName.getText().toString().trim();
             if (!newName.isEmpty()) {
                 if (txtDisplayName != null) {
@@ -258,4 +298,71 @@ public class EditProfileActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
+    private void uploadAvatarToBackend(Uri imageUri) {
+        Toast.makeText(this, "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show();
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            File tempFile = new File(getCacheDir(), "avatar_temp.jpg");
+            FileOutputStream out = new FileOutputStream(tempFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.close();
+            inputStream.close();
+
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), tempFile);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", tempFile.getName(), requestFile);
+
+            ApiClient.getApiService().uploadAvatar(body).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            String newUrl = response.body().string();
+                            if (newUrl != null) {
+                                newUrl = newUrl.trim();
+                                if (newUrl.startsWith("\"") && newUrl.endsWith("\"")) {
+                                    newUrl = newUrl.substring(1, newUrl.length() - 1);
+                                }
+                            }
+                            currentAvatarUrl = newUrl;
+                            if (imgAvatar != null) {
+                                int paddingPx = (int) (3 * getResources().getDisplayMetrics().density);
+                                imgAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                                imgAvatar.setBackgroundColor(Color.parseColor("#8C8E92"));
+                                Glide.with(EditProfileActivity.this)
+                                        .load(newUrl)
+                                        .placeholder(R.drawable.ic_avatar)
+                                        .circleCrop()
+                                        .into(imgAvatar);
+                            }
+                            Toast.makeText(EditProfileActivity.this, "Đã cập nhật ảnh đại diện!", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(EditProfileActivity.this, "Lỗi đọc URL ảnh", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        try {
+                            String errorStr = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
+                            android.util.Log.e("UploadAvatar", "Lỗi Backend: Mã " + response.code() + " - " + errorStr);
+                            Toast.makeText(EditProfileActivity.this, "Lỗi " + response.code() + ": Xem Logcat", Toast.LENGTH_LONG).show();
+                        } catch (Exception err) {
+                            err.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(EditProfileActivity.this, "Lỗi mạng khi tải ảnh", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi xử lý ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

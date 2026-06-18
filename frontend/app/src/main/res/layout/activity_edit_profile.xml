@@ -266,13 +266,15 @@
 
                             <TextView
                                 android:id="@+id/txtEmail"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="12345@gmail.com"
                                 android:textColor="@color/white"
                                 android:textSize="15sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp"/>
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:ellipsize="end"/>
                         </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
