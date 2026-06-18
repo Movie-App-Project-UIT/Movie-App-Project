@@ -76,6 +76,15 @@ public class UserService {
         return convertToProfileDto(user);
     }
 
+    @Transactional
+    public UserProfileDto updateProfile(String firebaseUid, String newUsername) {
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        user.setUsername(newUsername);
+        User saved = userRepository.save(user);
+        return convertToProfileDto(saved);
+    }
+
     private UserProfileDto convertToProfileDto(User user) {
         return UserProfileDto.builder()
                 .id(user.getId())
