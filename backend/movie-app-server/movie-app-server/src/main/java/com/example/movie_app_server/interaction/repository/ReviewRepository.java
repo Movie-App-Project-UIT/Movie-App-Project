@@ -23,4 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.media.id = :mediaId AND r.parent IS NULL ORDER BY r.createdAt DESC")
     List<Review> findRootReviewsByMediaIdWithUser(@Param("mediaId") Long mediaId);
+
+    @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.media.id = :mediaId")
+    List<Review> findAllByMediaIdWithUser(@Param("mediaId") Long mediaId);
 }

@@ -46,8 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/payments/vnpay-ipn", "/api/v1/payments/momo-ipn", "/api/v1/payments/vnpay-return").permitAll()
 
                         // 3. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)
-                        // TODO: Tạm thời cho phép tất cả để test API TMDB không cần Frontend. Sau này sẽ bật lại .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
-                        .requestMatchers("/api/v1/admin/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         // 3. CÁC API YÊU CẦU ĐĂNG NHẬP (User bình thường, ví dụ: bình luận, xem phim VIP)
                         .anyRequest().authenticated()

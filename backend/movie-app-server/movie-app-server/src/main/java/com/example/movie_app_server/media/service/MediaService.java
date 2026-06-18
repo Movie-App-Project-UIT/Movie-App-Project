@@ -45,10 +45,8 @@ public class MediaService {
     }
 
     // --- LOGIC LẤY DANH SÁCH & TÌM KIẾM ---
-    public List<MediaItemDto> searchMedia(String keyword) {
-        List<Media> mediaList = mediaRepository.findByTitleContainingIgnoreCase(keyword);
-
-        return mediaList.stream()
+    public List<MediaItemDto> searchMedia(String query) {
+        return mediaRepository.findByTitleContainingIgnoreCase(query, org.springframework.data.domain.PageRequest.of(0, 20)).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
     }
@@ -154,7 +152,9 @@ public class MediaService {
                 .isPremium(media.isPremium())
                 .trailerUrl(media.getTrailerUrl())
                 .duration(media.getDuration())
+                .language(media.getLanguage())
                 .countryName(media.getCountry() != null ? media.getCountry().getName() : null)
+                .ageRating(media.getAgeRating() != null ? media.getAgeRating().getName() : null)
                 .genres(genreNames)
                 .directors(directors)
                 .cast(cast)
@@ -224,12 +224,13 @@ public class MediaService {
                 .id(season.getId())
                 .seasonNumber(season.getSeasonNumber())
                 .title(season.getTitle())
+                .overview(season.getOverview())
                 .posterUrl(season.getPosterPath() != null ? "https://image.tmdb.org/t/p/w342" + season.getPosterPath() : null)
                 .episodes(episodeDtos)
                 .build();
     }
 
-    private EpisodeDto convertToEpisodeDto(Episode episode) {
+    public EpisodeDto convertToEpisodeDto(Episode episode) {
         List<SubtitleDto> subtitleDtos = episode.getSubtitles().stream()
                 .map(sub -> SubtitleDto.builder()
                         .id(sub.getId())
@@ -245,7 +246,7 @@ public class MediaService {
                 .overview(episode.getOverview())
                 .stillUrl(episode.getStillPath() != null ? "https://image.tmdb.org/t/p/w300" + episode.getStillPath() : null)
                 .duration(episode.getDuration())
-                .videoUrl(episode.getVideoUrl())
+                .isPlayable(episode.getVideoUrl() != null && !episode.getVideoUrl().trim().isEmpty())
                 .subtitles(subtitleDtos)
                 .build();
     }

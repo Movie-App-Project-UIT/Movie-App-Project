@@ -12,6 +12,6 @@ public class EpisodeDto {
     private String overview;
     private String stillUrl;
     private Integer duration;
-    private String videoUrl;
+    private boolean isPlayable;
     private java.util.List<SubtitleDto> subtitles;
 }

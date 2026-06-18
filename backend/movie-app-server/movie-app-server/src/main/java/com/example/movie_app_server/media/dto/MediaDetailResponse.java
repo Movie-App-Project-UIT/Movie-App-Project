@@ -15,22 +15,16 @@ public class MediaDetailResponse {
     private Float voteAverage;
     private String posterUrl;
     private String backdropUrl;
-    private Integer releaseYear;
     private Integer duration;
-    private Integer viewCount;
     private boolean isPremium;
     private String mediaType;
-    private String genre;
-    private String country;
     private String language;
 
     // --- Các trường bổ sung cho màn hình chi tiết ---
     private LocalDate releaseDate;
-    private String mediaType;       // MOVIE hoặc TV_SERIES
-    private boolean isPremium;
     private String trailerUrl;      // Link trailer YouTube (embed)
-    private Integer duration;       // Thời lượng phim (phút) - dành cho phim lẻ
     private String countryName;     // Tên quốc gia sản xuất
+    private String ageRating;       // Cảnh báo độ tuổi
     private List<String> genres;    // Danh sách tên thể loại (["Hành động", "Viễn tưởng"])
 
     private List<CreditDto> directors;

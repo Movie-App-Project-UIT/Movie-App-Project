@@ -17,7 +17,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByMediaType(MediaType mediaType);
 
     // Tìm kiếm phim theo tiêu đề (Không phân biệt chữ hoa / chữ thường)
-    List<Media> findByTitleContainingIgnoreCase(String title);
+    List<Media> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);

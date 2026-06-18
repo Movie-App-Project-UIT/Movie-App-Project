@@ -17,15 +17,17 @@ public class WatchHistoryController {
 
     private final WatchHistoryService watchHistoryService;
 
+    private String getUid() { return (String) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal(); }
+
     @PostMapping("/update")
     public ResponseEntity<?> updateHistory(@RequestBody UpdateHistoryRequest request) {
-        if (request.getUserId() == null || request.getMediaId() == null || request.getProgressSeconds() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu tham số bắt buộc (userId, mediaId, progressSeconds)"));
+        if (request.getMediaId() == null || request.getProgressSeconds() == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu tham số bắt buộc (mediaId, progressSeconds)"));
         }
         
         try {
-            WatchHistory history = watchHistoryService.updateHistory(
-                    request.getUserId(),
+            com.example.movie_app_server.interaction.dto.WatchHistoryItemDto history = watchHistoryService.updateHistory(
+                    getUid(),
                     request.getMediaId(),
                     request.getEpisodeId(),
                     request.getProgressSeconds()
@@ -36,15 +38,13 @@ public class WatchHistoryController {
         }
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserHistory(@PathVariable Long userId) {
-        List<WatchHistory> historyList = watchHistoryService.getUserHistory(userId);
-        return ResponseEntity.ok(historyList);
+    @GetMapping("/me")
+    public ResponseEntity<List<com.example.movie_app_server.interaction.dto.WatchHistoryItemDto>> getUserHistory() {
+        return ResponseEntity.ok(watchHistoryService.getUserHistory(getUid()));
     }
 
     @Data
     public static class UpdateHistoryRequest {
-        private Long userId; // Tạm thời dùng userId truyền từ App
         private Long mediaId;
         private Long episodeId; // Có thể null nếu là phim lẻ
         private Integer progressSeconds;
