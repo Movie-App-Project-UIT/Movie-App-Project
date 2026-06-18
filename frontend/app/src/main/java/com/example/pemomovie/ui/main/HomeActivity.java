@@ -174,6 +174,25 @@ public class HomeActivity extends AppCompatActivity {
             } else {
                 tvDropdownEmail.setText("No Email");
             }
+
+            if (currentUser.getPhotoUrl() != null && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
+                String photoUrl = currentUser.getPhotoUrl().toString().trim();
+                if (photoUrl.startsWith("\"") && photoUrl.endsWith("\"")) {
+                    photoUrl = photoUrl.substring(1, photoUrl.length() - 1);
+                }
+                int paddingPx = (int) (2 * getResources().getDisplayMetrics().density);
+                ivDropdownAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                ivDropdownAvatar.setBackgroundResource(R.drawable.bg_circle_avatar_border);
+                Glide.with(HomeActivity.this)
+                        .load(photoUrl)
+                        .placeholder(R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(ivDropdownAvatar);
+            } else {
+                ivDropdownAvatar.setBackground(null);
+                ivDropdownAvatar.setPadding(0, 0, 0, 0);
+                ivDropdownAvatar.setImageResource(R.drawable.ic_avatar);
+            }
         }
 
         LinearLayout layoutBtnProfile = popupView.findViewById(R.id.layoutBtnProfile);
@@ -196,5 +215,36 @@ public class HomeActivity extends AppCompatActivity {
 
         int yoff = (int) (8 * getResources().getDisplayMetrics().density);
         popupWindow.showAsDropDown(anchorView, 0, yoff);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadHomeProfileAvatar();
+    }
+
+    private void loadHomeProfileAvatar() {
+        ImageView btnProfile = findViewById(R.id.btnProfile);
+        if (btnProfile != null) {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null && currentUser.getPhotoUrl() != null && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
+                String photoUrl = currentUser.getPhotoUrl().toString().trim();
+                if (photoUrl.startsWith("\"") && photoUrl.endsWith("\"")) {
+                    photoUrl = photoUrl.substring(1, photoUrl.length() - 1);
+                }
+                int paddingPx = (int) (2 * getResources().getDisplayMetrics().density);
+                btnProfile.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                btnProfile.setBackgroundResource(R.drawable.bg_circle_avatar_border);
+                Glide.with(HomeActivity.this)
+                        .load(photoUrl)
+                        .placeholder(R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(btnProfile);
+            } else {
+                btnProfile.setBackground(null);
+                btnProfile.setPadding(0, 0, 0, 0);
+                btnProfile.setImageResource(R.drawable.ic_avatar);
+            }
+        }
     }
 }
