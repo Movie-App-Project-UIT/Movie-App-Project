@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -82,7 +81,7 @@
     <!-- Khu vực nhập bình luận + đánh giá -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:orientation="vertical">
 
         <!-- Nhập bình luận -->
@@ -96,21 +95,30 @@
             android:textColorHint="#888888"
             android:background="@drawable/bg_input_field"
             android:padding="8dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_margin="8dp"/>
 
         <!-- Rating + nút gửi -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center_vertical">
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
 
             <RatingBar
                 android:id="@+id/ratingBar"
-                style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:numStars="5"
-                android:stepSize="1" />
+                android:stepSize="1"
+                android:rating="0"
+                android:progressTint="#FFD700"
+                android:secondaryProgressTint="#FFD700"
+                android:backgroundTint="#444444"
+                android:theme="@style/RatingBarTheme"
+                android:layout_marginStart="8dp"
+                android:scaleX="0.8"
+                android:scaleY="0.8"/>
+
 
             <Button
                 android:id="@+id/btnSubmitRate"
@@ -118,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:text="Gửi đánh giá"
                 android:textSize="14sp"
-                android:background="@drawable/bg_gradient_save_button"
+                android:background="@drawable/bg_btn_login"
                 android:layout_marginStart="10dp"/>
         </LinearLayout>
     </LinearLayout>

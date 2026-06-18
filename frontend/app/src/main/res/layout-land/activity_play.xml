@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- PlayerView full màn ngang -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:use_controller="true"
+        app:resize_mode="fit"
+        app:hide_on_touch="true"
+        app:show_timeout="5000"
+        app:show_buffering="when_playing"
+        android:background="@android:color/background_dark"
+        app:played_color="#D70466"
+        app:scrubber_color="#D70466"
+        app:buffered_color="#444444"
+        app:unplayed_color="#888888"
+        app:controller_layout_id="@layout/custom_player_control">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#66000000"
+            android:padding="8dp"
+            android:paddingStart="40dp"
+            android:layout_gravity="top">
+
+            <TextView
+                android:id="@+id/nameMovie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tiếng yêu này anh dịch được không?"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hàn Quốc"
+                android:textColor="#CCCCCC"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </androidx.media3.ui.PlayerView>
+</FrameLayout>

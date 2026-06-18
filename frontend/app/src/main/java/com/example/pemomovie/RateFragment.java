@@ -11,7 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 /**
@@ -60,6 +63,24 @@ public class RateFragment extends Fragment {
         EditText edtRateComment = view.findViewById(R.id.edtRateComment);
         RatingBar ratingBar = view.findViewById(R.id.ratingBar);
         Button btnSubmitRate = view.findViewById(R.id.btnSubmitRate);
+        ImageButton btnClose = view.findViewById(R.id.btnCloseRate);
+
+        // Đóng fragment đánh giá
+        btnClose.setOnClickListener(v -> {
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(this)
+                    .commit();
+
+            // hiển thị lại scroll view và ẩn fragment
+            ScrollView svInfo = requireActivity().findViewById(R.id.svInfo);
+            FrameLayout detailContainer = requireActivity().findViewById(R.id.detailFragmentContainer);
+
+
+            svInfo.setVisibility(View.VISIBLE);
+            detailContainer.setVisibility(View.GONE);
+        });
 
         btnSubmitRate.setOnClickListener(v -> {
             String comment = edtRateComment.getText().toString().trim();
@@ -82,6 +103,7 @@ public class RateFragment extends Fragment {
             // Reset sau khi gửi
             edtRateComment.setText("");
             ratingBar.setRating(0);
+
         });
     }
 }

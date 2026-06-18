@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link CommentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class CommentFragment extends Fragment {
@@ -52,12 +53,20 @@ public class CommentFragment extends Fragment {
         ImageButton btnClose =
                 view.findViewById(R.id.btnCloseComment);
 
-        btnClose.setOnClickListener(v ->
-                requireActivity()
-                        .getSupportFragmentManager()
-                        .beginTransaction()
-                        .remove(this)
-                        .commit()
-        );
+        btnClose.setOnClickListener(v -> {
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(this)
+                    .commit();
+
+            // hiển thị lại scroll view và ẩn fragment
+            ScrollView svInfo = requireActivity().findViewById(R.id.svInfo);
+            FrameLayout detailContainer = requireActivity().findViewById(R.id.detailFragmentContainer);
+
+
+            svInfo.setVisibility(View.VISIBLE);
+            detailContainer.setVisibility(View.GONE);
+        });
     }
 }

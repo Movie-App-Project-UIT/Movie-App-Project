@@ -1,6 +1,7 @@
 package com.example.pemomovie.ui.main;
 
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pemomovie.CommentFragment;
 import com.example.pemomovie.R;
+import com.example.pemomovie.RateFragment;
 import com.example.pemomovie.adapter.PosterAdapter;
 
 public class DetailActivity extends AppCompatActivity {
@@ -45,9 +48,25 @@ public class DetailActivity extends AppCompatActivity {
 
         txtIMDb.getPaint().setShader(textShader);
 
+
+        // Xem video
+        ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+        btnPlay.setOnClickListener(v -> {
+            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+//            intent.putExtra("MOVIE_ID", bannerMovie.getId());
+//            startActivity(intent);
+        });
+
+        ScrollView svInfo = findViewById(R.id.svInfo);
+        FrameLayout detailContainer = findViewById(R.id.detailFragmentContainer);
+
         // màn hình bình luận
         ImageButton btnComment = findViewById(R.id.btnComment);
         btnComment.setOnClickListener(v -> {
+
+            //ẩn phần dưới poster để hiển thị fragment
+            svInfo.setVisibility(View.GONE);
+            detailContainer.setVisibility(View.VISIBLE);
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -65,7 +84,11 @@ public class DetailActivity extends AppCompatActivity {
 
         // màn hình đánh giá
         ImageButton btnRate = findViewById(R.id.btnRate);
-        btnComment.setOnClickListener(v -> {
+        btnRate.setOnClickListener(v -> {
+
+            //ẩn phần dưới poster để hiển thị fragment
+            svInfo.setVisibility(View.GONE);
+            detailContainer.setVisibility(View.VISIBLE);
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -75,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
                     )
                     .replace(
                             R.id.detailFragmentContainer,
-                            new CommentFragment()
+                            new RateFragment()
                     )
                     .addToBackStack(null)
                     .commit();
