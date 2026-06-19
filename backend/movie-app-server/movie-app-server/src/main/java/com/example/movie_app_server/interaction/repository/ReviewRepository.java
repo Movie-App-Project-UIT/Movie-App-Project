@@ -21,6 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // riêng các reply của một bình luận cha cụ thể
     List<Review> findByParentIdOrderByCreatedAtAsc(Long parentId); // Xếp từ cũ đến mới để đọc theo luồng hội thoại
 
-    @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.media.id = :mediaId AND r.parent IS NULL ORDER BY r.createdAt DESC")
+    @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.media.id = :mediaId AND r.parent IS NULL AND r.isHidden = false ORDER BY r.createdAt DESC")
     List<Review> findRootReviewsByMediaIdWithUser(@Param("mediaId") Long mediaId);
 }

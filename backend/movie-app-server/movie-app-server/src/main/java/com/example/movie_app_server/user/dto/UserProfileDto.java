@@ -12,4 +12,5 @@ public class UserProfileDto {
     private String email;
     private String avatarUrl;
     private Tier tier;
+    private com.example.movie_app_server.user.entity.enums.Role role;
 }

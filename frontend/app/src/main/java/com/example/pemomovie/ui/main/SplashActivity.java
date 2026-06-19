@@ -47,12 +47,18 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 // Toàn bộ code trong khối run() này sẽ được thực thi
                 // SAU KHI đếm ngược đủ thời gian quy định ở dưới cùng.
-                // Kiểm tra xem người dùng đã đăng nhập chưa
                 com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                 Intent intent;
                 if (currentUser != null) {
-                    // Nếu đã đăng nhập, chuyển thẳng vào HomeActivity
-                    intent = new Intent(SplashActivity.this, HomeActivity.class);
+                    // Nếu đã đăng nhập, đọc role từ SharedPreferences
+                    android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+                    String role = prefs.getString("user_role", "USER");
+                    
+                    if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
+                        intent = new Intent(SplashActivity.this, com.example.pemomovie.ui.main.AdminDashboardActivity.class);
+                    } else {
+                        intent = new Intent(SplashActivity.this, HomeActivity.class);
+                    }
                 } else {
                     // Nếu chưa đăng nhập, chuyển vào LoginActivity
                     intent = new Intent(SplashActivity.this, LoginActivity.class);

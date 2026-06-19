@@ -42,7 +42,7 @@ public class MediaService {
 
     // --- LOGIC LẤY DANH SÁCH & TÌM KIẾM ---
     public List<MediaItemDto> searchMedia(String keyword) {
-        List<Media> mediaList = mediaRepository.findByTitleContainingIgnoreCase(keyword);
+        List<Media> mediaList = mediaRepository.findByTitleContainingIgnoreCaseAndIsDeletedFalse(keyword);
 
         return mediaList.stream()
                 .map(this::convertToItemDto)
@@ -68,11 +68,11 @@ public class MediaService {
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
-        List<MediaItemDto> topRated = mediaRepository.findTop10ByOrderByVoteAverageDesc().stream()
+        List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseOrderByVoteAverageDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByOrderByIdDesc().stream()
+        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByIdDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
@@ -91,6 +91,10 @@ public class MediaService {
     public MediaDetailResponse getMediaDetail(Long id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+
+        if (media.isDeleted()) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
 
         String tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w185";
 
@@ -144,6 +148,10 @@ public class MediaService {
     public String getPlayableVideoUrl(Long mediaId, String firebaseUid) {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+
+        if (media.isDeleted()) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
 
         if (media.isPremium()) {
             if (!userService.hasPremiumAccess(firebaseUid)) {

@@ -85,6 +85,10 @@ public class Media {
     @Builder.Default
     private boolean isPremium = false;
 
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private boolean isDeleted = false;
+
     // --- MỐI QUAN HỆ CON ---
 
     @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -9,6 +9,7 @@ public class MediaItemDto {
     private boolean isPremium;
     private String mediaType;
     private boolean isPlayable;
+    private boolean deleted; // mapping to isDeleted from backend
 
     public Long getId() {
         return id;
@@ -72,5 +73,13 @@ public class MediaItemDto {
 
     public void setPlayable(boolean playable) {
         isPlayable = playable;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

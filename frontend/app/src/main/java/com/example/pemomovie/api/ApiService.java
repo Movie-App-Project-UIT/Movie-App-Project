@@ -37,4 +37,11 @@ public interface ApiService {
 
     @GET("/api/v1/media/{id}")
     Call<com.example.pemomovie.dto.MediaDetailResponse> getMediaDetail(@retrofit2.http.Path("id") Long id);
+
+    // --- ADMIN API ---
+    @GET("/api/v1/admin/movies")
+    Call<List<MediaItemDto>> getAllMoviesAdmin();
+
+    @retrofit2.http.PUT("/api/v1/admin/movies/{id}/soft-delete")
+    Call<Void> softDeleteMovie(@retrofit2.http.Path("id") Long id);
 }

@@ -17,21 +17,22 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByMediaType(MediaType mediaType);
 
     // Tìm kiếm phim theo tiêu đề (Không phân biệt chữ hoa / chữ thường)
-    List<Media> findByTitleContainingIgnoreCase(String title);
+    List<Media> findByTitleContainingIgnoreCaseAndIsDeletedFalse(String title);
 
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);
 
     // --- Homepage API Queries ---
     // Phim được đánh giá cao nhất (Top Rated)
-    List<Media> findTop10ByOrderByVoteAverageDesc();
+    List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();
 
     // Phim mới cập nhật (Recently Added)
-    List<Media> findTop10ByOrderByIdDesc();
+    List<Media> findTop10ByIsDeletedFalseOrderByIdDesc();
 
     @Query("SELECT DISTINCT m FROM Media m " +
             "LEFT JOIN m.genres g " +
-            "WHERE (:genreId IS NULL OR g.id = :genreId) " +
+            "WHERE m.isDeleted = false " +
+            "AND (:genreId IS NULL OR g.id = :genreId) " +
             "AND (:countryId IS NULL OR m.country.id = :countryId) " +
             "AND (:ageRatingId IS NULL OR m.ageRating.id = :ageRatingId) " +
             "AND (CAST(:startDate AS date) IS NULL OR m.releaseDate >= :startDate) " +

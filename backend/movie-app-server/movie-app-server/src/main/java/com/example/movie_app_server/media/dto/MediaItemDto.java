@@ -14,4 +14,5 @@ public class MediaItemDto {
     private boolean isPremium;  // Để App hiện cái mác "PREMIUM" màu đen góc phải
     private String mediaType;   // Trả về "MOVIE" hoặc "TV_SHOW" để App phân biệt
     private boolean isPlayable; // Bằng true nếu phim đã có videoUrl, App có thể làm mờ nút Play nếu false
+    private boolean isDeleted;
 }

@@ -60,9 +60,31 @@
             android:name=".ui.main.MovieActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.main.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminMovieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminSubscriptionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.ProfileActivity"
             android:exported="false" />
         <activity android:name=".ui.main.EditProfileActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.main.AdminDashboardActivity"
+            android:exported="false"/>
+        <activity android:name=".ui.admin.AdminMovieActivity"
             android:exported="false"/>
     </application>
 

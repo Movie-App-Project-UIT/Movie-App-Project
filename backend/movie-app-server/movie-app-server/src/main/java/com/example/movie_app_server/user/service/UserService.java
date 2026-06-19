@@ -35,7 +35,15 @@ public class UserService {
                         .email(email)
                         .username(username)
                         .avatarUrl(avatarUrl)
+                        .isActive(true)
+                        .role(com.example.movie_app_server.user.entity.enums.Role.USER)
+                        .tier(com.example.movie_app_server.user.entity.enums.Tier.FREE)
                         .build()));
+                        
+        if (!user.isActive()) {
+            throw new org.springframework.security.access.AccessDeniedException("Tài khoản của bạn đã bị khóa.");
+        }
+        
         return convertToProfileDto(user);
     }
 
@@ -43,6 +51,11 @@ public class UserService {
     public UserProfileDto getUserProfile(String firebaseUid) {
         User user = userRepository.findByFirebaseUid(firebaseUid)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+                
+        if (!user.isActive()) {
+            throw new org.springframework.security.access.AccessDeniedException("Tài khoản của bạn đã bị khóa.");
+        }
+        
         return convertToProfileDto(user);
     }
 
@@ -53,6 +66,7 @@ public class UserService {
                 .email(user.getEmail())
                 .avatarUrl(user.getAvatarUrl())
                 .tier(user.getTier())
+                .role(user.getRole())
                 .build();
     }
 
