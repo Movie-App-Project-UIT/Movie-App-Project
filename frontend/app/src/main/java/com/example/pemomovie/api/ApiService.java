@@ -45,4 +45,7 @@ public interface ApiService {
     @Multipart
     @POST("/api/v1/users/avatar")
     Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
+
+    @GET("/api/v1/media/{id}/play")
+    Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
 }
