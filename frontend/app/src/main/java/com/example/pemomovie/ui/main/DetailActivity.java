@@ -108,10 +108,12 @@ public class DetailActivity extends AppCompatActivity {
         rvContent = findViewById(R.id.rvContent);
         // Mặc định mở màn hình là tab gợi ý tương tự
         showSuggestionList();
-
-        //click tab gợi ý và tab tập phim
+        
         TextView tabSuggestion = findViewById(R.id.tabSuggestion);
         TextView tabEpisode = findViewById(R.id.tabEpisode);
+        
+        // Đặt vị trí ban đầu cho thanh gạch dưới sau khi giao diện đã được vẽ xong
+        tabSuggestion.post(() -> animateIndicatorTo(tabSuggestion));
         tabSuggestion.setOnClickListener(v -> {
             animateIndicatorTo(tabSuggestion);
             showSuggestionList();
@@ -133,7 +135,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private void animateIndicatorTo(View target) {
         View tabIndicator = findViewById(R.id.tabIndicator);
-        float targetX = target.getX();
+        // Tính toán vị trí để thanh indicator nằm ngay giữa chữ
+        float targetX = target.getX() + (target.getWidth() - tabIndicator.getWidth()) / 2f;
         ObjectAnimator animator = ObjectAnimator.ofFloat(tabIndicator, "translationX", targetX);
         animator.setDuration(300);
         animator.setInterpolator(new DecelerateInterpolator());
@@ -155,7 +158,6 @@ public class DetailActivity extends AppCompatActivity {
         // hiển thị list ập phim theo 3 tập mỗi hàng
         rvContent.setLayoutManager(new GridLayoutManager(this, 3));
         //adapter...
-
     }
 
 
@@ -217,6 +219,40 @@ public class DetailActivity extends AppCompatActivity {
             com.bumptech.glide.Glide.with(this)
                     .load(detail.getPosterUrl())
                     .into(ivBackdrop);
+        }
+
+        // Xử lý nút Yêu thích (Tym)
+        ImageButton btnFavorite = findViewById(R.id.btnFavorite);
+        if (btnFavorite != null) {
+            // Chuyển MediaDetailResponse sang MediaItemDto để lưu
+            com.example.pemomovie.dto.MediaItemDto currentMovie = new com.example.pemomovie.dto.MediaItemDto();
+            currentMovie.setId(detail.getId());
+            currentMovie.setTitle(detail.getTitle());
+            currentMovie.setPosterUrl(detail.getPosterUrl());
+            currentMovie.setBackdropUrl(detail.getBackdropUrl());
+
+            // Set màu ban đầu
+            if (com.example.pemomovie.utils.FavoriteManager.isFavorite(this, detail.getId())) {
+                btnFavorite.setImageResource(R.drawable.ic_heart);
+                btnFavorite.setColorFilter(Color.parseColor("#FF1493")); // Đỏ hồng
+            } else {
+                btnFavorite.setImageResource(R.drawable.ic_favorites);
+                btnFavorite.setColorFilter(null);
+            }
+
+            // Click sự kiện
+            btnFavorite.setOnClickListener(v -> {
+                boolean isAdded = com.example.pemomovie.utils.FavoriteManager.toggleFavorite(this, currentMovie);
+                if (isAdded) {
+                    btnFavorite.setImageResource(R.drawable.ic_heart);
+                    btnFavorite.setColorFilter(Color.parseColor("#FF1493"));
+                    android.widget.Toast.makeText(this, "Đã thêm vào yêu thích", android.widget.Toast.LENGTH_SHORT).show();
+                } else {
+                    btnFavorite.setImageResource(R.drawable.ic_favorites);
+                    btnFavorite.setColorFilter(null);
+                    android.widget.Toast.makeText(this, "Đã bỏ yêu thích", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

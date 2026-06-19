@@ -265,51 +265,50 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"/>
 
-            <!--2 tab hiển thị ặc đinnh là "Gợi ý tương tự" nếu là phim bộ thì hiển thị "Tập phim" còn không thì bỏ qua-->
+            <!--2 tab hiển thị mặc định là "Gợi ý tương tự" nếu là phim bộ thì hiển thị "Tập phim" còn không thì bỏ qua-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <!-- Tabs -->
-                <LinearLayout
-                    android:id="@+id/tabContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                        <!-- Tabs -->
+                        <LinearLayout
+                            android:id="@+id/tabContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tabSuggestion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="Gợi ý tương tự"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                            <TextView
+                                android:id="@+id/tabSuggestion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="20dp"
+                                android:paddingVertical="8dp"
+                                android:text="Gợi ý tương tự"
+                                android:textColor="@color/white"
+                                android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tabEpisode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tập phim"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"/>
-                </LinearLayout>
+                            <TextView
+                                android:id="@+id/tabEpisode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tập phim"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:paddingHorizontal="20dp"
+                                android:paddingVertical="8dp"/>
+                        </LinearLayout>
 
-                <!-- Thanh trượt dưới tab -->
-                <View
-                    android:id="@+id/tabIndicator"
-                    android:layout_width="100dp"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/bg_gradient_save_button"
-                    android:layout_marginEnd="50dp"
-                    android:layout_gravity="center"/>
+                        <!-- Thanh trượt dưới tab -->
+                        <View
+                            android:id="@+id/tabIndicator"
+                            android:layout_width="100dp"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_gradient_save_button"
+                            android:layout_gravity="start"/>
 
                 <!-- Nội dung thay đổi -->
                 <androidx.recyclerview.widget.RecyclerView

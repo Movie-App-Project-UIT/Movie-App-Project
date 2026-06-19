@@ -8,7 +8,7 @@ public class UserProfileDto {
     @SerializedName("username")
     private String name;
     private String avatarUrl;
-    private boolean isPremium;
+    private String tier;
 
     // Getters and setters
     public String getId() { return id; }
@@ -19,6 +19,11 @@ public class UserProfileDto {
     public void setName(String name) { this.name = name; }
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
-    public boolean isPremium() { return isPremium; }
-    public void setPremium(boolean premium) { isPremium = premium; }
+    
+    public String getTier() { return tier; }
+    public void setTier(String tier) { this.tier = tier; }
+    
+    public boolean isPremium() {
+        return "PREMIUM".equalsIgnoreCase(this.tier);
+    }
 }
