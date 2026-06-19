@@ -18,7 +18,7 @@ public class WatchlistController {
 
     // API: GET /api/v1/watchlist -> Lấy danh sách phim đã lưu
     @GetMapping
-    public ResponseEntity<List<Watchlist>> getWatchlist() {
+    public ResponseEntity<List<com.example.movie_app_server.interaction.dto.WatchlistItemDto>> getWatchlist() {
         return ResponseEntity.ok(watchlistService.getMyWatchlist(getUid()));
     }
 

@@ -2,6 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:startColor="#F7328E"
+        android:centerColor="#A62AB4"
         android:endColor="#6F25CD"
         android:angle="0" /> <!-- Đổ màu từ trái qua phải -->
     <corners android:radius="16dp" />

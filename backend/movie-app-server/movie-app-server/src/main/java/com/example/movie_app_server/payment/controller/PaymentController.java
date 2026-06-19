@@ -59,6 +59,15 @@ public class PaymentController {
     // Return URL: Trình duyệt của user chuyển hướng về đây sau khi thanh toán xong
     @GetMapping("/vnpay-return")
     public ResponseEntity<String> vnpayReturn(@RequestParam Map<String, String> params) {
+        String secureHash = params.get("vnp_SecureHash");
+        params.remove("vnp_SecureHash");
+        params.remove("vnp_SecureHashType");
+
+        String signValue = com.example.movie_app_server.payment.config.VNPayConfig.hashAllFields(params, paymentService.getVnPaySecretKey());
+        if (!signValue.equals(secureHash)) {
+            return ResponseEntity.badRequest().body("Chữ ký không hợp lệ. Đã có lỗi xảy ra!");
+        }
+
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
             // Hiển thị giao diện hoặc redirect về App (DeepLink)

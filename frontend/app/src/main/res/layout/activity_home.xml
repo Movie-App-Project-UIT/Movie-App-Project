@@ -66,7 +66,7 @@
                         android:text="Phát"
                         android:textSize="16sp"
                         app:icon="@drawable/ic_play"
-                        android:background="@color/btn_p_d_selector"
+                        android:background="@drawable/btn_p_d_selector"
                         app:iconPadding="10dp"
                         app:iconTint="@color/white"
                         android:layout_marginRight="20dp"/>
@@ -75,7 +75,7 @@
                         android:id="@+id/btnDetail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/btn_p_d_selector"
+                        android:background="@drawable/btn_p_d_selector"
                         android:textSize="16sp"
                         android:text="Chi tiết"/>
                 </LinearLayout>

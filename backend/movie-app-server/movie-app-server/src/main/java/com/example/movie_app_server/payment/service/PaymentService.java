@@ -203,6 +203,11 @@ public class PaymentService {
                 return;
             }
 
+            if (!amount.equals(transaction.getAmount())) {
+                log.error("MoMo Invalid Amount");
+                return;
+            }
+
             if (resultCode == 0) { // 0 là thành công
                 transaction.setStatus("SUCCESS");
                 transaction.setGatewayTransactionNo(String.valueOf(transId));
@@ -270,6 +275,11 @@ public class PaymentService {
             return "{\"RspCode\":\"01\",\"Message\":\"Order not found\"}";
         }
 
+        long vnpAmount = Long.parseLong(params.get("vnp_Amount")) / 100;
+        if (transaction.getAmount() != vnpAmount) {
+            return "{\"RspCode\":\"04\",\"Message\":\"Invalid amount\"}";
+        }
+
         if (!"PENDING".equals(transaction.getStatus())) {
             return "{\"RspCode\":\"02\",\"Message\":\"Order already confirmed\"}";
         }
@@ -286,5 +296,9 @@ public class PaymentService {
             transactionRepository.save(transaction);
 
         return "{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}";
+    }
+
+    public String getVnPaySecretKey() {
+        return vnPayConfig.getSecretKey();
     }
 }

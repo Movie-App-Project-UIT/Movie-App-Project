@@ -1,9 +1,16 @@
 package com.example.pemomovie.ui.main;
 
+import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -11,10 +18,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pemomovie.CommentFragment;
 import com.example.pemomovie.R;
+import com.example.pemomovie.RateFragment;
+import com.example.pemomovie.adapter.PosterAdapter;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private  RecyclerView rvContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +48,81 @@ public class DetailActivity extends AppCompatActivity {
 
         txtIMDb.getPaint().setShader(textShader);
 
+
+        // Xem video
+        ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+        btnPlay.setOnClickListener(v -> {
+            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+//            intent.putExtra("MOVIE_ID", bannerMovie.getId());
+//            startActivity(intent);
+        });
+
+        ScrollView svInfo = findViewById(R.id.svInfo);
+        FrameLayout detailContainer = findViewById(R.id.detailFragmentContainer);
+
+        // màn hình bình luận
+        ImageButton btnComment = findViewById(R.id.btnComment);
+        btnComment.setOnClickListener(v -> {
+
+            //ẩn phần dưới poster để hiển thị fragment
+            svInfo.setVisibility(View.GONE);
+            detailContainer.setVisibility(View.VISIBLE);
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_up,
+                            0
+                    )
+                    .replace(
+                            R.id.detailFragmentContainer,
+                            new CommentFragment()
+                    )
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // màn hình đánh giá
+        ImageButton btnRate = findViewById(R.id.btnRate);
+        btnRate.setOnClickListener(v -> {
+
+            //ẩn phần dưới poster để hiển thị fragment
+            svInfo.setVisibility(View.GONE);
+            detailContainer.setVisibility(View.VISIBLE);
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_up,
+                            0
+                    )
+                    .replace(
+                            R.id.detailFragmentContainer,
+                            new RateFragment()
+                    )
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+
+        rvContent = findViewById(R.id.rvContent);
+        // Mặc định mở màn hình là tab gợi ý tương tự
+        showSuggestionList();
+
+        //click tab gợi ý và tab tập phim
+        TextView tabSuggestion = findViewById(R.id.tabSuggestion);
+        TextView tabEpisode = findViewById(R.id.tabEpisode);
+        tabSuggestion.setOnClickListener(v -> {
+            animateIndicatorTo(tabSuggestion);
+            showSuggestionList();
+        });
+        // Nếu không là phim bộ thì ẩn tabEpisode
+        tabEpisode.setOnClickListener(v -> {
+            animateIndicatorTo(tabEpisode);
+            showEpisodeList();
+        });
+
+
         com.example.pemomovie.utils.NavigationHelper.setupBottomNavigation(this);
         
         Long movieId = getIntent().getLongExtra("MOVIE_ID", -1);
@@ -41,6 +130,34 @@ public class DetailActivity extends AppCompatActivity {
             loadMovieDetails(movieId);
         }
     }
+
+    private void animateIndicatorTo(View target) {
+        View tabIndicator = findViewById(R.id.tabIndicator);
+        float targetX = target.getX();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(tabIndicator, "translationX", targetX);
+        animator.setDuration(300);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.start();
+    }
+
+    // list poster
+    private void showSuggestionList(){
+        // hiển thị list poster theo 2 poster mỗi hàng
+        rvContent.setLayoutManager(new GridLayoutManager(this, 2));
+
+        //adapter....
+    }
+
+    // list episode
+    private  void showEpisodeList(){
+        // kiểm tra điều kiện nếu là phim bộ thì hiển thị tập phim
+
+        // hiển thị list ập phim theo 3 tập mỗi hàng
+        rvContent.setLayoutManager(new GridLayoutManager(this, 3));
+        //adapter...
+
+    }
+
 
     private void loadMovieDetails(Long movieId) {
         com.example.pemomovie.api.ApiClient.getApiService().getMediaDetail(movieId).enqueue(new retrofit2.Callback<com.example.pemomovie.dto.MediaDetailResponse>() {
@@ -83,6 +200,8 @@ public class DetailActivity extends AppCompatActivity {
         tvCountry.setText(detail.getCountry());
         tvGenre.setText(detail.getLanguage());
         tvDesc.setText(detail.getOverview());
+
+        //thêm nếu là phim lẻ thì không hiển thị tabEpisode
 
         if (detail.isPremium()) {
             txtVIP.setVisibility(android.view.View.VISIBLE);

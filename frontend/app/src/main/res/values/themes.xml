@@ -25,4 +25,9 @@
     <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_bottom_sheet</item>
     </style>
+
+    <style name="RatingBarTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorControlActivated">#FFD700</item> <!-- màu sao vàng -->
+        <item name="colorControlNormal">#555555</item>    <!-- sao chưa chọn -->
+    </style>
 </resources>

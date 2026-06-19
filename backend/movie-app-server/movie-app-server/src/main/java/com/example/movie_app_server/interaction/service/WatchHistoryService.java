@@ -23,10 +23,11 @@ public class WatchHistoryService {
     private final UserRepository userRepository;
     private final MediaRepository mediaRepository;
     private final EpisodeRepository episodeRepository;
+    private final com.example.movie_app_server.media.service.MediaService mediaService;
 
     @Transactional
-    public WatchHistory updateHistory(Long userId, Long mediaId, Long episodeId, Integer progressSeconds) {
-        User user = userRepository.findById(userId)
+    public com.example.movie_app_server.interaction.dto.WatchHistoryItemDto updateHistory(String firebaseUid, Long mediaId, Long episodeId, Integer progressSeconds) {
+        User user = userRepository.findByFirebaseUid(firebaseUid)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found"));
@@ -39,9 +40,9 @@ public class WatchHistoryService {
 
         Optional<WatchHistory> existingHistory;
         if (episode != null) {
-            existingHistory = watchHistoryRepository.findByUserIdAndEpisodeId(userId, episodeId);
+            existingHistory = watchHistoryRepository.findByUserIdAndEpisodeId(user.getId(), episodeId);
         } else {
-            existingHistory = watchHistoryRepository.findByUserIdAndMediaId(userId, mediaId);
+            existingHistory = watchHistoryRepository.findByUserIdAndMediaId(user.getId(), mediaId);
         }
 
         WatchHistory history;
@@ -57,11 +58,25 @@ public class WatchHistoryService {
                     .build();
         }
 
-        return watchHistoryRepository.save(history);
+        WatchHistory savedHistory = watchHistoryRepository.save(history);
+        return convertToDto(savedHistory);
     }
 
     @Transactional(readOnly = true)
-    public List<WatchHistory> getUserHistory(Long userId) {
-        return watchHistoryRepository.findByUserIdOrderByLastWatchedAtDesc(userId);
+    public List<com.example.movie_app_server.interaction.dto.WatchHistoryItemDto> getUserHistory(String firebaseUid) {
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return watchHistoryRepository.findByUserIdOrderByLastWatchedAtDesc(user.getId())
+                .stream().map(this::convertToDto).toList();
+    }
+
+    private com.example.movie_app_server.interaction.dto.WatchHistoryItemDto convertToDto(WatchHistory h) {
+        return com.example.movie_app_server.interaction.dto.WatchHistoryItemDto.builder()
+                .id(h.getId())
+                .progressSeconds(h.getProgressSeconds())
+                .lastWatchedAt(h.getLastWatchedAt())
+                .media(mediaService.convertToItemDto(h.getMedia()))
+                .episode(h.getEpisode() != null ? mediaService.convertToEpisodeDto(h.getEpisode()) : null)
+                .build();
     }
 }

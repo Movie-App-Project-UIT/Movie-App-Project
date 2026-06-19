@@ -80,11 +80,26 @@
         <activity
             android:name=".ui.main.ProfileActivity"
             android:exported="false" />
-        <activity android:name=".ui.main.EditProfileActivity"
+        <activity
+            android:name=".ui.main.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SeeAllActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.SeeAllActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.WatchingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.AdminDashboardActivity"
             android:exported="false"/>
-        <activity android:name=".ui.main.AdminDashboardActivity"
-            android:exported="false"/>
-        <activity android:name=".ui.admin.AdminMovieActivity"
+        <activity
+            android:name=".ui.admin.AdminMovieActivity"
             android:exported="false"/>
     </application>
 

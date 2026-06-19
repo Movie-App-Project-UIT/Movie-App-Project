@@ -6,77 +6,94 @@
     android:layout_height="match_parent"
     android:background="#050814">
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/headerBanner"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+    <FrameLayout
+        android:id="@+id/ImagePoster"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/nen"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:elevation="8dp"
+        android:outlineProvider="background">
+
+        <ImageView
+            android:id="@+id/ivBackdrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/headedetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/txt_IMDb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IMDb 9.0"
+                android:textColor="@android:color/white"
+                android:padding="4dp"
+                android:background="@drawable/bg_text"
+                android:textSize="14sp"
+                android:layout_marginLeft="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_VIP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VIP"
+                android:textColor="#F1D30E"
+                android:padding="5dp"
+                android:background="@drawable/bg_text"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginRight="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+
+    <ImageButton
+        android:id="@+id/btnPlayDetail"
+        android:layout_width="50dp"
+        android:layout_height="55dp"
+        android:elevation="10dp"
+        android:layout_marginEnd="45dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_play_detail"
+        android:layout_gravity="end"
+        android:layout_marginTop="-40dp"/>
+    </LinearLayout>
+
+    <!--Fragment cho bình luận và đánh giá-->
+    <FrameLayout
+        android:id="@+id/detailFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavInclude">
+        app:layout_constraintTop_toBottomOf="@id/headerBanner"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ScrollView
+        android:id="@+id/svInfo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/headerBanner">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <FrameLayout
-                android:id="@+id/ImagePoster"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@drawable/nen"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:elevation="8dp"
-                android:outlineProvider="background">
-
-                <ImageView
-                    android:id="@+id/ivBackdrop"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/headedetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:id="@+id/txt_IMDb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="IMDb 9.0"
-                        android:textColor="@android:color/white"
-                        android:padding="4dp"
-                        android:background="@drawable/bg_text"
-                        android:textSize="14sp"
-                        android:layout_marginLeft="20dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/txt_VIP"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="VIP"
-                        android:textColor="#F1D30E"
-                        android:padding="5dp"
-                        android:background="@drawable/bg_text"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginRight="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </FrameLayout>
-
-            <ImageButton
-                android:id="@+id/btnPlayDetail"
-                android:layout_width="50dp"
-                android:layout_height="55dp"
-                android:elevation="10dp"
-                android:layout_marginEnd="45dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_play_detail"
-                android:layout_gravity="end"
-                android:layout_marginTop="-40dp"/>
 
             <!--Thông tin phim-->
             <LinearLayout
@@ -234,32 +251,73 @@
                 android:text="Mitsuha, một nữ sinh sống ở vùng quê yên bình, và Taki, một nam sinh ở Tokyo, bất ngờ hoán đổi cơ thể cho nhau một cách bí ẩn. Khi dần quen với cuộc sống của đối phương, cả hai bắt đầu hình thành một mối liên kết đặc biệt vượt qua khoảng cách không gian và thời gian. Hành trình tìm kiếm nhau hé lộ những bí mật cảm động về định mệnh, ký ức và tình yêu."
                 android:textColor="#BABABA"/>
 
-            <TextView
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:text="Gợi ý tương tự"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"/>
+                android:layout_height="1dp"
+                android:background="@drawable/bg_gradient_save_button"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="2dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvSuggestions"
+            <!--Tab yêu thích + bình luận + đánh giá-->
+            <include
+                layout="@layout/layout_detail_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"/>
+
+            <!--2 tab hiển thị ặc đinnh là "Gợi ý tương tự" nếu là phim bộ thì hiển thị "Tập phim" còn không thì bỏ qua-->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="8dp"
-                android:paddingBottom="20dp"
-                android:clipToPadding="false"/>
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- Tabs -->
+                <LinearLayout
+                    android:id="@+id/tabContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tabSuggestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="8dp"
+                        android:text="Gợi ý tương tự"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tabEpisode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tập phim"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="8dp"/>
+                </LinearLayout>
+
+                <!-- Thanh trượt dưới tab -->
+                <View
+                    android:id="@+id/tabIndicator"
+                    android:layout_width="100dp"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_gradient_save_button"
+                    android:layout_marginEnd="50dp"
+                    android:layout_gravity="center"/>
+
+                <!-- Nội dung thay đổi -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
-
-    <include
-        android:id="@+id/bottomNavInclude"
-        layout="@layout/layout_bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

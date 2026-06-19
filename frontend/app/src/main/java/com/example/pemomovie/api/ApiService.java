@@ -11,6 +11,10 @@ import com.example.pemomovie.dto.MediaItemDto;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
+import retrofit2.http.Multipart;
+import retrofit2.http.Part;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -44,4 +48,8 @@ public interface ApiService {
 
     @retrofit2.http.PUT("/api/v1/admin/movies/{id}/soft-delete")
     Call<Void> softDeleteMovie(@retrofit2.http.Path("id") Long id);
+
+    @Multipart
+    @POST("/api/v1/users/avatar")
+    Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
 }

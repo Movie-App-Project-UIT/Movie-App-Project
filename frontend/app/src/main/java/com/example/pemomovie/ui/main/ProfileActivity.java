@@ -11,9 +11,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.example.pemomovie.ui.auth.LoginActivity;
 import com.bumptech.glide.Glide;
 import com.example.pemomovie.R;
 import com.example.pemomovie.adapter.WatchingAdapter;
@@ -59,6 +62,19 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
         NavigationHelper.setupBottomNavigation(this);
+
+        androidx.cardview.widget.CardView btnLogout = findViewById(R.id.btnLogout);
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                FirebaseAuth.getInstance().signOut();
+
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+        }
+
     }
 
     @Override
@@ -78,7 +94,6 @@ public class ProfileActivity extends AppCompatActivity {
                     TextView txtUserName = findViewById(R.id.txtUserName);
                     if (txtUserName != null) {
                         String name = profile.getName();
-                        // Nếu tên bị null hoặc rỗng, mặc định hiển thị là "User"
                         if (name == null || name.trim().isEmpty()) {
                             txtUserName.setText("User");
                         } else {
@@ -87,11 +102,25 @@ public class ProfileActivity extends AppCompatActivity {
                     }
 
                     ImageView imgAvatar = findViewById(R.id.imgAvatar);
-                    if (imgAvatar != null && profile.getAvatarUrl() != null && !profile.getAvatarUrl().isEmpty()) {
-                        Glide.with(ProfileActivity.this)
-                                .load(profile.getAvatarUrl())
-                                .placeholder(R.drawable.ic_avatar)
-                                .into(imgAvatar);
+                    if (imgAvatar != null) {
+                        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().trim().isEmpty()) {
+                            String avatarUrl = profile.getAvatarUrl().trim();
+                            if (avatarUrl.startsWith("\"") && avatarUrl.endsWith("\"")) {
+                                avatarUrl = avatarUrl.substring(1, avatarUrl.length() - 1);
+                            }
+                            int paddingPx = (int) (3 * getResources().getDisplayMetrics().density);
+                            imgAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                            imgAvatar.setBackgroundColor(Color.parseColor("#8C8E92"));
+                            Glide.with(ProfileActivity.this)
+                                    .load(avatarUrl)
+                                    .placeholder(R.drawable.ic_avatar)
+                                    .circleCrop()
+                                    .into(imgAvatar);
+                        } else {
+                            imgAvatar.setBackgroundColor(Color.parseColor("#A7F3D0"));
+                            imgAvatar.setPadding(0, 0, 0, 0);
+                            imgAvatar.setImageResource(R.drawable.ic_avatar);
+                        }
                     }
                     
                     // Xử lý hiển thị nút Admin

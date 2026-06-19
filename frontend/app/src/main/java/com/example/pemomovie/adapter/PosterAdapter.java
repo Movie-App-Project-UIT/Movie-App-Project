@@ -30,7 +30,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.poster_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.poster_section_item, parent, false);
         return new PosterViewHolder(view);
     }
 
