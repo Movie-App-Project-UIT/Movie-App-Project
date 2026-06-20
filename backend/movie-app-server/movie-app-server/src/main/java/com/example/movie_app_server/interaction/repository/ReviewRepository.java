@@ -26,4 +26,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.media.id = :mediaId")
     List<Review> findAllByMediaIdWithUser(@Param("mediaId") Long mediaId);
+
+    // Lấy danh sách bình luận của một user cụ thể
+    List<Review> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

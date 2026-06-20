@@ -4,6 +4,7 @@ import java.util.List;
 
 public class MediaDetailResponse {
     private Long id;
+    private Integer tmdbId;
     private String title;
     private String overview;
     private Float voteAverage;
@@ -12,16 +13,21 @@ public class MediaDetailResponse {
     private Integer releaseYear;
     private Integer duration;
     private Integer viewCount;
+    @com.google.gson.annotations.SerializedName("isPremium")
     private boolean isPremium;
+    @com.google.gson.annotations.SerializedName("isDeleted")
+    private boolean isDeleted;
     private String mediaType;
-    private String genre;
-    private String country;
+    private java.util.List<String> genres;
+    private String countryName;
     private String language;
     private List<CreditDto> directors;
     private List<CreditDto> cast;
     private List<SubtitleDto> subtitles;
+    private String trailerUrl;
 
     public Long getId() { return id; }
+    public Integer getTmdbId() { return tmdbId; }
     public String getTitle() { return title; }
     public String getOverview() { return overview; }
     public Float getVoteAverage() { return voteAverage; }
@@ -31,11 +37,13 @@ public class MediaDetailResponse {
     public Integer getDuration() { return duration; }
     public Integer getViewCount() { return viewCount; }
     public boolean isPremium() { return isPremium; }
+    public boolean isDeleted() { return isDeleted; }
     public String getMediaType() { return mediaType; }
-    public String getGenre() { return genre; }
-    public String getCountry() { return country; }
+    public java.util.List<String> getGenres() { return genres; }
+    public String getCountryName() { return countryName; }
     public String getLanguage() { return language; }
     public List<CreditDto> getDirectors() { return directors; }
     public List<CreditDto> getCast() { return cast; }
     public List<SubtitleDto> getSubtitles() { return subtitles; }
+    public String getTrailerUrl() { return trailerUrl; }
 }

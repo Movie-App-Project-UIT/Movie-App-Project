@@ -68,11 +68,24 @@
         <activity
             android:name=".ui.admin.AdminCategoryActivity"
             android:exported="false" />
+            
+        <activity
+            android:name=".ui.admin.AdminCategoryDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.admin.AdminSubscriptionActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.admin.AdminSubscriptionDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminSubscriptionGiftActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.admin.AdminUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminUserDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.admin.AdminProfileActivity"
@@ -96,10 +109,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.main.AdminDashboardActivity"
+            android:name=".ui.admin.AdminMovieAddActivity"
             android:exported="false"/>
         <activity
-            android:name=".ui.admin.AdminMovieActivity"
+            android:name=".ui.admin.AdminMovieDetailActivity"
             android:exported="false"/>
     </application>
 

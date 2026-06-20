@@ -24,6 +24,16 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);
 
+    // Tìm các phim thuộc một thể loại
+    List<Media> findByGenres_Id(Long genreId);
+
+    // Tìm các phim ĐANG HOẠT ĐỘNG và thuộc một thể loại
+    List<Media> findByIsDeletedFalseAndGenres_Id(Long genreId);
+
+    // Tìm các phim KHÔNG thuộc một thể loại
+    @Query("SELECT m FROM Media m WHERE m.isDeleted = false AND :genre NOT MEMBER OF m.genres")
+    List<Media> findMediaNotContainingGenre(@Param("genre") com.example.movie_app_server.media.entity.Genre genre);
+
     // --- Homepage API Queries ---
     // Phim được đánh giá cao nhất (Top Rated)
     List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();

@@ -6,10 +6,14 @@ public class MediaItemDto {
     private String posterUrl;
     private String backdropUrl;
     private Float voteAverage;
-    private boolean isPremium;
-    private String mediaType;
-    private boolean isPlayable;
-    private boolean deleted; // mapping to isDeleted from backend
+    @com.google.gson.annotations.SerializedName("isPremium")
+    private boolean isPremium;  // Để App hiện cái mác "PREMIUM" màu đen góc phải
+    private String mediaType;   // Trả về "MOVIE" hoặc "TV_SHOW" để App phân biệt
+    @com.google.gson.annotations.SerializedName("isPlayable")
+    private boolean isPlayable; // Bằng true nếu phim đã có videoUrl, App có thể làm mờ nút Play nếu false
+    @com.google.gson.annotations.SerializedName(value = "isDeleted", alternate = {"deleted"})
+    private boolean isDeleted; // mapping to isDeleted from backend
+    private java.util.List<String> genres;
 
     public Long getId() {
         return id;
@@ -76,10 +80,35 @@ public class MediaItemDto {
     }
 
     public boolean isDeleted() {
-        return deleted;
+        return isDeleted;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
+
+    public java.util.List<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(java.util.List<String> genres) {
+        this.genres = genres;
+    }
+
+    private String language;
+    private String country;
+    private Integer viewCount;
+    private Long hiddenByGenreId;
+
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
+    
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+    
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+
+    public Long getHiddenByGenreId() { return hiddenByGenreId; }
+    public void setHiddenByGenreId(Long hiddenByGenreId) { this.hiddenByGenreId = hiddenByGenreId; }
 }

@@ -15,45 +15,113 @@
         android:gravity="center"
         android:paddingTop="15dp">
 
-        <ImageButton
+        <!-- Dashboard -->
+        <LinearLayout
             android:id="@+id/btnAdminDashboard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_home"
-            app:tint="@color/btn_nav_selector"
-            android:elevation="8dp"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                app:tint="@color/btn_nav_selector"
+                android:duplicateParentState="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang chủ"
+                android:textSize="10sp"
+                android:textColor="@color/btn_nav_selector"
+                android:layout_marginTop="4dp"
+                android:duplicateParentState="true"/>
+        </LinearLayout>
 
-        <ImageButton
+        <!-- Subscriptions / Premium -->
+        <LinearLayout
             android:id="@+id/btnAdminSubscriptions"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_crown"
-            app:tint="@color/btn_nav_selector"
-            android:elevation="8dp"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_crown"
+                app:tint="@color/btn_nav_selector"
+                android:duplicateParentState="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Premium"
+                android:textSize="10sp"
+                android:textColor="@color/btn_nav_selector"
+                android:layout_marginTop="4dp"
+                android:duplicateParentState="true"/>
+        </LinearLayout>
 
-        <ImageButton
+        <!-- Users / Khách hàng -->
+        <LinearLayout
             android:id="@+id/btnAdminUsers"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_profile"
-            app:tint="@color/btn_nav_selector"
-            android:elevation="8dp"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_profile"
+                app:tint="@color/btn_nav_selector"
+                android:duplicateParentState="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khách hàng"
+                android:textSize="10sp"
+                android:textColor="@color/btn_nav_selector"
+                android:layout_marginTop="4dp"
+                android:duplicateParentState="true"/>
+        </LinearLayout>
 
-        <ImageButton
+        <!-- Profile -->
+        <LinearLayout
             android:id="@+id/btnAdminProfile"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_shield"
-            app:tint="@color/btn_nav_selector"
-            android:elevation="8dp"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_shield"
+                app:tint="@color/btn_nav_selector"
+                android:duplicateParentState="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textSize="10sp"
+                android:textColor="@color/btn_nav_selector"
+                android:layout_marginTop="4dp"
+                android:duplicateParentState="true"/>
+        </LinearLayout>
 
     </LinearLayout>
 </FrameLayout>

@@ -72,7 +72,7 @@ public class Media {
     @JoinColumn(name = "age_rating_id")
     private AgeRating ageRating;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "media_genre",
             joinColumns = @JoinColumn(name = "media_id"),
@@ -88,6 +88,9 @@ public class Media {
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private boolean isDeleted = false;
+
+    @Column(name = "hidden_by_genre_id")
+    private Long hiddenByGenreId;
 
     // --- MỐI QUAN HỆ CON ---
 

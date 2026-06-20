@@ -3,17 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@color/bg_card"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#0F172A"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
+    app:cardElevation="0dp"
     android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <View
             android:id="@+id/colorIndicator"
@@ -36,44 +35,112 @@
             app:layout_constraintTop_toTopOf="@id/colorIndicator"
             app:layout_constraintBottom_toBottomOf="@id/colorIndicator"/>
 
-        <TextView
-            android:id="@+id/txtCategoryName"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginStart="16dp"
-            android:text="Hành Động"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/colorIndicator"
+            app:layout_constraintEnd_toStartOf="@id/layoutActions"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnEdit"/>
+            app:layout_constraintBottom_toBottomOf="parent">
+            
+            <TextView
+                android:id="@+id/txtCategoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hành Động"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+                
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical">
+                
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_watching"
+                    app:tint="#8B5CF6"/>
+                <TextView
+                    android:id="@+id/txtViews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 lượt xem"
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"/>
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" • "
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp"/>
+                    
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_play"
+                    app:tint="#8B5CF6"/>
+                <TextView
+                    android:id="@+id/txtMediaCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 phim"
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/btnEdit"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_edit"
-            android:padding="4dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/gray_text_light"
-            app:layout_constraintEnd_toStartOf="@id/btnDelete"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageView
-            android:id="@+id/btnDelete"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_delete"
-            android:padding="4dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#EF4444"
+        <LinearLayout
+            android:id="@+id/layoutActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center_vertical">
+            
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:strokeColor="#A855F7"
+                app:strokeWidth="1dp"
+                android:layout_marginEnd="8dp">
+                <ImageView
+                    android:id="@+id/btnEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#A855F7"
+                    android:padding="6dp"/>
+            </com.google.android.material.card.MaterialCardView>
+                
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:strokeColor="#EF4444"
+                app:strokeWidth="1dp">
+                <ImageView
+                    android:id="@+id/btnDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_delete"
+                    app:tint="#EF4444"
+                    android:padding="6dp"/>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

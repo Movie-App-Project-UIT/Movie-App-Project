@@ -15,10 +15,10 @@ import com.example.pemomovie.ui.admin.AdminProfileActivity;
 
 public class AdminNavigationHelper {
     public static void setupBottomNavigation(Activity activity) {
-        ImageButton btnAdminDashboard = activity.findViewById(R.id.btnAdminDashboard);
-        ImageButton btnAdminSubscriptions = activity.findViewById(R.id.btnAdminSubscriptions);
-        ImageButton btnAdminUsers = activity.findViewById(R.id.btnAdminUsers);
-        ImageButton btnAdminProfile = activity.findViewById(R.id.btnAdminProfile);
+        View btnAdminDashboard = activity.findViewById(R.id.btnAdminDashboard);
+        View btnAdminSubscriptions = activity.findViewById(R.id.btnAdminSubscriptions);
+        View btnAdminUsers = activity.findViewById(R.id.btnAdminUsers);
+        View btnAdminProfile = activity.findViewById(R.id.btnAdminProfile);
 
         // Tự động làm sáng (Selected) icon của màn hình hiện tại
         if (activity instanceof com.example.pemomovie.ui.main.AdminDashboardActivity) {

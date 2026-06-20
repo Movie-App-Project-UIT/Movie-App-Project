@@ -46,8 +46,71 @@ public interface ApiService {
     @GET("/api/v1/admin/movies")
     Call<List<MediaItemDto>> getAllMoviesAdmin();
 
+    @GET("/api/v1/admin/movies/{id}")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> getMediaDetailAdmin(@retrofit2.http.Path("id") Long id);
+
     @retrofit2.http.PUT("/api/v1/admin/movies/{id}/soft-delete")
     Call<Void> softDeleteMovie(@retrofit2.http.Path("id") Long id);
+
+    @GET("/api/v1/admin/movies/preview-tmdb")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> previewTmdbMovie(@retrofit2.http.Query("tmdbId") Integer tmdbId);
+
+    @POST("/api/v1/admin/movies")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> createMovie(@Body com.example.pemomovie.dto.AdminMovieSaveRequest request);
+
+    @retrofit2.http.PUT("/api/v1/admin/movies/{id}")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> updateMovie(@retrofit2.http.Path("id") Long id, @Body com.example.pemomovie.dto.AdminMovieSaveRequest request);
+
+    @GET("/api/v1/admin/categories")
+    Call<List<com.example.pemomovie.dto.AdminGenreDto>> getAllCategoriesAdmin();
+
+    @POST("/api/v1/admin/categories")
+    Call<com.example.pemomovie.dto.AdminGenreDto> createCategory(@Body java.util.Map<String, String> body);
+
+    @retrofit2.http.PUT("/api/v1/admin/categories/{id}/soft-delete")
+    Call<Void> softDeleteCategory(@retrofit2.http.Path("id") Long id);
+
+    @GET("/api/v1/admin/categories/{id}/media")
+    Call<List<MediaItemDto>> getMediaInGenre(@retrofit2.http.Path("id") Long id);
+
+    @GET("/api/v1/admin/categories/{id}/media/exclude")
+    Call<List<MediaItemDto>> getMediaNotInGenre(@retrofit2.http.Path("id") Long id);
+
+    @POST("/api/v1/admin/categories/{id}/media/{mediaId}")
+    Call<Void> addMediaToGenre(@retrofit2.http.Path("id") Long id, @retrofit2.http.Path("mediaId") Long mediaId);
+
+    @retrofit2.http.DELETE("/api/v1/admin/categories/{id}/media/{mediaId}")
+    Call<Void> removeMediaFromGenre(@retrofit2.http.Path("id") Long id, @retrofit2.http.Path("mediaId") Long mediaId);
+
+    // --- ADMIN SUBSCRIPTION API ---
+    @GET("/api/v1/admin/subscriptions")
+    Call<List<com.example.pemomovie.dto.AdminSubscriptionDto>> getAllSubscriptions();
+
+    @POST("/api/v1/admin/subscriptions")
+    Call<com.example.pemomovie.dto.AdminSubscriptionDto> createSubscription(@Body com.example.pemomovie.dto.AdminSubscriptionDto request);
+
+    @retrofit2.http.PUT("/api/v1/admin/subscriptions/{id}")
+    Call<com.example.pemomovie.dto.AdminSubscriptionDto> updateSubscription(@retrofit2.http.Path("id") Long id, @Body com.example.pemomovie.dto.AdminSubscriptionDto request);
+
+    @retrofit2.http.PUT("/api/v1/admin/subscriptions/{id}/toggle-status")
+    Call<Void> toggleSubscriptionStatus(@retrofit2.http.Path("id") Long id);
+
+    @GET("/api/v1/admin/users")
+    Call<List<com.example.pemomovie.dto.AdminUserDto>> getUsers(@retrofit2.http.Query("isPremium") Boolean isPremium, @retrofit2.http.Query("search") String search);
+
+    @GET("/api/v1/admin/users/{id}/details")
+    Call<com.example.pemomovie.dto.AdminUserDetailDto> getUserDetails(@retrofit2.http.Path("id") Long id);
+
+    @retrofit2.http.PUT("/api/v1/admin/users/{id}/toggle-status")
+    Call<Void> toggleUserStatus(@retrofit2.http.Path("id") Long id);
+
+    @POST("/api/v1/admin/subscriptions/{id}/gift")
+    Call<Void> giftSubscription(
+            @retrofit2.http.Path("id") Long id,
+            @Body com.example.pemomovie.dto.GiftSubscriptionRequest request);
+
+    @GET("/api/v1/admin/subscriptions/{id}/gifted-users")
+    Call<List<com.example.pemomovie.dto.AdminUserDto>> getGiftedUsers(@retrofit2.http.Path("id") Long id);
 
     @Multipart
     @POST("/api/v1/users/avatar")

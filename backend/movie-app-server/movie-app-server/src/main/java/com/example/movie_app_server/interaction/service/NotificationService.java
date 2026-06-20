@@ -18,11 +18,17 @@ public class NotificationService {
 
     @Transactional
     public void createNotification(User user, String title, String message, NotificationType type) {
+        createNotificationWithRelatedId(user, title, message, type, null);
+    }
+
+    @Transactional
+    public void createNotificationWithRelatedId(User user, String title, String message, NotificationType type, Long relatedId) {
         Notification notification = Notification.builder()
                 .user(user)
                 .title(title)
                 .message(message)
                 .type(type)
+                .relatedId(relatedId)
                 .isRead(false)
                 .build();
         notificationRepository.save(notification);

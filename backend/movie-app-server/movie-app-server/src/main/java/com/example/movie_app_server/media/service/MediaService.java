@@ -41,6 +41,13 @@ public class MediaService {
                 .isPremium(media.isPremium())
                 .mediaType(media.getMediaType().name())
                 .isPlayable(media.getVideoUrl() != null && !media.getVideoUrl().trim().isEmpty()) // Trim khoảng trắng an toàn hơn
+                .genres(media.getGenres().stream().map(g -> g.getName()).collect(Collectors.toList()))
+                .isDeleted(media.isDeleted())
+                .language(media.getLanguage() != null ? media.getLanguage() : "N/A")
+                .country(media.getCountry() != null ? media.getCountry().getName() : "N/A")
+                .hiddenByGenreId(media.getHiddenByGenreId())
+                // TODO: XÓA ĐOẠN FAKE DATA NÀY KHI CÓ HỆ THỐNG ĐẾM LƯỢT XEM THỰC TẾ
+                .viewCount(media.getId() != null ? (int) (media.getId() * 1234 % 50000) : 0) // Tạo lượt xem giả ngẫu nhiên nhưng cố định theo ID phim
                 .build();
     }
 
@@ -98,7 +105,7 @@ public class MediaService {
         return response;
     }
 
-    // --- LOGIC LẤY CHI TIẾT PHIM ---
+    // --- LOGIC LẤY CHI TIẾT PHIM (DÀNH CHO NGƯỜI DÙNG) ---
     public MediaDetailResponse getMediaDetail(Long id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
@@ -107,6 +114,17 @@ public class MediaService {
             throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
         }
 
+        return convertToDetailResponse(media);
+    }
+
+    // --- LOGIC LẤY CHI TIẾT PHIM (DÀNH CHO ADMIN) ---
+    public MediaDetailResponse getMediaDetailAdmin(Long id) {
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+        return convertToDetailResponse(media);
+    }
+
+    public MediaDetailResponse convertToDetailResponse(Media media) {
         String tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w185";
 
         List<CreditDto> directors = media.getCredits().stream()
@@ -146,6 +164,7 @@ public class MediaService {
 
         return MediaDetailResponse.builder()
                 .id(media.getId())
+                .tmdbId(media.getTmdbId())
                 .title(media.getTitle())
                 .overview(media.getOverview())
                 .voteAverage(media.getVoteAverage())
@@ -154,6 +173,7 @@ public class MediaService {
                 .releaseDate(media.getReleaseDate())
                 .mediaType(media.getMediaType().name())
                 .isPremium(media.isPremium())
+                .isDeleted(media.isDeleted())
                 .trailerUrl(media.getTrailerUrl())
                 .duration(media.getDuration())
                 .language(media.getLanguage())
