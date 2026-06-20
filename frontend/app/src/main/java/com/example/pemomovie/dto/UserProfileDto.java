@@ -10,6 +10,7 @@ public class UserProfileDto {
     private String avatarUrl;
     private boolean isPremium;
     private String role;
+    private String tier;
 
     // Getters and setters
     public String getId() { return id; }
@@ -20,8 +21,13 @@ public class UserProfileDto {
     public void setName(String name) { this.name = name; }
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
-    public boolean isPremium() { return isPremium; }
+    public boolean isPremium() {
+        return isPremium || "PREMIUM".equalsIgnoreCase(this.tier);
+    }
     public void setPremium(boolean premium) { isPremium = premium; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    
+    public String getTier() { return tier; }
+    public void setTier(String tier) { this.tier = tier; }
 }

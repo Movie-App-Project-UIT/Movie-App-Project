@@ -115,4 +115,29 @@ public interface ApiService {
     @Multipart
     @POST("/api/v1/users/avatar")
     Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
+
+    @GET("/api/v1/media/{id}/play")
+    Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
+
+    @GET("/api/v1/lookups/genres")
+    Call<List<com.example.pemomovie.dto.GenreDto>> getGenres();
+
+    @GET("/api/v1/lookups/countries")
+    Call<List<com.example.pemomovie.dto.CountryDto>> getCountries();
+
+    @GET("/api/v1/lookups/age-ratings")
+    Call<List<com.example.pemomovie.dto.AgeRatingDto>> getAgeRatings();
+
+    @GET("/api/v1/media/filter")
+    Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> filterMedia(
+            @retrofit2.http.Query("keyword") String keyword,
+            @retrofit2.http.Query("genreId") Long genreId,
+            @retrofit2.http.Query("countryId") Long countryId,
+            @retrofit2.http.Query("ageRatingId") Long ageRatingId,
+            @retrofit2.http.Query("releaseYear") Integer releaseYear,
+            @retrofit2.http.Query("mediaType") String mediaType,
+            @retrofit2.http.Query("sortBy") String sortBy,
+            @retrofit2.http.Query("page") int page,
+            @retrofit2.http.Query("size") int size
+    );
 }

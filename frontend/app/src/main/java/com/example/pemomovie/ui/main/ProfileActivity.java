@@ -28,6 +28,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.pemomovie.utils.FavoriteManager;
+import android.view.View;
+import android.widget.LinearLayout;
+
 public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +57,14 @@ public class ProfileActivity extends AppCompatActivity {
             btnBack.setOnClickListener(v -> finish());
         }
 
+        // Chuyển sang trang Edit Profile
         ImageView btnEdit = findViewById(R.id.btnEditAvatar);
-        if(btnEdit != null)
-        {
+        if(btnEdit != null) {
             btnEdit.setOnClickListener(v -> {
                 Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
                 startActivity(intent);
             });
         }
-        NavigationHelper.setupBottomNavigation(this);
 
         androidx.cardview.widget.CardView btnLogout = findViewById(R.id.btnLogout);
         if (btnLogout != null) {
@@ -75,6 +78,23 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+        // Xử lý nút click mở danh sách yêu thích
+        View btnProfileFavorites = findViewById(R.id.btnProfileFavorites);
+        if (btnProfileFavorites != null) {
+            btnProfileFavorites.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, FavoriteActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Xử lý nút Nâng cấp Premium
+        View btnUpgradePremium = findViewById(R.id.btnUpgradePremium);
+        if (btnUpgradePremium != null) {
+            btnUpgradePremium.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, UpgradePremiumActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     @Override
@@ -82,6 +102,13 @@ public class ProfileActivity extends AppCompatActivity {
         super.onResume();
         // Tải lại dữ liệu người dùng mỗi khi màn hình hiển thị (ví dụ: quay lại từ EditProfileActivity)
         loadUserProfile();
+        
+        // Cập nhật số lượng phim yêu thích
+        TextView txtFavCount = findViewById(R.id.txtFavCount);
+        if (txtFavCount != null) {
+            int favSize = FavoriteManager.getFavorites(this).size();
+            txtFavCount.setText(favSize + " phim");
+        }
     }
 
     private void loadUserProfile() {
@@ -122,8 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
                             imgAvatar.setImageResource(R.drawable.ic_avatar);
                         }
                     }
-                    
-                    // Xử lý hiển thị nút Admin
+// Xử lý hiển thị nút Admin
                     android.view.View layoutAdmin = findViewById(R.id.layoutAdmin);
                     if (layoutAdmin != null) {
                         if ("ADMIN".equals(profile.getRole())) {
@@ -135,6 +161,19 @@ public class ProfileActivity extends AppCompatActivity {
                         } else {
                             layoutAdmin.setVisibility(android.view.View.GONE);
                         }
+
+                    // Logic hiển thị bảng Premium
+                    LinearLayout layoutPremium = findViewById(R.id.layoutPremium);
+                    LinearLayout layoutUpgradePremium = findViewById(R.id.layoutUpgradePremium);
+                    
+                    if (profile.isPremium()) {
+                        // Đã là premium thì hiện dòng "Thành viên Premium" dưới tên và ẩn bảng Nâng cấp
+                        if (layoutPremium != null) layoutPremium.setVisibility(View.VISIBLE);
+                        if (layoutUpgradePremium != null) layoutUpgradePremium.setVisibility(View.GONE);
+                    } else {
+                        // Chưa mua Premium thì ẩn dòng "Thành viên" và hiện bảng "Nâng cấp" to chà bá
+                        if (layoutPremium != null) layoutPremium.setVisibility(View.GONE);
+                        if (layoutUpgradePremium != null) layoutUpgradePremium.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -144,5 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(ProfileActivity.this, "Không thể tải hồ sơ: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 }
+

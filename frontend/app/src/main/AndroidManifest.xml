@@ -97,6 +97,9 @@
             android:name=".ui.main.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.main.UpgradePremiumActivity"
+            android:exported="false" />
+        <activity
             android:name=".SeeAllActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

@@ -111,6 +111,12 @@ public class EditProfileActivity extends AppCompatActivity {
         loadUserProfile();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     private void saveChangesToDatabase() {
         String newName = txtDisplayName != null ? txtDisplayName.getText().toString() : "";
         if (newName.isEmpty() || newName.equals("User")) {

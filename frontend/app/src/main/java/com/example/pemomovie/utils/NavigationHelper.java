@@ -11,6 +11,7 @@ import com.example.pemomovie.ui.main.FavoriteActivity;
 import com.example.pemomovie.ui.main.HomeActivity;
 import com.example.pemomovie.ui.main.MovieActivity;
 import com.example.pemomovie.ui.main.ProfileActivity;
+import com.example.pemomovie.ui.main.WatchingActivity;
 
 public class NavigationHelper {
     public static void setupBottomNavigation(Activity activity) {
@@ -65,7 +66,7 @@ public class NavigationHelper {
             addBounceEffect(btnWatching);
             btnWatching.setOnClickListener(v -> {
                 if (!(activity instanceof ProfileActivity)) {
-                    startActivityWithAnim(activity, ProfileActivity.class);
+                    startActivityWithAnim(activity, WatchingActivity.class);
                 }
             });
         }
