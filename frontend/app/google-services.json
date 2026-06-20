@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "472197560087",
-    "project_id": "movieapp-project-bfa9f",
-    "storage_bucket": "movieapp-project-bfa9f.firebasestorage.app"
+    "project_number": "471246810127",
+    "project_id": "pemomovie",
+    "storage_bucket": "pemomovie.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:472197560087:android:0a0d3f386ce8546d9f6952",
+        "mobilesdk_app_id": "1:471246810127:android:50aa9152cb69c075bc477a",
         "android_client_info": {
           "package_name": "com.example.pemomovie"
         }
       },
       "oauth_client": [
         {
-          "client_id": "472197560087-e0sm7hmqhqmvqbu6vk5533ictmd3h7vi.apps.googleusercontent.com",
+          "client_id": "471246810127-v28om2r40uq4k1jalmuqkdm8achp2mgl.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.pemomovie",
-            "certificate_hash": "9f248c2172ab86004d4afe2e598d1ecc604928c4"
+            "certificate_hash": "71955450b52721e183ed09cdbdc095a1d437e521"
           }
         },
         {
-          "client_id": "472197560087-k8aj0atuh2s3tajlprmoqnpjggi2055f.apps.googleusercontent.com",
+          "client_id": "471246810127-s42c5mpd6ulc54hhl9p7gmnm0mdk7pr4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD3qCxBnonerRibb9kM4VMF9nPIn_pcmOU"
+          "current_key": "AIzaSyD0r8KHq-_TZF7UJnTE2g1oeoIzVRbr1FQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "472197560087-k8aj0atuh2s3tajlprmoqnpjggi2055f.apps.googleusercontent.com",
+              "client_id": "471246810127-s42c5mpd6ulc54hhl9p7gmnm0mdk7pr4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

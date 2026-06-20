@@ -161,6 +161,7 @@ public class ProfileActivity extends AppCompatActivity {
                         } else {
                             layoutAdmin.setVisibility(android.view.View.GONE);
                         }
+                    }
 
                     // Logic hiển thị bảng Premium
                     LinearLayout layoutPremium = findViewById(R.id.layoutPremium);

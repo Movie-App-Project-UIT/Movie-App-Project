@@ -198,8 +198,9 @@ public class DetailActivity extends AppCompatActivity {
         txtIMDb.setText(String.format(java.util.Locale.US, "IMDb %.1f", detail.getVoteAverage()));
         tvDuration.setText(detail.getDuration() != null ? detail.getDuration() + " phút" : "N/A");
         tvView.setText(detail.getViewCount() != null ? detail.getViewCount() + " lượt xem" : "N/A");
-        tvMediaType.setText(detail.getGenre());
-        tvCountry.setText(detail.getCountry());
+        String genresStr = detail.getGenres() != null ? String.join(", ", detail.getGenres()) : "N/A";
+        tvMediaType.setText(genresStr);
+        tvCountry.setText(detail.getCountryName() != null ? detail.getCountryName() : "N/A");
         tvGenre.setText(detail.getLanguage());
         tvDesc.setText(detail.getOverview());
 
