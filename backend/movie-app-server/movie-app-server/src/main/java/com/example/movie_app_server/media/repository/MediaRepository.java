@@ -17,21 +17,34 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByMediaType(MediaType mediaType);
 
     // Tìm kiếm phim theo tiêu đề (Không phân biệt chữ hoa / chữ thường)
+    List<Media> findByTitleContainingIgnoreCaseAndIsDeletedFalse(String title, Pageable pageable);
+    List<Media> findByTitleContainingIgnoreCaseAndIsDeletedFalse(String title);
     List<Media> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     // Tìm kiếm phim bằng ID lấy từ hệ thống TMDB để tránh trùng lặp khi đồng bộ
     Optional<Media> findByTmdbId(Integer tmdbId);
 
+    // Tìm các phim thuộc một thể loại
+    List<Media> findByGenres_Id(Long genreId);
+
+    // Tìm các phim ĐANG HOẠT ĐỘNG và thuộc một thể loại
+    List<Media> findByIsDeletedFalseAndGenres_Id(Long genreId);
+
+    // Tìm các phim KHÔNG thuộc một thể loại
+    @Query("SELECT m FROM Media m WHERE m.isDeleted = false AND :genre NOT MEMBER OF m.genres")
+    List<Media> findMediaNotContainingGenre(@Param("genre") com.example.movie_app_server.media.entity.Genre genre);
+
     // --- Homepage API Queries ---
     // Phim được đánh giá cao nhất (Top Rated)
-    List<Media> findTop10ByOrderByVoteAverageDesc();
+    List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();
 
     // Phim mới cập nhật (Recently Added)
-    List<Media> findTop10ByOrderByIdDesc();
+    List<Media> findTop10ByIsDeletedFalseOrderByIdDesc();
 
     @Query("SELECT DISTINCT m FROM Media m " +
             "LEFT JOIN m.genres g " +
-            "WHERE (:keyword IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "WHERE m.isDeleted = false " +
+            "AND (:keyword IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "AND (:genreId IS NULL OR g.id = :genreId) " +
             "AND (:countryId IS NULL OR m.country.id = :countryId) " +
             "AND (:ageRatingId IS NULL OR m.ageRating.id = :ageRatingId) " +

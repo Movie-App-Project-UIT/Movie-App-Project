@@ -30,13 +30,7 @@ public class TmdbSyncService {
     private final com.example.movie_app_server.media.repository.GenreRepository genreRepository;
     private final com.example.movie_app_server.media.repository.CountryRepository countryRepository;
 
-    @Transactional
-    // UPDATED: Added videoUrl and isPremium parameters
-    public Media syncMovieFromTmdb(Integer tmdbId, String videoUrl, boolean isPremium) {
-        if (mediaRepository.findByTmdbId(tmdbId).isPresent()) {
-            throw new AppException("Phim này đã tồn tại trong hệ thống!", HttpStatus.CONFLICT);
-        }
-
+    public Media previewMovieFromTmdb(Integer tmdbId) {
         TmdbMovieDetailsDto movieDto = tmdbClient.getMovieDetails(tmdbId);
         TmdbCreditsResponseDto creditsDto = tmdbClient.getMovieCredits(tmdbId);
 
@@ -60,9 +54,7 @@ public class TmdbSyncService {
                 .voteAverage(movieDto.getVoteAverage())
                 .mediaType(MediaType.MOVIE)
                 .language(movieDto.getOriginalLanguage() != null ? new java.util.Locale(movieDto.getOriginalLanguage()).getDisplayLanguage(new java.util.Locale("vi", "VN")) : null)
-                .videoUrl(videoUrl) // UPDATED: Apply videoUrl
-                .trailerUrl(trailerUrl) // Thêm trailerUrl
-                .isPremium(isPremium) // UPDATED: Apply isPremium
+                .trailerUrl(trailerUrl)
                 .build();
 
         // Map Genres
@@ -106,6 +98,19 @@ public class TmdbSyncService {
         }
 
         media.setCredits(creditEntities);
+        return media;
+    }
+
+    @Transactional
+    public Media syncMovieFromTmdb(Integer tmdbId, String videoUrl, boolean isPremium) {
+        if (mediaRepository.findByTmdbId(tmdbId).isPresent()) {
+            throw new AppException("Phim này đã tồn tại trong hệ thống!", HttpStatus.CONFLICT);
+        }
+        
+        Media media = previewMovieFromTmdb(tmdbId);
+        media.setVideoUrl(videoUrl);
+        media.setPremium(isPremium);
+        
         return mediaRepository.save(media);
     }
 

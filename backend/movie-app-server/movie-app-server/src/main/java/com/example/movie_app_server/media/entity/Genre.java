@@ -23,6 +23,10 @@ public class Genre {
     @Column(name = "tmdb_genre_id", nullable = false, unique = true)
     private Integer tmdbGenreId;
 
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private boolean isDeleted = false;
+
     @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
     @JsonIgnore
     @Builder.Default

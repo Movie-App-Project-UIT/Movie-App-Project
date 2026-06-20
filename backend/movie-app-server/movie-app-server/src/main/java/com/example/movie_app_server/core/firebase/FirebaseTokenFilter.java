@@ -1,5 +1,7 @@
 package com.example.movie_app_server.core.firebase;
 
+import com.example.movie_app_server.user.entity.User;
+import com.example.movie_app_server.user.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -20,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.List;
 
 @Component
@@ -41,6 +44,14 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 // Xác thực Token với Firebase
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
                 String uid = decodedToken.getUid(); // Rút trích ID người dùng (UID)
+
+                // Kiểm tra xem user có bị khóa trong database không
+                Optional<User> userOpt = userRepository.findByFirebaseUid(uid);
+                if (userOpt.isPresent() && !userOpt.get().isActive()) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Tai khoan cua ban da bi khoa");
+                    return;
+                }
 
                 // Cấp quyền truy cập hệ thống cho UID này
                 List<GrantedAuthority> authorities = new ArrayList<>();

@@ -20,4 +20,8 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
             com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus status,
             java.time.LocalDateTime start,
             java.time.LocalDateTime end);
+
+    List<UserSubscription> findByPlanAndStatus(
+            com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan plan,
+            com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus status);
 }
