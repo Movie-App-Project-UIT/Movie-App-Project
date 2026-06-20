@@ -31,7 +31,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
 
     @Query("SELECT DISTINCT m FROM Media m " +
             "LEFT JOIN m.genres g " +
-            "WHERE (:genreId IS NULL OR g.id = :genreId) " +
+            "WHERE (:keyword IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND (:genreId IS NULL OR g.id = :genreId) " +
             "AND (:countryId IS NULL OR m.country.id = :countryId) " +
             "AND (:ageRatingId IS NULL OR m.ageRating.id = :ageRatingId) " +
             "AND (CAST(:startDate AS date) IS NULL OR m.releaseDate >= :startDate) " +
@@ -48,6 +49,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             "  ))" +
             ")")
     Page<Media> filterMediaDynamically(
+            @Param("keyword") String keyword,
             @Param("genreId") Long genreId,
             @Param("countryId") Long countryId,
             @Param("ageRatingId") Long ageRatingId,

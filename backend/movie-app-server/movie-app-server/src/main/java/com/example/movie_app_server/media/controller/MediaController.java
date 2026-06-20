@@ -44,6 +44,7 @@ public class MediaController {
      */
     @GetMapping("/filter")
     public ResponseEntity<Page<MediaItemDto>> filterMedia(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long genreId,
             @RequestParam(required = false) Long countryId,
             @RequestParam(required = false) Long ageRatingId,
@@ -62,7 +63,7 @@ public class MediaController {
         }
 
         return ResponseEntity.ok(mediaService.filterMedia(
-                genreId, countryId, ageRatingId, releaseYear, isPlayable, mediaType, PageRequest.of(page, size, sort)));
+                keyword, genreId, countryId, ageRatingId, releaseYear, isPlayable, mediaType, PageRequest.of(page, size, sort)));
     }
 
     /**

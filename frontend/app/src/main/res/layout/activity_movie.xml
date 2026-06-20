@@ -44,27 +44,113 @@
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 
-        <!--Bộ lọc thể loại động-->
-        <HorizontalScrollView
+        <!-- TabLayout cho Định dạng phim -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayoutMediaType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:paddingTop="8dp">
-
-            <LinearLayout
-                android:id="@+id/layoutFilters"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            app:tabIndicatorColor="#00C853"
+            app:tabSelectedTextColor="#00C853"
+            app:tabTextColor="#BDBDBD">
+            
+            <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"/>
-        </HorizontalScrollView>
+                android:text="Tất cả" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phim Lẻ" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phim Bộ" />
+        </com.google.android.material.tabs.TabLayout>
 
-        <!-- Danh sách section phim-->
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+        <!-- Nút Mở rộng bộ lọc -->
+        <LinearLayout
+            android:id="@+id/btnToggleFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+            
+            <!-- Icon phễu tạm thay bằng 3 dấu ngang -->
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_search"
+                app:tint="#BDBDBD" />
+                
+            <TextView
+                android:id="@+id/txtToggleFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mở rộng bộ lọc"
+                android:textColor="#BDBDBD"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" />
+
+        <!-- Container chứa các cuộn ngang -->
+        <LinearLayout
+            android:id="@+id/layoutFiltersContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingTop="12dp">
+            
+            <!-- Hàng: Khu vực -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="Khu vực:" android:textColor="#888888" android:textSize="13sp"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvCountries" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- Hàng: Thể loại -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="Loại hình:" android:textColor="#888888" android:textSize="13sp"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvGenres" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- Hàng: Độ tuổi -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="Độ tuổi:" android:textColor="#888888" android:textSize="13sp"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvAgeRatings" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- Hàng: Thập niên -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="Thập niên:" android:textColor="#888888" android:textSize="13sp"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvYears" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- Hàng: Sắp xếp -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="Sắp xếp:" android:textColor="#888888" android:textSize="13sp"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSorts" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Danh sách phim -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvSections"
+            android:id="@+id/rvMovies"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:paddingTop="8dp"/>
+            android:paddingTop="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="20dp" />
     </LinearLayout>
 
     <include
