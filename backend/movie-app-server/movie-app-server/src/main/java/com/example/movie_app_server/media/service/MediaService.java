@@ -52,7 +52,7 @@ public class MediaService {
     }
 
     // --- LOGIC LỌC PHIM ---
-    public Page<MediaItemDto> filterMedia(Long genreId, Long countryId, Long ageRatingId,
+    public Page<MediaItemDto> filterMedia(String keyword, Long genreId, Long countryId, Long ageRatingId,
                                           Integer releaseYear, Boolean isPlayable, String mediaType, Pageable pageable) {
         
         java.time.LocalDate startDate = null;
@@ -63,7 +63,7 @@ public class MediaService {
         }
 
         Page<Media> mediaPage = mediaRepository.filterMediaDynamically(
-                genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
+                keyword, genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
 
         return mediaPage.map(this::convertToItemDto);
     }

@@ -27,6 +27,11 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         this.posterList = posterList;
     }
 
+    public void updateData(List<MediaItemDto> newPosters) {
+        this.posterList = newPosters;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
