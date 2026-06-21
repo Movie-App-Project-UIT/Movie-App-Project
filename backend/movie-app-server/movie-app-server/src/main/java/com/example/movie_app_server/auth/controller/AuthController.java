@@ -20,6 +20,15 @@ public class AuthController {
     @Autowired
     private com.example.movie_app_server.user.repository.UserRepository userRepository;
 
+    @Autowired
+    private com.example.movie_app_server.interaction.service.NotificationService notificationService;
+
+    @Autowired
+    private com.example.movie_app_server.interaction.repository.UserSubscriptionRepository userSubscriptionRepository;
+
+    @Autowired
+    private com.example.movie_app_server.interaction.repository.SubscriptionPlanRepository subscriptionPlanRepository;
+
     private Map<String, String> msg(String message) {
         Map<String, String> m = new HashMap<>();
         m.put("message", message);
@@ -115,9 +124,48 @@ public class AuthController {
                         .email(email)
                         .username(username)
                         .build();
-                userRepository.save(newUser);
+                newUser = userRepository.save(newUser);
 
-                // 3. Clear OTP
+                // 3. Tạo thông báo chào mừng
+                notificationService.createNotification(
+                        newUser,
+                        "Chào mừng đến với CineApp",
+                        "Đăng ký tài khoản thành công. Chúc bạn xem phim vui vẻ!",
+                        com.example.movie_app_server.interaction.entity.enums.NotificationType.SYSTEM
+                );
+
+                // 4. Tạo gói quà tặng Tân thủ (7 ngày)
+                com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan plan = 
+                    subscriptionPlanRepository.findAll().stream().findFirst().orElseGet(() -> {
+                        com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan p = new com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan();
+                        p.setName("Gói Premium 7 ngày");
+                        p.setDescription("Gói xem phim không quảng cáo 7 ngày");
+                        p.setPrice(java.math.BigDecimal.ZERO);
+                        p.setDurationDays(7);
+                        p.setIsActive(true);
+                        return subscriptionPlanRepository.save(p);
+                    });
+
+                com.example.movie_app_server.interaction.entity.subscription.UserSubscription giftSub = 
+                    com.example.movie_app_server.interaction.entity.subscription.UserSubscription.builder()
+                        .user(newUser)
+                        .plan(plan)
+                        .status(com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus.PENDING_GIFT)
+                        .startDate(java.time.LocalDateTime.now())
+                        .endDate(java.time.LocalDateTime.now().plusDays(plan.getDurationDays()))
+                        .build();
+                giftSub = userSubscriptionRepository.save(giftSub);
+
+                // Tạo thông báo nhận quà (đính kèm ID gói quà để app có thể kích hoạt)
+                notificationService.createNotificationWithRelatedId(
+                        newUser,
+                        "Quà tặng tân thủ",
+                        "Bạn nhận được 7 ngày Premium miễn phí. Nhấn để kích hoạt ngay!",
+                        com.example.movie_app_server.interaction.entity.enums.NotificationType.GIFT_RECEIVED,
+                        giftSub.getId()
+                );
+
+                // 5. Clear OTP
                 otpService.clearOtp(email);
 
                 return ResponseEntity.ok(msg("Đăng ký tài khoản thành công!"));

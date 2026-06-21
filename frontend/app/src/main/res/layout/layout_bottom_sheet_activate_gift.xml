@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet"
+    android:padding="24dp">
+
+    <!-- Close Button -->
+    <ImageView
+        android:id="@+id/btnCloseBottomSheet"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="end"
+        android:background="@drawable/bg_circle_close"
+        android:contentDescription="Đóng"
+        android:padding="8dp"
+        android:src="@drawable/ic_close" />
+
+    <!-- Gift Image -->
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-20dp"
+        android:src="@drawable/ic_gift"
+        android:background="@drawable/bg_gift_icon"
+        android:padding="24dp"
+        app:tint="@color/white"/>
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Xác nhận kích hoạt gói Premium"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Bạn nhận được 7 ngày Premium miễn phí\ntừ Admin.\nKích hoạt ngay để tận hưởng tất cả đặc quyền."
+        android:textColor="@color/gray_text_light"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="4dp"/>
+
+    <!-- Plan Info Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_plan_info_card"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:layout_marginTop="24dp">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_crown"
+            android:background="@drawable/bg_circle_dot"
+            android:padding="8dp"
+            app:tint="@color/white"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thời hạn gói"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:layout_marginStart="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="7 ngày"
+            android:textColor="#B39DFF"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="32dp"
+        android:weightSum="2">
+
+        <!-- Button Để sau -->
+        <TextView
+            android:id="@+id/btnLater"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Để sau"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:background="@drawable/bg_button_outline"
+            android:paddingVertical="14dp"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Button Xác nhận -->
+        <TextView
+            android:id="@+id/btnConfirmActivate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Xác nhận kích hoạt"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:background="@drawable/bg_button_gradient"
+            android:paddingVertical="14dp"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+</LinearLayout>

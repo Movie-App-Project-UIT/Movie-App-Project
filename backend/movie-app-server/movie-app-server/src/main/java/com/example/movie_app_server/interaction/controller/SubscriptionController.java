@@ -10,6 +10,7 @@ import com.example.movie_app_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,10 +25,11 @@ public class SubscriptionController {
     private final UserRepository userRepository;
 
     @PostMapping("/claim-gift/{notificationId}")
-    public ResponseEntity<String> claimGift(@PathVariable Long notificationId) {
-        String firebaseUid = SecurityContextHolder.getContext().getAuthentication().getName();
+    @Transactional
+    public ResponseEntity<java.util.Map<String, String>> claimGift(@PathVariable Long notificationId) {
+        String firebaseUid = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userRepository.findByFirebaseUid(firebaseUid).orElse(null);
-        if (currentUser == null) return ResponseEntity.status(401).body("User not found");
+        if (currentUser == null) return ResponseEntity.status(401).body(java.util.Map.of("message", "User not found"));
 
         Notification notification = notificationRepository.findById(notificationId).orElse(null);
         if (notification == null || !notification.getUser().getId().equals(currentUser.getId())) {
@@ -36,12 +38,12 @@ public class SubscriptionController {
 
         Long userSubscriptionId = notification.getRelatedId();
         if (userSubscriptionId == null) {
-            return ResponseEntity.badRequest().body("Invalid gift notification");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Invalid gift notification"));
         }
 
         UserSubscription giftSub = userSubscriptionRepository.findById(userSubscriptionId).orElse(null);
         if (giftSub == null || giftSub.getStatus() != SubscriptionStatus.PENDING_GIFT) {
-            return ResponseEntity.badRequest().body("Gift already claimed or not found");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Gift already claimed or not found"));
         }
 
         // Kích hoạt gói quà tặng
@@ -65,10 +67,17 @@ public class SubscriptionController {
 
         userSubscriptionRepository.save(giftSub);
 
+        // Cập nhật tài khoản người dùng thành PREMIUM thực tế trong Database
+        currentUser.setTier(com.example.movie_app_server.user.entity.enums.Tier.PREMIUM);
+        userRepository.save(currentUser);
+
         // Đánh dấu đã đọc
         notification.setIsRead(true);
         notificationRepository.save(notification);
 
-        return ResponseEntity.ok("Claimed successfully");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String formattedDate = giftSub.getEndDate().format(formatter);
+
+        return ResponseEntity.ok(java.util.Map.of("message", "Kích hoạt thành công! Hạn mới: " + formattedDate));
     }
 }

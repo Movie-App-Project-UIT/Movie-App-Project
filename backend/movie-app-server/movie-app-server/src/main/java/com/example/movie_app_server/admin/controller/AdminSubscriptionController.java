@@ -92,6 +92,8 @@ public class AdminSubscriptionController {
                         .user(user)
                         .plan(plan)
                         .status(SubscriptionStatus.PENDING_GIFT)
+                        .startDate(java.time.LocalDateTime.now())
+                        .endDate(java.time.LocalDateTime.now().plusDays(plan.getDurationDays()))
                         .build();
                 UserSubscription savedSub = userSubscriptionRepository.save(userSubscription);
 

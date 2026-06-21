@@ -83,90 +83,226 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:paddingVertical="8dp">
+            android:paddingVertical="12dp">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_crown"
-                android:background="@drawable/bg_circle_avatar_border"
-                android:padding="8dp"/>
+            <!-- Dấu chấm & Icon -->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <View
+                    android:id="@+id/dotUnreadAdminGift"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/bg_circle_dot"/>
+                <ImageView
+                    android:id="@+id/ivGiftIcon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_toEndOf="@id/dotUnreadAdminGift"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_gift"
+                    android:background="@drawable/bg_gift_icon"
+                    android:padding="12dp"
+                    app:tint="@color/white"/>
+            </RelativeLayout>
 
-            <LinearLayout
+            <!-- Nội dung bên phải -->
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Text Nội dung -->
+                <LinearLayout
+                    android:id="@+id/llTextContent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Quà tặng từ Admin"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical"
+                    android:layout_toStartOf="@+id/ivChevron"
+                    android:layout_marginEnd="8dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quà tặng từ Admin"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bạn nhận được 7 ngày\nPremium miễn phí."
+                        android:textColor="@color/gray_text_light"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp"
+                        android:lineSpacingExtra="2dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1 giờ trước"
+                        android:textColor="#888888"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+                <!-- Mũi tên -->
+                <ImageView
+                    android:id="@+id/ivChevron"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#666666"/>
+
+                <!-- Nút Kích hoạt -->
                 <TextView
+                    android:id="@+id/btnActivateGift"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bạn được tặng gói Premium. Nhấn vào để kích hoạt ngay!"
-                    android:textColor="@color/gray_text_light"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"/>
-            </LinearLayout>
+                    android:layout_below="@id/llTextContent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="8dp"
+                    android:text="Kích hoạt"
+                    android:textColor="#B39DFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_activate"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"/>
+            </RelativeLayout>
         </LinearLayout>
 
         <View
+            android:id="@+id/dividerDropdown"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#33FFFFFF"
-            android:layout_marginVertical="8dp"/>
+            android:layout_marginVertical="8dp"
+            android:visibility="gone"/>
 
-        <!-- Thông báo 2: Đăng ký thành công -->
+        <!-- Thông báo 2: Nâng cấp thành công -->
         <LinearLayout
             android:id="@+id/layoutNotifSuccess"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="?attr/selectableItemBackground"
+            android:layout_marginTop="8dp"
             android:clickable="true"
-            android:focusable="true"
-            android:paddingVertical="8dp">
+            android:focusable="true">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_check_circle_filled"
-                android:background="@drawable/bg_circle_avatar_border"
-                android:padding="8dp"
-                app:tint="@color/purple_accent"/>
+            <!-- Dấu chấm chưa đọc (Bên trái ngoài cùng) -->
+            <View
+                android:id="@+id/dotUnreadSuccess"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_circle_dot"
+                android:backgroundTint="@color/purple_accent"/>
 
+            <!-- Khung thông báo chính -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginStart="12dp">
+                android:background="@drawable/bg_plan_info_card"
+                android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nâng cấp thành công"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chào mừng bạn đến với trải nghiệm xem phim đỉnh cao Premium."
-                    android:textColor="@color/gray_text_light"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"/>
+                    <!-- Icon -->
+                    <ImageView
+                        android:id="@+id/ivSuccessIcon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_circle_gradient"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_crown"
+                        app:tint="@color/white" />
+
+                    <!-- Nội dung chữ -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toEndOf="@id/ivSuccessIcon"
+                        android:layout_marginStart="12dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:text="Nâng cấp thành công"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <!-- Badge Mới -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:background="@drawable/bg_button_outline"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="2dp"
+                                android:text="Mới"
+                                android:textColor="#B39DFF"
+                                android:textSize="10sp" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Chào mừng bạn đến với Premium! Bạn đã mở khóa tất cả đặc quyền xem phim."
+                            android:textColor="@color/gray_text_light"
+                            android:textSize="13sp" />
+
+                        <!-- Footer (Time + Button) -->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:text="Vừa xong"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+
+                            <!-- Nút hành động -->
+                            <TextView
+                                android:id="@+id/btnViewPrivileges"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:background="@drawable/bg_button_activate"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="6dp"
+                                android:text="Xem đặc quyền"
+                                android:textColor="#B39DFF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                        </RelativeLayout>
+                    </LinearLayout>
+                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -180,6 +316,7 @@
         android:layout_marginBottom="12dp"/>
 
     <LinearLayout
+        android:id="@+id/btnViewAllNotifications"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
