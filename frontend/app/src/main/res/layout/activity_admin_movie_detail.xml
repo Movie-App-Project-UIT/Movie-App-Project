@@ -177,6 +177,23 @@
                 android:textColor="@color/white"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Điểm đánh giá"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etVoteAverage"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bg_input_field"
+                android:textColor="@color/white"
+                android:paddingHorizontal="16dp"
+                android:enabled="false"
+                android:layout_marginBottom="16dp"/>
                 
             <TextView
                 android:layout_width="wrap_content"
@@ -185,13 +202,73 @@
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
-            <EditText
-                android:id="@+id/etVideoUrl"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_field"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <EditText
+                    android:id="@+id/etVideoUrl"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_field"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="16dp"/>
+
+                <Button
+                    android:id="@+id/btnUploadVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#10B981"
+                    android:text="Upload MP4"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quản lý Phụ đề"
                 android:textColor="@color/white"
-                android:paddingHorizontal="16dp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/etSubtitleLanguage"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="50dp"
+                    android:hint="Ngôn ngữ (VD: vi, en)"
+                    android:textColorHint="#9CA3AF"
+                    android:background="@drawable/bg_input_field"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="16dp"/>
+
+                <Button
+                    android:id="@+id/btnUploadSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#3B82F6"
+                    android:text="Thêm file SRT"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSubtitles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"/>
 
             <TextView
@@ -242,13 +319,26 @@
         </LinearLayout>
     </ScrollView>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="@color/bg_dark"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnViewReviews"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="#3B82F6"
+            android:text="Xem Bình Luận"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            app:cornerRadius="12dp"/>
 
         <Button
             android:id="@+id/btnSave"
@@ -260,7 +350,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             app:cornerRadius="12dp"/>
-    </FrameLayout>
+    </LinearLayout>
     
     <ProgressBar
         android:id="@+id/progressBar"

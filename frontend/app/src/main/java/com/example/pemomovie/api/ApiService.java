@@ -163,4 +163,13 @@ public interface ApiService {
 
     @GET("/api/v1/reviews/media/{mediaId}")
     Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
+
+    @Multipart
+    @POST("/api/v1/admin/upload/video")
+    Call<String> uploadVideoAdmin(@Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("/api/v1/admin/upload/subtitle")
+    Call<String> uploadSubtitleAdmin(@Part MultipartBody.Part file);
+
 }

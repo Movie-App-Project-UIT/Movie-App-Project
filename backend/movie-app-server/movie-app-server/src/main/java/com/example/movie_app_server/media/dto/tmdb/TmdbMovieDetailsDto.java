@@ -8,6 +8,7 @@ public class TmdbMovieDetailsDto {
     private Integer id;
     private String title;
     private String overview;
+    private Integer runtime;
 
     @JsonProperty("poster_path")
     private String posterPath;
