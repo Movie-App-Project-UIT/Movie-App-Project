@@ -28,6 +28,10 @@ import com.example.pemomovie.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.pemomovie.adapter.WatchingAdapter;
+
 public class WatchingActivity extends AppCompatActivity {
 
     @Override
@@ -41,9 +45,12 @@ public class WatchingActivity extends AppCompatActivity {
             return insets;
         });
         NavigationHelper.setupBottomNavigation(this);
-        ImageButton btnMore = findViewById(R.id.btnMore);
         ImageView btnProfile = findViewById(R.id.btnProfile);
         btnProfile.setOnClickListener(v -> showProfileDropdown(v));
+
+        RecyclerView rvContinue = findViewById(R.id.rvContinue);
+        rvContinue.setLayoutManager(new LinearLayoutManager(this));
+        rvContinue.setAdapter(new WatchingAdapter(true));
     }
     private void showProfileDropdown(View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);

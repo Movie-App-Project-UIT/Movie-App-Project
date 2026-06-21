@@ -67,6 +67,9 @@ public class PaymentSuccessActivity extends AppCompatActivity {
     }
 
     private void goToHome() {
+        android.content.SharedPreferences prefs = getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE);
+        prefs.edit().putBoolean("has_new_premium_notification", true).apply();
+
         Intent intent = new Intent(PaymentSuccessActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

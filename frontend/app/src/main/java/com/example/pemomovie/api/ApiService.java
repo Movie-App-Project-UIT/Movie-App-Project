@@ -132,6 +132,8 @@ public interface ApiService {
 
     @POST("/api/v1/payments/test-success")
     Call<ResponseBody> simulateSuccess(
+            @Query("packageId") Long packageId);
+
             @Query("packageId") Long packageId
     );
     @GET("/api/v1/media/{id}/play")
