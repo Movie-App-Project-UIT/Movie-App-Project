@@ -66,6 +66,8 @@ public class PaymentController {
     // Return URL: Trình duyệt của user chuyển hướng về đây sau khi thanh toán xong
     @GetMapping("/vnpay-return")
     public ResponseEntity<String> vnpayReturn(@RequestParam Map<String, String> params) {
+        Map<String, String> originalParams = new HashMap<>(params); // Save original for IPN
+
         String secureHash = params.get("vnp_SecureHash");
         params.remove("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
@@ -77,6 +79,8 @@ public class PaymentController {
 
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
+            // Since VNPay server cannot reach localhost IPN URL, we manually call IPN logic here for testing
+            paymentService.processIpnWebhook(originalParams);
             // Hiển thị giao diện hoặc redirect về App (DeepLink)
             return ResponseEntity.ok("Thanh toán thành công! Bạn có thể quay lại Ứng dụng.");
         } else {

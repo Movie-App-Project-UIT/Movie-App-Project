@@ -279,6 +279,25 @@ public class HomeActivity extends AppCompatActivity {
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.VISIBLE);
             if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(hasAdminGift ? View.VISIBLE : View.GONE);
             if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(hasPremiumNotif ? View.VISIBLE : View.GONE);
+            
+            String giftTime = "Vừa xong";
+            String successTime = "Vừa xong";
+            for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
+                if (notif.getRead() == null || !notif.getRead()) {
+                    if ("GIFT_RECEIVED".equals(notif.getType())) {
+                        giftTime = getTimeAgo(notif.getCreatedAt());
+                    } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
+                        successTime = getTimeAgo(notif.getCreatedAt());
+                    }
+                }
+            }
+            
+            TextView tvAdminGiftTime = popupView.findViewById(R.id.tvAdminGiftTime);
+            if (tvAdminGiftTime != null) tvAdminGiftTime.setText(giftTime);
+            
+            TextView tvSuccessTime = popupView.findViewById(R.id.tvSuccessTime);
+            if (tvSuccessTime != null) tvSuccessTime.setText(successTime);
+            
         } else {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.GONE);
@@ -466,6 +485,39 @@ public class HomeActivity extends AppCompatActivity {
                 btnProfile.setPadding(0, 0, 0, 0);
                 btnProfile.setImageResource(R.drawable.ic_avatar);
             }
+        }
+    }
+
+    private String getTimeAgo(String createdAt) {
+        if (createdAt == null || createdAt.isEmpty()) return "Vừa xong";
+        try {
+            // Remove fractional seconds if present (e.g. .123456)
+            if (createdAt.contains(".")) {
+                createdAt = createdAt.substring(0, createdAt.indexOf("."));
+            }
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+            // sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); // Remove this to use local time
+            java.util.Date date = sdf.parse(createdAt);
+            if (date == null) return "Vừa xong";
+
+            long time = date.getTime();
+            long now = System.currentTimeMillis();
+            long diff = now - time;
+
+            if (diff < 0) diff = 0; // Prevent negative time difference
+
+            if (diff < 60 * 1000) {
+                return "Vừa xong";
+            } else if (diff < 60 * 60 * 1000) {
+                return (diff / (60 * 1000)) + " phút trước";
+            } else if (diff < 24 * 60 * 60 * 1000) {
+                return (diff / (60 * 60 * 1000)) + " giờ trước";
+            } else {
+                return (diff / (24 * 60 * 60 * 1000)) + " ngày trước";
+            }
+        } catch (Exception e) {
+            return "Vừa xong";
         }
     }
 }

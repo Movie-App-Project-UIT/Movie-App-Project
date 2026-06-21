@@ -166,6 +166,9 @@ public interface ApiService {
     @POST("/api/v1/subscriptions/claim-gift/{notificationId}")
     Call<Map<String, String>> claimGift(@retrofit2.http.Path("notificationId") Long notificationId);
 
+    @GET("/api/v1/subscriptions/plans")
+    Call<List<com.example.pemomovie.dto.AdminSubscriptionDto>> getActivePlans();
+
     @GET("/api/v1/reviews/media/{mediaId}")
     Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 

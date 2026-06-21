@@ -58,7 +58,7 @@ public class AdminSubscriptionController {
     @PutMapping("/{id}/toggle-status")
     public ResponseEntity<Void> toggleSubscriptionStatus(@PathVariable Long id) {
         return subscriptionPlanRepository.findById(id).map(plan -> {
-            boolean newStatus = !plan.getIsActive();
+            boolean newStatus = plan.getIsActive() == null || !plan.getIsActive();
             plan.setIsActive(newStatus);
             subscriptionPlanRepository.save(plan);
 

@@ -27,8 +27,11 @@ public class PaymentActivity extends AppCompatActivity {
     private ConstraintLayout cardPayMomo, cardPayVnpay;
     private ImageView icCheckMomo, icCheckVnpay;
     private String selectedMethod = "MOMO"; // Default
-    private int selectedPlan = 6;
-    private String planPriceStr = "249.000đ";
+    private Long selectedPlanId = -1L;
+    private String selectedPlanName = "";
+    private String planPriceStr = "0đ";
+    private double selectedPlanPriceRaw = 0.0;
+    private int selectedPlanDuration = 180;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,27 +44,23 @@ public class PaymentActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Lấy gói đã chọn
-        selectedPlan = getIntent().getIntExtra("SELECTED_PLAN", 6);
+        // Lấy gói đã chọn qua Intent
+        selectedPlanId = getIntent().getLongExtra("SELECTED_PLAN_ID", -1L);
+        selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        planPriceStr = getIntent().getStringExtra("SELECTED_PLAN_PRICE");
+        if (planPriceStr == null) planPriceStr = "0đ";
+        selectedPlanPriceRaw = getIntent().getDoubleExtra("SELECTED_PLAN_PRICE_RAW", 0.0);
+        selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
         
         TextView txtPlanName = findViewById(R.id.txtPlanName);
         TextView txtPlanPrice = findViewById(R.id.txtPlanPrice);
-        TextView txtPayBtn = findViewById(R.id.txtPayBtn);
         
-        if (selectedPlan == 1) {
-            txtPlanName.setText("Gói 1 tháng");
-            planPriceStr = "49.000đ";
-        } else if (selectedPlan == 12) {
-            txtPlanName.setText("Gói 1 năm");
-            planPriceStr = "449.000đ";
-        } else {
-            txtPlanName.setText("Gói 6 tháng");
-            planPriceStr = "249.000đ";
+        if (txtPlanName != null) {
+            txtPlanName.setText(selectedPlanName);
         }
-        
-        txtPlanPrice.setText(planPriceStr);
-        // Bỏ dòng cập nhật text nút bấm để luôn giữ là "Tiếp tục thanh toán"
-        // txtPayBtn.setText("Thanh toán " + planPriceStr);
+        if (txtPlanPrice != null) {
+            txtPlanPrice.setText(planPriceStr);
+        }
 
         // Nút Back
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -87,8 +86,11 @@ public class PaymentActivity extends AppCompatActivity {
         if (btnPay != null) {
             btnPay.setOnClickListener(v -> {
                 Intent intent = new Intent(PaymentActivity.this, QrPaymentActivity.class);
-                intent.putExtra("SELECTED_PLAN", selectedPlan);
+                intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
+                intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
                 intent.putExtra("PLAN_PRICE", planPriceStr);
+                intent.putExtra("SELECTED_PLAN_PRICE_RAW", selectedPlanPriceRaw);
+                intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
                 intent.putExtra("PAYMENT_METHOD", selectedMethod);
                 startActivity(intent);
             });

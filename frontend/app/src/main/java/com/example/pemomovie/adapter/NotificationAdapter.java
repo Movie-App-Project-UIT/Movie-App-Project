@@ -58,11 +58,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvTitle.setText(notif.getTitle());
         holder.tvMessage.setText(notif.getMessage());
         
-        // Mock time for now, or parse createdAt
         if (notif.getCreatedAt() != null) {
-            holder.tvTime.setText("Vừa xong"); // Tạm thời
+            holder.tvTime.setText(getTimeAgo(notif.getCreatedAt()));
         } else {
-            holder.tvTime.setText("Hôm qua, 20:45");
+            holder.tvTime.setText("Vừa xong");
         }
 
         // Đọc / Chưa đọc
@@ -124,7 +123,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 
                 borderDrawable.setStroke(dpToPx(1), Color.parseColor("#5424F2")); // Purple border
                 
-                holder.tvBadge.setText("Mới");
+                holder.tvBadge.setText("VIP");
                 holder.tvBadge.setTextColor(Color.parseColor("#B39DFF"));
                 badgeDrawable.setStroke(dpToPx(1), Color.parseColor("#B39DFF"));
                 holder.tvBadge.setBackground(badgeDrawable);
@@ -171,6 +170,37 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private int dpToPx(int dp) {
         float density = context.getResources().getDisplayMetrics().density;
         return Math.round((float) dp * density);
+    }
+
+    private String getTimeAgo(String createdAt) {
+        if (createdAt == null || createdAt.isEmpty()) return "Vừa xong";
+        try {
+            // Remove fractional seconds if present
+            if (createdAt.contains(".")) {
+                createdAt = createdAt.substring(0, createdAt.indexOf("."));
+            }
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+            java.util.Date date = sdf.parse(createdAt);
+            if (date == null) return "Vừa xong";
+
+            long time = date.getTime();
+            long now = System.currentTimeMillis();
+            long diff = now - time;
+
+            if (diff < 0) diff = 0;
+
+            if (diff < 60 * 1000) {
+                return "Vừa xong";
+            } else if (diff < 60 * 60 * 1000) {
+                return (diff / (60 * 1000)) + " phút trước";
+            } else if (diff < 24 * 60 * 60 * 1000) {
+                return (diff / (60 * 60 * 1000)) + " giờ trước";
+            } else {
+                return (diff / (24 * 60 * 60 * 1000)) + " ngày trước";
+            }
+        } catch (Exception e) {
+            return "Vừa xong";
+        }
     }
 
     @Override
