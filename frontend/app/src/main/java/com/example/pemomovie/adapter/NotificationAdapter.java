@@ -150,11 +150,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 holder.tvBadge.setBackground(badgeDrawable);
                 holder.tvBadge.setVisibility(View.VISIBLE);
 
-                holder.btnAction.setText("Kích hoạt");
-                holder.btnAction.setTextColor(Color.parseColor("#F5D166"));
-                btnDrawable.setColor(Color.parseColor("#332A15")); // Dark gold bg
-                holder.btnAction.setBackground(btnDrawable);
-                holder.btnAction.setVisibility(View.VISIBLE);
+                if (notif.getIsClaimed() != null && notif.getIsClaimed()) {
+                    holder.btnAction.setText("Đã kích hoạt");
+                    holder.btnAction.setTextColor(Color.parseColor("#888888"));
+                    btnDrawable.setColor(Color.parseColor("#333333")); // Dark gray bg
+                    holder.btnAction.setBackground(btnDrawable);
+                    holder.btnAction.setVisibility(View.VISIBLE);
+                    holder.btnAction.setClickable(false);
+                } else {
+                    holder.btnAction.setText("Kích hoạt");
+                    holder.btnAction.setTextColor(Color.parseColor("#F5D166"));
+                    btnDrawable.setColor(Color.parseColor("#332A15")); // Dark gold bg
+                    holder.btnAction.setBackground(btnDrawable);
+                    holder.btnAction.setVisibility(View.VISIBLE);
+                    holder.btnAction.setClickable(true);
+                }
                 break;
                 
             default:

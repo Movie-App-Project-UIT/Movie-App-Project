@@ -52,8 +52,16 @@ public class SubscriptionController {
         }
 
         UserSubscription giftSub = userSubscriptionRepository.findById(userSubscriptionId).orElse(null);
-        if (giftSub == null || giftSub.getStatus() != SubscriptionStatus.PENDING_GIFT) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Gift already claimed or not found"));
+        if (giftSub == null) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Gift not found"));
+        }
+
+        if (giftSub.getStatus() != SubscriptionStatus.PENDING_GIFT) {
+            return ResponseEntity.ok(java.util.Map.of(
+                    "isClaimed", true,
+                    "durationDays", giftSub.getPlan().getDurationDays(),
+                    "planName", giftSub.getPlan().getName()
+            ));
         }
 
         UserSubscription activeSub = userSubscriptionRepository
@@ -68,6 +76,7 @@ public class SubscriptionController {
         }
 
         return ResponseEntity.ok(java.util.Map.of(
+                "isClaimed", false,
                 "durationDays", giftSub.getPlan().getDurationDays(),
                 "planName", giftSub.getPlan().getName(),
                 "calculatedEndDate", newEndDate.toString()

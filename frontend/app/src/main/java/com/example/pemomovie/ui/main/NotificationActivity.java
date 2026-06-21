@@ -261,18 +261,46 @@ public class NotificationActivity extends AppCompatActivity {
                         }
                     } catch (Exception ignored) {}
 
-                    if (tvSubtitle != null) {
-                        tvSubtitle.setText("Bạn nhận được " + durationDays + " ngày Premium miễn phí\ntừ Admin.\nKích hoạt ngay để tận hưởng tất cả đặc quyền.");
+                    Boolean isClaimed = false;
+                    if (data.containsKey("isClaimed")) {
+                        Object claimedObj = data.get("isClaimed");
+                        if (claimedObj instanceof Boolean) {
+                            isClaimed = (Boolean) claimedObj;
+                        } else if (claimedObj instanceof String) {
+                            isClaimed = Boolean.parseBoolean((String) claimedObj);
+                        }
                     }
-                    if (tvDuration != null) {
-                        tvDuration.setText(durationDays + " ngày");
-                    }
-                    if (tvCalculatedEndDate != null) {
-                        tvCalculatedEndDate.setText(displayDate);
-                    }
-                    if (btnConfirmActivate != null) {
-                        btnConfirmActivate.setEnabled(true);
-                        btnConfirmActivate.setAlpha(1.0f);
+
+                    if (isClaimed) {
+                        if (tvSubtitle != null) {
+                            tvSubtitle.setText("Bạn đã kích hoạt gói quà này.\nCảm ơn bạn đã đồng hành cùng chúng tôi!");
+                        }
+                        if (tvDuration != null) {
+                            tvDuration.setText(durationDays + " ngày");
+                        }
+                        if (tvCalculatedEndDate != null) {
+                            tvCalculatedEndDate.setText("Đã kích hoạt");
+                        }
+                        if (btnConfirmActivate != null) {
+                            btnConfirmActivate.setText("Đã kích hoạt");
+                            btnConfirmActivate.setEnabled(false);
+                            btnConfirmActivate.setBackgroundResource(R.drawable.bg_button_gradient);
+                            btnConfirmActivate.setAlpha(0.4f);
+                        }
+                    } else {
+                        if (tvSubtitle != null) {
+                            tvSubtitle.setText("Bạn nhận được " + durationDays + " ngày Premium miễn phí\ntừ Admin.\nKích hoạt ngay để tận hưởng tất cả đặc quyền.");
+                        }
+                        if (tvDuration != null) {
+                            tvDuration.setText(durationDays + " ngày");
+                        }
+                        if (tvCalculatedEndDate != null) {
+                            tvCalculatedEndDate.setText(displayDate);
+                        }
+                        if (btnConfirmActivate != null) {
+                            btnConfirmActivate.setEnabled(true);
+                            btnConfirmActivate.setAlpha(1.0f);
+                        }
                     }
                 } else {
                     if (tvSubtitle != null) tvSubtitle.setText("Lỗi: Không thể xem trước ngày hết hạn.");

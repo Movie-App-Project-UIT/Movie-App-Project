@@ -108,8 +108,6 @@ public class AdminSubscriptionController {
                         .startDate(java.time.LocalDateTime.now())
                         .endDate(java.time.LocalDateTime.now().plusDays(plan.getDurationDays()))
                         .isGift(true)
-                        .startDate(java.time.LocalDateTime.now())
-                        .endDate(java.time.LocalDateTime.now())
                         .build();
                 UserSubscription savedSub = userSubscriptionRepository.save(userSubscription);
 

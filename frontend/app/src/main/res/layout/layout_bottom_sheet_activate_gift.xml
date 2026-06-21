@@ -106,7 +106,7 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_calendar"
+                android:src="@drawable/ic_time"
                 android:background="@drawable/bg_circle_dot"
                 android:padding="8dp"
                 app:tint="@color/white"
