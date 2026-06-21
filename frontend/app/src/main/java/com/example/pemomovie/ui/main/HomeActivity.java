@@ -36,6 +36,7 @@ import com.example.pemomovie.api.ApiClient;
 import com.example.pemomovie.api.ApiService;
 import com.example.pemomovie.custom.GradientTextView;
 import com.example.pemomovie.dto.MediaItemDto;
+import com.example.pemomovie.dto.UserProfileDto;
 import com.example.pemomovie.model.Section;
 import com.example.pemomovie.ui.auth.LoginActivity;
 import com.example.pemomovie.utils.NavigationHelper;
@@ -248,6 +249,10 @@ public class HomeActivity extends AppCompatActivity {
         popupWindow.showAsDropDown(anchorView, 0, yoff);
     }
 
+    private List<com.example.pemomovie.dto.NotificationDto> dbNotifications = new java.util.ArrayList<>();
+    private boolean hasAdminGift = false;
+    private boolean hasPremiumNotif = false;
+
     private void showNotificationDropdown(View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.layout_notification_dropdown, null);
@@ -268,24 +273,58 @@ public class HomeActivity extends AppCompatActivity {
         View layoutNotifAdminGift = popupView.findViewById(R.id.layoutNotifAdminGift);
         View layoutNotifSuccess = popupView.findViewById(R.id.layoutNotifSuccess);
 
-        android.content.SharedPreferences prefs = getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE);
-        boolean hasPremiumNotif = prefs.getBoolean("has_new_premium_notification", false);
-
-        if (hasPremiumNotif) {
+        // Hiển thị dropdown dựa trên dữ liệu thật từ Database
+        if (hasPremiumNotif || hasAdminGift) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.VISIBLE);
-            if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(View.GONE);
-            if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(View.VISIBLE);
+            if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(hasAdminGift ? View.VISIBLE : View.GONE);
+            if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(hasPremiumNotif ? View.VISIBLE : View.GONE);
+            
+            String giftTime = "Vừa xong";
+            String successTime = "Vừa xong";
+            for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
+                if (notif.getRead() == null || !notif.getRead()) {
+                    if ("GIFT_RECEIVED".equals(notif.getType())) {
+                        giftTime = getTimeAgo(notif.getCreatedAt());
+                    } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
+                        successTime = getTimeAgo(notif.getCreatedAt());
+                    }
+                }
+            }
+            
+            TextView tvAdminGiftTime = popupView.findViewById(R.id.tvAdminGiftTime);
+            if (tvAdminGiftTime != null) tvAdminGiftTime.setText(giftTime);
+            
+            TextView tvSuccessTime = popupView.findViewById(R.id.tvSuccessTime);
+            if (tvSuccessTime != null) tvSuccessTime.setText(successTime);
+            
         } else {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.GONE);
         }
 
+        // Ẩn/hiện đường gạch phân cách ở giữa dựa trên số lượng thông báo hiển thị
+        View dividerDropdown = popupView.findViewById(R.id.dividerDropdown);
+        if (dividerDropdown != null) {
+            dividerDropdown.setVisibility((hasAdminGift && hasPremiumNotif) ? View.VISIBLE : View.GONE);
+        }
+
         if (layoutNotifAdminGift != null) {
             layoutNotifAdminGift.setOnClickListener(v -> {
                 popupWindow.dismiss();
-                Toast.makeText(HomeActivity.this, "Đã kích hoạt gói Premium quà tặng thành công!", Toast.LENGTH_LONG).show();
+                // Mở màn hình chi tiết thông báo để kích hoạt thật
+                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                startActivity(intent);
             });
+            
+            View btnActivateGift = popupView.findViewById(R.id.btnActivateGift);
+            if (btnActivateGift != null) {
+                btnActivateGift.setOnClickListener(v -> {
+                    popupWindow.dismiss();
+                    Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                    startActivity(intent);
+                });
+            }
         }
 
         if (layoutNotifSuccess != null) {
@@ -296,19 +335,114 @@ public class HomeActivity extends AppCompatActivity {
             });
         }
 
-        // Đánh dấu đã đọc
+        View btnViewPrivileges = popupView.findViewById(R.id.btnViewPrivileges);
+        if (btnViewPrivileges != null) {
+            btnViewPrivileges.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Đánh dấu đã đọc tất cả thông báo thật trong Database
         View tvMarkAsRead = popupView.findViewById(R.id.tvMarkAsRead);
         if (tvMarkAsRead != null) {
             tvMarkAsRead.setOnClickListener(v -> {
-                prefs.edit().putBoolean("has_new_premium_notification", false).apply();
+                for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
+                    if (notif.getRead() == null || !notif.getRead()) {
+                        markNotificationAsReadOnBackend(notif.getId());
+                    }
+                }
+                hasAdminGift = false;
+                hasPremiumNotif = false;
+                updateNotificationBadge(0);
                 popupWindow.dismiss();
                 Toast.makeText(HomeActivity.this, "Đã đánh dấu đọc tất cả", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        View btnViewAllNotifications = popupView.findViewById(R.id.btnViewAllNotifications);
+        if (btnViewAllNotifications != null) {
+            btnViewAllNotifications.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                startActivity(intent);
             });
         }
 
         int xoff = anchorView.getWidth() - width;
         int yoff = (int) (8 * getResources().getDisplayMetrics().density);
         popupWindow.showAsDropDown(anchorView, xoff, yoff);
+    }
+
+    private void markNotificationAsReadOnBackend(Long id) {
+        if (id == null) return;
+        ApiClient.getApiService().markNotificationAsRead(id).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {}
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+        });
+    }
+
+    private void fetchNotifications() {
+        ApiService apiService = ApiClient.getApiService();
+        apiService.getMyProfile().enqueue(new Callback<UserProfileDto>() {
+            @Override
+            public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        Long userId = Long.parseLong(response.body().getId());
+                        apiService.getUserNotifications(userId).enqueue(new Callback<List<com.example.pemomovie.dto.NotificationDto>>() {
+                            @Override
+                            public void onResponse(Call<List<com.example.pemomovie.dto.NotificationDto>> call, Response<List<com.example.pemomovie.dto.NotificationDto>> response2) {
+                                if (response2.isSuccessful() && response2.body() != null) {
+                                    dbNotifications.clear();
+                                    dbNotifications.addAll(response2.body());
+                                    
+                                    hasAdminGift = false;
+                                    hasPremiumNotif = false;
+                                    int unreadCount = 0;
+                                    
+                                    for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
+                                        if (notif.getRead() == null || !notif.getRead()) {
+                                            unreadCount++;
+                                            if ("GIFT_RECEIVED".equals(notif.getType())) {
+                                                hasAdminGift = true;
+                                            } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
+                                                hasPremiumNotif = true;
+                                            }
+                                        }
+                                    }
+                                    updateNotificationBadge(unreadCount);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<com.example.pemomovie.dto.NotificationDto>> call, Throwable t) {}
+                        });
+                    } catch (NumberFormatException e) {
+                        Log.e("HomeActivity", "Lỗi định dạng User ID", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileDto> call, Throwable t) {}
+        });
+    }
+
+    private void updateNotificationBadge(int unreadCount) {
+        TextView tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
+        
+        if (tvNotificationBadge != null) {
+            if (unreadCount > 0) {
+                tvNotificationBadge.setText(String.valueOf(unreadCount));
+                tvNotificationBadge.setVisibility(View.VISIBLE);
+            } else {
+                tvNotificationBadge.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
@@ -323,6 +457,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadHomeProfileAvatar();
+        fetchNotifications();
         if (handler != null && sliderRunnable != null) {
             handler.postDelayed(sliderRunnable, 5000);
         }
@@ -350,6 +485,39 @@ public class HomeActivity extends AppCompatActivity {
                 btnProfile.setPadding(0, 0, 0, 0);
                 btnProfile.setImageResource(R.drawable.ic_avatar);
             }
+        }
+    }
+
+    private String getTimeAgo(String createdAt) {
+        if (createdAt == null || createdAt.isEmpty()) return "Vừa xong";
+        try {
+            // Remove fractional seconds if present (e.g. .123456)
+            if (createdAt.contains(".")) {
+                createdAt = createdAt.substring(0, createdAt.indexOf("."));
+            }
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+            // sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); // Remove this to use local time
+            java.util.Date date = sdf.parse(createdAt);
+            if (date == null) return "Vừa xong";
+
+            long time = date.getTime();
+            long now = System.currentTimeMillis();
+            long diff = now - time;
+
+            if (diff < 0) diff = 0; // Prevent negative time difference
+
+            if (diff < 60 * 1000) {
+                return "Vừa xong";
+            } else if (diff < 60 * 60 * 1000) {
+                return (diff / (60 * 1000)) + " phút trước";
+            } else if (diff < 24 * 60 * 60 * 1000) {
+                return (diff / (60 * 60 * 1000)) + " giờ trước";
+            } else {
+                return (diff / (24 * 60 * 60 * 1000)) + " ngày trước";
+            }
+        } catch (Exception e) {
+            return "Vừa xong";
         }
     }
 }

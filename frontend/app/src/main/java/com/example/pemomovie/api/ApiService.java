@@ -157,6 +157,18 @@ public interface ApiService {
             @retrofit2.http.Query("size") int size
     );
 
+    @GET("/api/v1/notifications/{userId}")
+    Call<List<com.example.pemomovie.dto.NotificationDto>> getUserNotifications(@retrofit2.http.Path("userId") Long userId);
+
+    @retrofit2.http.PUT("/api/v1/notifications/{id}/read")
+    Call<Map<String, String>> markNotificationAsRead(@retrofit2.http.Path("id") Long id);
+
+    @POST("/api/v1/subscriptions/claim-gift/{notificationId}")
+    Call<Map<String, String>> claimGift(@retrofit2.http.Path("notificationId") Long notificationId);
+
+    @GET("/api/v1/subscriptions/plans")
+    Call<List<com.example.pemomovie.dto.AdminSubscriptionDto>> getActivePlans();
+
     @GET("/api/v1/reviews/media/{mediaId}")
     Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 

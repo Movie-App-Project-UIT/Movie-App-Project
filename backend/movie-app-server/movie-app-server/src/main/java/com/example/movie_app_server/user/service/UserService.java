@@ -20,7 +20,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ImageKitService imageKitService;
-
+    private final com.example.movie_app_server.interaction.service.NotificationService notificationService;
+    private final com.example.movie_app_server.interaction.repository.UserSubscriptionRepository userSubscriptionRepository;
+    private final com.example.movie_app_server.interaction.repository.SubscriptionPlanRepository subscriptionPlanRepository;
+ 
     /**
      * Hàm đồng bộ thông tin User từ Firebase xuống MySQL.
      * Logic: Tìm xem UID này đã có trong Database chưa.
@@ -71,6 +74,15 @@ public class UserService {
                     .role(com.example.movie_app_server.user.entity.enums.Role.USER)
                     .tier(com.example.movie_app_server.user.entity.enums.Tier.FREE)
                     .build());
+
+            // 1. Tạo thông báo chào mừng
+            notificationService.createNotification(
+                    newUser,
+                    "Chào mừng đến với CineApp",
+                    "Đăng ký tài khoản thành công. Chúc bạn xem phim vui vẻ!",
+                    com.example.movie_app_server.interaction.entity.enums.NotificationType.SYSTEM
+            );
+
             return convertToProfileDto(newUser);
         }
     }

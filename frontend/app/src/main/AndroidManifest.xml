@@ -98,6 +98,9 @@
             android:name=".ui.main.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.main.NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.UpgradePremiumActivity"
             android:exported="false" />
         <activity android:name=".ui.main.PaymentActivity"

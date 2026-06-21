@@ -58,7 +58,7 @@ public class AdminSubscriptionController {
     @PutMapping("/{id}/toggle-status")
     public ResponseEntity<Void> toggleSubscriptionStatus(@PathVariable Long id) {
         return subscriptionPlanRepository.findById(id).map(plan -> {
-            boolean newStatus = !plan.getIsActive();
+            boolean newStatus = plan.getIsActive() == null || !plan.getIsActive();
             plan.setIsActive(newStatus);
             subscriptionPlanRepository.save(plan);
 
@@ -105,6 +105,8 @@ public class AdminSubscriptionController {
                         .user(user)
                         .plan(plan)
                         .status(SubscriptionStatus.PENDING_GIFT)
+                        .startDate(java.time.LocalDateTime.now())
+                        .endDate(java.time.LocalDateTime.now().plusDays(plan.getDurationDays()))
                         .isGift(true)
                         .build();
                 UserSubscription savedSub = userSubscriptionRepository.save(userSubscription);

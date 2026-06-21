@@ -39,6 +39,7 @@ public class PaymentService {
     private final SubscriptionPlanRepository planRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository;
+    private final com.example.movie_app_server.interaction.service.NotificationService notificationService;
 
     public String createPaymentUrl(Long packageId, String paymentMethod, String firebaseUid, String ipAddress, Long customAmount) {
         User user = userRepository.findByFirebaseUid(firebaseUid)
@@ -281,6 +282,14 @@ public class PaymentService {
                 .status(SubscriptionStatus.ACTIVE)
                 .build();
         userSubscriptionRepository.save(newSub);
+
+        // Lưu thông báo nâng cấp gói thành công vào Database
+        notificationService.createNotification(
+                user,
+                "Nâng cấp thành công",
+                "Chào mừng bạn đến với Premium! Bạn đã mở khóa tất cả đặc quyền xem phim.",
+                com.example.movie_app_server.interaction.entity.enums.NotificationType.SUBSCRIPTION_NEW_PLAN
+        );
     }
 
     public void simulateSuccess(Long packageId, String userUid) {

@@ -25,6 +25,9 @@ public class TmdbTvDetailsDto {
     @JsonProperty("original_language")
     private String originalLanguage;
 
+    @JsonProperty("original_name")
+    private String originalName;
+
     private List<TmdbSeasonBasicDto> seasons; // Chứa danh sách các phần
     private TmdbVideosDto videos;
 
