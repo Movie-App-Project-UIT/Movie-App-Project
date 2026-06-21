@@ -23,6 +23,7 @@
         app:controller_layout_id="@layout/custom_player_control">
 
         <LinearLayout
+            android:id="@+id/topInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
