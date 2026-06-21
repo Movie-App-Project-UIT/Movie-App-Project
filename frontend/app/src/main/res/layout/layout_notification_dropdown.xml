@@ -143,6 +143,7 @@
                         android:lineSpacingExtra="2dp"/>
 
                     <TextView
+                        android:id="@+id/tvAdminGiftTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1 giờ trước"
@@ -244,6 +245,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentStart="true"
+                                android:layout_toStartOf="@+id/tvBadgeNewDropdown"
+                                android:layout_marginEnd="8dp"
                                 android:text="Nâng cấp thành công"
                                 android:textColor="@color/white"
                                 android:textSize="16sp"
@@ -251,6 +254,7 @@
 
                             <!-- Badge Mới -->
                             <TextView
+                                android:id="@+id/tvBadgeNewDropdown"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
@@ -278,6 +282,7 @@
                             android:layout_marginTop="12dp">
 
                             <TextView
+                                android:id="@+id/tvSuccessTime"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"

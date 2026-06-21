@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pemomovie.R;
 import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.dto.UserProfileDto;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -39,8 +40,11 @@ import retrofit2.Response;
 
 public class QrPaymentActivity extends AppCompatActivity {
 
-    private int selectedPlan = 6;
+    private Long selectedPlanId = 2L;
+    private String selectedPlanName = "Premium 6 tháng";
     private String planPriceStr = "249.000đ";
+    private double selectedPlanPriceRaw = 249000.0;
+    private int selectedPlanDuration = 180;
     private String paymentMethod = "MOMO";
     private CountDownTimer countDownTimer;
     private TextView txtTimer;
@@ -56,9 +60,13 @@ public class QrPaymentActivity extends AppCompatActivity {
             return insets;
         });
 
-        selectedPlan = getIntent().getIntExtra("SELECTED_PLAN", 6);
+        selectedPlanId = getIntent().getLongExtra("SELECTED_PLAN_ID", 2L);
+        selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        if (selectedPlanName == null) selectedPlanName = "Premium 6 tháng";
         planPriceStr = getIntent().getStringExtra("PLAN_PRICE");
         if (planPriceStr == null) planPriceStr = "249.000đ";
+        selectedPlanPriceRaw = getIntent().getDoubleExtra("SELECTED_PLAN_PRICE_RAW", 249000.0);
+        selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
         paymentMethod = getIntent().getStringExtra("PAYMENT_METHOD");
         if (paymentMethod == null) paymentMethod = "MOMO";
 
@@ -86,19 +94,23 @@ public class QrPaymentActivity extends AppCompatActivity {
 
         TextView txtOrderId = findViewById(R.id.txtOrderId);
         long randomId = (long) (Math.random() * 900000) + 100000;
-        String orderId = "PREMIUM" + selectedPlan + "T-" + randomId;
+        String orderId = "PREMIUM-" + selectedPlanId + "-" + randomId;
         txtOrderId.setText("Nội dung: " + orderId);
 
         // Chuyển giá tiền (vd: "249.000đ") thành số nguyên ("249000")
         String numericPrice = planPriceStr.replaceAll("[^0-9]", "");
-        long finalAmount = 99000L;
-        try {
-            finalAmount = Long.parseLong(numericPrice);
-        } catch (Exception e) {}
+        long finalAmount = (long) selectedPlanPriceRaw;
+        if (finalAmount <= 0) {
+            try {
+                finalAmount = Long.parseLong(numericPrice);
+            } catch (Exception e) {
+                finalAmount = 99000L;
+            }
+        }
 
         // Gọi API thực tế từ Backend để lấy URL thanh toán (Sandbox MoMo / VNPay)
         Toast.makeText(this, "Đang lấy mã " + paymentMethod + " từ Server...", Toast.LENGTH_SHORT).show();
-        ApiClient.getApiService().createPaymentUrl(2L, paymentMethod, finalAmount) // Truyền ID gói và giá tiền động
+        ApiClient.getApiService().createPaymentUrl(selectedPlanId, paymentMethod, finalAmount) // Truyền ID gói và giá tiền động
             .enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -106,7 +118,16 @@ public class QrPaymentActivity extends AppCompatActivity {
                         try {
                             String paymentUrl = response.body().string();
                             // Render URL này thành mã QR để quét
-                            runOnUiThread(() -> generateQrCode(paymentUrl, imgQrCode));
+                            runOnUiThread(() -> {
+                                generateQrCode(paymentUrl, imgQrCode);
+                                // Thêm sự kiện bấm vào QR code để Copy URL
+                                imgQrCode.setOnClickListener(v -> {
+                                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                                    android.content.ClipData clip = android.content.ClipData.newPlainText("Payment URL", paymentUrl);
+                                    clipboard.setPrimaryClip(clip);
+                                    Toast.makeText(QrPaymentActivity.this, "Đã copy link! Hãy gửi link này sang máy tính và dán vào Chrome để test nhé.", Toast.LENGTH_LONG).show();
+                                });
+                            });
                         } catch (Exception e) {
                             e.printStackTrace();
                             runOnUiThread(() -> Toast.makeText(QrPaymentActivity.this, "Lỗi đọc dữ liệu QR", Toast.LENGTH_SHORT).show());
@@ -141,7 +162,35 @@ public class QrPaymentActivity extends AppCompatActivity {
         CardView btnPayComplete = findViewById(R.id.btnPayComplete);
         if (btnPayComplete != null) {
             btnPayComplete.setOnClickListener(v -> {
-                Toast.makeText(this, "Vui lòng sử dụng 2 nút Test bên dưới để giả lập luồng thanh toán nhé!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Đang kiểm tra kết quả thanh toán...", Toast.LENGTH_SHORT).show();
+                ApiClient.getApiService().getMyProfile().enqueue(new Callback<UserProfileDto>() {
+                    @Override
+                    public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String tier = response.body().getTier();
+                            if ("PREMIUM".equalsIgnoreCase(tier)) {
+                                // Đã lên VIP thành công
+                                Toast.makeText(QrPaymentActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(QrPaymentActivity.this, PaymentProcessingActivity.class);
+                                intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
+                                intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+                                intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
+                                intent.putExtra("PLAN_PRICE", planPriceStr);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(QrPaymentActivity.this, "Hệ thống chưa nhận được thanh toán. Vui lòng chờ thêm vài giây rồi thử lại!", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toast.makeText(QrPaymentActivity.this, "Lỗi kiểm tra thông tin", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<UserProfileDto> call, Throwable t) {
+                        Toast.makeText(QrPaymentActivity.this, "Lỗi kết nối Server", Toast.LENGTH_SHORT).show();
+                    }
+                });
             });
         }
 
@@ -150,14 +199,16 @@ public class QrPaymentActivity extends AppCompatActivity {
         if (btnTestSuccess != null) {
             btnTestSuccess.setOnClickListener(v -> {
                 Toast.makeText(this, "Đang gửi tín hiệu giả lập thanh toán lên Server...", Toast.LENGTH_SHORT).show();
-                ApiClient.getApiService().simulateSuccess(2L) // 2L là ID của gói Premium mặc định
+                ApiClient.getApiService().simulateSuccess(selectedPlanId) // Gửi ID gói thực tế
                     .enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                             if (response.isSuccessful()) {
                                 // Gọi Server thành công, chuyển sang màn hình loading
                                 Intent intent = new Intent(QrPaymentActivity.this, PaymentProcessingActivity.class);
-                                intent.putExtra("SELECTED_PLAN", selectedPlan);
+                                intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
+                                intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+                                intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
                                 intent.putExtra("PLAN_PRICE", planPriceStr);
                                 startActivity(intent);
                                 finish();

@@ -30,15 +30,13 @@ public class PaymentSuccessActivity extends AppCompatActivity {
             return insets;
         });
 
-        int selectedPlan = getIntent().getIntExtra("SELECTED_PLAN", 6);
+        String selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        if (selectedPlanName == null) selectedPlanName = "Premium";
+        int selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
         
         TextView txtPlanName = findViewById(R.id.txtPlanName);
-        if (selectedPlan == 1) {
-            txtPlanName.setText("Premium 1 tháng");
-        } else if (selectedPlan == 12) {
-            txtPlanName.setText("Premium 1 năm");
-        } else {
-            txtPlanName.setText("Premium 6 tháng");
+        if (txtPlanName != null) {
+            txtPlanName.setText(selectedPlanName);
         }
 
         TextView txtStartDate = findViewById(R.id.txtStartDate);
@@ -47,11 +45,15 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         Date startDate = calendar.getTime();
-        txtStartDate.setText(sdf.format(startDate));
+        if (txtStartDate != null) {
+            txtStartDate.setText(sdf.format(startDate));
+        }
 
-        calendar.add(Calendar.MONTH, selectedPlan);
+        calendar.add(Calendar.DAY_OF_YEAR, selectedPlanDuration);
         Date endDate = calendar.getTime();
-        txtEndDate.setText(sdf.format(endDate));
+        if (txtEndDate != null) {
+            txtEndDate.setText(sdf.format(endDate));
+        }
 
         findViewById(R.id.btnBack).setOnClickListener(v -> {
             goToHome();

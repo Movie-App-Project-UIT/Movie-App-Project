@@ -15,7 +15,9 @@ import com.example.pemomovie.R;
 
 public class PaymentProcessingActivity extends AppCompatActivity {
 
-    private int selectedPlan = 6;
+    private Long selectedPlanId = -1L;
+    private String selectedPlanName = "";
+    private int selectedPlanDuration = 180;
     private String planPriceStr = "249.000đ";
 
     @Override
@@ -29,13 +31,17 @@ public class PaymentProcessingActivity extends AppCompatActivity {
             return insets;
         });
 
-        selectedPlan = getIntent().getIntExtra("SELECTED_PLAN", 6);
+        selectedPlanId = getIntent().getLongExtra("SELECTED_PLAN_ID", -1L);
+        selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
         planPriceStr = getIntent().getStringExtra("PLAN_PRICE");
 
         // Giả lập quá trình xác nhận thanh toán mất 3 giây
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent = new Intent(PaymentProcessingActivity.this, PaymentSuccessActivity.class);
-            intent.putExtra("SELECTED_PLAN", selectedPlan);
+            intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
+            intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+            intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
             intent.putExtra("PLAN_PRICE", planPriceStr);
             startActivity(intent);
             finish();

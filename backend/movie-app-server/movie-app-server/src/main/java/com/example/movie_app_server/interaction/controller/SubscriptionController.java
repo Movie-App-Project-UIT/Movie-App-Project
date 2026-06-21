@@ -5,6 +5,8 @@ import com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus;
 import com.example.movie_app_server.interaction.entity.subscription.UserSubscription;
 import com.example.movie_app_server.interaction.repository.NotificationRepository;
 import com.example.movie_app_server.interaction.repository.UserSubscriptionRepository;
+import com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan;
+import com.example.movie_app_server.interaction.repository.SubscriptionPlanRepository;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,15 @@ public class SubscriptionController {
     private final NotificationRepository notificationRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository;
+    private final SubscriptionPlanRepository subscriptionPlanRepository;
+
+    @GetMapping("/plans")
+    public ResponseEntity<java.util.List<SubscriptionPlan>> getActivePlans() {
+        // Lấy danh sách các gói premium đang bán (isActive = true)
+        return ResponseEntity.ok(subscriptionPlanRepository.findAll().stream()
+                .filter(plan -> Boolean.TRUE.equals(plan.getIsActive()))
+                .collect(java.util.stream.Collectors.toList()));
+    }
 
     @PostMapping("/claim-gift/{notificationId}")
     @Transactional
