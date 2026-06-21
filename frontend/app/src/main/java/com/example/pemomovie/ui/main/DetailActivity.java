@@ -51,10 +51,11 @@ public class DetailActivity extends AppCompatActivity {
 
         // Xem video
         ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+        Long movieIdForPlay = getIntent().getLongExtra("MOVIE_ID", -1);
         btnPlay.setOnClickListener(v -> {
             Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
-//            intent.putExtra("MOVIE_ID", bannerMovie.getId());
-//            startActivity(intent);
+            intent.putExtra("MOVIE_ID", movieIdForPlay);
+            startActivity(intent);
         });
 
         ScrollView svInfo = findViewById(R.id.svInfo);
