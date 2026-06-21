@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet"
+    android:padding="24dp"
+    android:gravity="center_horizontal">
+
+    <ImageView
+        android:id="@+id/btnCloseBottomSheet"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="end"
+        android:background="@drawable/bg_circle_close"
+        android:contentDescription="Đóng"
+        android:padding="8dp"
+        android:src="@drawable/ic_close" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="-20dp"
+        android:src="@drawable/ic_alarm_clock"
+        android:background="@drawable/bg_circle_gradient_red"
+        android:padding="20dp"
+        app:tint="@color/white"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Premium sắp hết hạn!"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/tvExpiringSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gói Premium của bạn sắp hết hạn."
+        android:textColor="@color/gray_text_light"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="4dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_plan_info_card"
+        android:padding="16dp"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gia hạn ngay để tiếp tục:"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp" android:gravity="center_vertical">
+            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check" app:tint="#F44336" android:background="@drawable/bg_circle_dot" android:backgroundTint="#3D1616" android:padding="2dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Xem phim không quảng cáo" android:textColor="@color/gray_text_light" android:textSize="14sp" android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp" android:gravity="center_vertical">
+            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check" app:tint="#F44336" android:background="@drawable/bg_circle_dot" android:backgroundTint="#3D1616" android:padding="2dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Xem 4K Ultra HD" android:textColor="@color/gray_text_light" android:textSize="14sp" android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp" android:gravity="center_vertical">
+            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check" app:tint="#F44336" android:background="@drawable/bg_circle_dot" android:backgroundTint="#3D1616" android:padding="2dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tải phim offline" android:textColor="@color/gray_text_light" android:textSize="14sp" android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_check" app:tint="#F44336" android:background="@drawable/bg_circle_dot" android:backgroundTint="#3D1616" android:padding="2dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Xem trên nhiều thiết bị" android:textColor="@color/gray_text_light" android:textSize="14sp" android:layout_marginStart="12dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/btnRenewPremium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gia hạn ngay"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:background="@drawable/bg_button_activate"
+        android:backgroundTint="#F44336"
+        android:paddingVertical="14dp"
+        android:layout_marginTop="24dp"/>
+
+    <TextView
+        android:id="@+id/btnLater"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Để sau"
+        android:textColor="@color/gray_text_light"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="8dp"/>
+
+</LinearLayout>

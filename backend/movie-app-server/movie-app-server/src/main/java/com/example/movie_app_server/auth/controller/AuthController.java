@@ -129,7 +129,7 @@ public class AuthController {
                 // 3. Tạo thông báo chào mừng
                 notificationService.createNotification(
                         newUser,
-                        "Chào mừng đến với CineApp",
+                        "Chào mừng đến với PemoMovie",
                         "Đăng ký tài khoản thành công. Chúc bạn xem phim vui vẻ!",
                         com.example.movie_app_server.interaction.entity.enums.NotificationType.SYSTEM
                 );

@@ -77,6 +77,114 @@
         android:orientation="vertical"
         android:visibility="gone">
 
+        <!-- Thông báo 0: Sắp hết hạn -->
+        <LinearLayout
+            android:id="@+id/layoutNotifExpiring"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingVertical="12dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <View
+                    android:id="@+id/dotUnreadExpiring"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/bg_circle_dot"
+                    android:backgroundTint="#F44336"/>
+                <ImageView
+                    android:id="@+id/ivExpiringIcon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_toEndOf="@id/dotUnreadExpiring"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_alarm_clock"
+                    android:background="@drawable/bg_circle_gradient_red"
+                    android:padding="12dp"
+                    app:tint="@color/white"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp">
+
+                <LinearLayout
+                    android:id="@+id/llTextContentExpiring"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_toStartOf="@+id/ivChevronExpiring"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Premium sắp hết hạn"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvExpiringMessageDropdown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gói Premium của bạn sắp hết hạn."
+                        android:textColor="@color/gray_text_light"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp"
+                        android:lineSpacingExtra="2dp"/>
+
+                    <TextView
+                        android:id="@+id/tvExpiringTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vừa xong"
+                        android:textColor="#888888"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivChevronExpiring"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#666666"/>
+
+                <TextView
+                    android:id="@+id/btnRenewDropdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llTextContentExpiring"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="8dp"
+                    android:text="Gia hạn"
+                    android:textColor="#F44336"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_activate"
+                    android:backgroundTint="#3D1616"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/dividerExpiring"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#33FFFFFF"
+            android:layout_marginVertical="8dp"
+            android:visibility="gone"/>
+
         <!-- Thông báo 1: Admin tặng Premium -->
         <LinearLayout
             android:id="@+id/layoutNotifAdminGift"

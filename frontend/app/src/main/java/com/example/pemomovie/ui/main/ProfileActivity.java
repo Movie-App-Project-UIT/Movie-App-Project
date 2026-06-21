@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.example.pemomovie.R;
 import com.example.pemomovie.adapter.WatchingAdapter;
 import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.dto.GenreDto;
 import com.example.pemomovie.dto.UserProfileDto;
 import com.example.pemomovie.utils.NavigationHelper;
 
@@ -32,6 +33,7 @@ import retrofit2.Response;
 import com.example.pemomovie.utils.FavoriteManager;
 import android.view.View;
 import android.widget.LinearLayout;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
     @Override
@@ -103,6 +105,61 @@ public class ProfileActivity extends AppCompatActivity {
             btnViewAllWatching.setOnClickListener(v -> {
                 Intent intent = new Intent(ProfileActivity.this, WatchingActivity.class);
                 startActivity(intent);
+            });
+        }
+
+        // Settings click listeners
+        View btnSettingGenres = findViewById(R.id.btnSettingGenres);
+        if (btnSettingGenres != null) {
+            btnSettingGenres.setOnClickListener(v -> {
+                ApiClient.getApiService().getGenres().enqueue(new Callback<List<GenreDto>>() {
+                    @Override
+                    public void onResponse(Call<List<GenreDto>> call, Response<List<GenreDto>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<GenreDto> genres = response.body();
+                            String[] options = new String[genres.size()];
+                            for (int i = 0; i < genres.size(); i++) {
+                                options[i] = genres.get(i).getName();
+                            }
+                            if (options.length > 0) {
+                                showSettingBottomSheet("Thể loại yêu thích", options, "pref_genres");
+                            } else {
+                                Toast.makeText(ProfileActivity.this, "Danh sách thể loại trống", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(ProfileActivity.this, "Không thể tải danh sách thể loại", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<GenreDto>> call, Throwable t) {
+                        Toast.makeText(ProfileActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
+        
+        View btnSettingLanguage = findViewById(R.id.btnSettingLanguage);
+        if (btnSettingLanguage != null) {
+            btnSettingLanguage.setOnClickListener(v -> {
+                String[] options = {"Tiếng Việt", "English", "日本語 (Nhật Bản)", "한국어 (Hàn Quốc)"};
+                showSettingBottomSheet("Ngôn ngữ", options, "pref_language");
+            });
+        }
+        
+        View btnSettingQuality = findViewById(R.id.btnSettingQuality);
+        if (btnSettingQuality != null) {
+            btnSettingQuality.setOnClickListener(v -> {
+                String[] options = {"Tự động", "1080p (FHD)", "720p (HD)", "480p", "360p"};
+                showSettingBottomSheet("Chất lượng mặc định", options, "pref_quality");
+            });
+        }
+        
+        View btnSettingSubtitles = findViewById(R.id.btnSettingSubtitles);
+        if (btnSettingSubtitles != null) {
+            btnSettingSubtitles.setOnClickListener(v -> {
+                String[] options = {"Bật", "Tắt", "Chỉ hiển thị khi không có thuyết minh"};
+                showSettingBottomSheet("Phụ đề", options, "pref_subtitles");
             });
         }
     }
@@ -195,6 +252,71 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showSettingBottomSheet(String title, String[] options, String prefKey) {
+        com.google.android.material.bottomsheet.BottomSheetDialog bottomSheetDialog = new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setBackgroundResource(R.drawable.bg_bottom_sheet);
+        int padding = (int)(16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(padding, padding, padding, padding);
+        
+        android.widget.TextView tvTitle = new android.widget.TextView(this);
+        tvTitle.setText(title);
+        tvTitle.setTextColor(android.graphics.Color.WHITE);
+        tvTitle.setTextSize(18);
+        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        tvTitle.setGravity(android.view.Gravity.CENTER);
+        tvTitle.setPadding(0, 0, 0, padding);
+        layout.addView(tvTitle);
+        
+        // Get currently selected option
+        android.content.SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        String currentSelection = prefs.getString(prefKey, options[0]);
+        
+        for (String option : options) {
+            android.widget.TextView tvOption = new android.widget.TextView(this);
+            tvOption.setText(option);
+            tvOption.setTextSize(16);
+            tvOption.setPadding(padding, padding, padding, padding);
+            
+            // Highlight selected
+            if (option.equals(currentSelection)) {
+                tvOption.setTextColor(android.graphics.Color.parseColor("#A78BFA")); // Purple accent
+                tvOption.setTypeface(null, android.graphics.Typeface.BOLD);
+            } else {
+                tvOption.setTextColor(android.graphics.Color.WHITE);
+            }
+            
+            // Background ripple
+            android.util.TypedValue outValue = new android.util.TypedValue();
+            getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+            tvOption.setBackgroundResource(outValue.resourceId);
+            tvOption.setClickable(true);
+            
+            tvOption.setOnClickListener(v -> {
+                prefs.edit().putString(prefKey, option).apply();
+                android.widget.Toast.makeText(this, "Đã chọn: " + option, android.widget.Toast.LENGTH_SHORT).show();
+                bottomSheetDialog.dismiss();
+            });
+            
+            layout.addView(tvOption);
+            
+            // Divider
+            android.view.View divider = new android.view.View(this);
+            android.widget.LinearLayout.LayoutParams dividerParams = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) (1 * getResources().getDisplayMetrics().density)
+            );
+            divider.setLayoutParams(dividerParams);
+            divider.setBackgroundColor(android.graphics.Color.parseColor("#333333"));
+            layout.addView(divider);
+        }
+        
+        bottomSheetDialog.setContentView(layout);
+        bottomSheetDialog.show();
     }
 }
 
