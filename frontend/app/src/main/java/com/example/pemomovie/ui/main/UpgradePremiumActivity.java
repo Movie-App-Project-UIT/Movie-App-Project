@@ -21,6 +21,7 @@ public class UpgradePremiumActivity extends AppCompatActivity {
 
     private ConstraintLayout cardPlan1Month, cardPlan6Month, cardPlan1Year;
     private ImageView icCheck1, icCheck6, icCheck12;
+    private int selectedPlan = 6; // Mặc định gói 6 tháng
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +69,15 @@ public class UpgradePremiumActivity extends AppCompatActivity {
         CardView btnContinue = findViewById(R.id.btnContinue);
         if (btnContinue != null) {
             btnContinue.setOnClickListener(v -> {
-                Toast.makeText(this, "Chuyển sang trang thanh toán...", Toast.LENGTH_SHORT).show();
-                // Thực hiện logic chuyển sang Activity thanh toán ở đây
+                android.content.Intent intent = new android.content.Intent(UpgradePremiumActivity.this, PaymentActivity.class);
+                intent.putExtra("SELECTED_PLAN", selectedPlan);
+                startActivity(intent);
             });
         }
     }
 
     private void selectPlan(int planType) {
+        this.selectedPlan = planType;
         // Reset tất cả về unselected
         cardPlan1Month.setBackgroundResource(R.drawable.bg_plan_unselected);
         cardPlan6Month.setBackgroundResource(R.drawable.bg_plan_unselected);

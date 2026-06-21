@@ -80,4 +80,6 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.3.1")
     implementation("androidx.media3:media3-common:1.3.1")
 
+    // ZXing (Tạo mã QR)
+    implementation("com.google.zxing:core:3.5.3")
 }
