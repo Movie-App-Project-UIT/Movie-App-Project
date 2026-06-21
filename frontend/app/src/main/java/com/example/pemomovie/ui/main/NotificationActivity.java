@@ -60,6 +60,11 @@ public class NotificationActivity extends AppCompatActivity {
                 if ("GIFT_RECEIVED".equals(notification.getType())) {
                     // Hiển thị bottom sheet
                     showAdminGiftConfirmationDialog(notification);
+                } else if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
+                    showExpiringPremiumBottomSheet(notification);
+                } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
+                    Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -180,7 +185,7 @@ public class NotificationActivity extends AppCompatActivity {
         NotificationDto n4 = new NotificationDto();
         n4.setId(4L);
         n4.setTitle("Phim mới cập nhật");
-        n4.setMessage("“Violet Evergarden: Tập đặc biệt” đã có mặt trên CineApp. Xem ngay!");
+        n4.setMessage("“Violet Evergarden: Tập đặc biệt” đã có mặt trên PemoMovie. Xem ngay!");
         n4.setType("SYSTEM");
         n4.setRead(false);
 
@@ -256,6 +261,45 @@ public class NotificationActivity extends AppCompatActivity {
                         Toast.makeText(NotificationActivity.this, "Lỗi kết nối khi kích hoạt quà tặng", Toast.LENGTH_SHORT).show();
                     }
                 });
+            });
+        }
+
+        bottomSheetDialog.show();
+    }
+
+    private void showExpiringPremiumBottomSheet(NotificationDto notification) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_bottom_sheet_expiring_premium, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+
+        bottomSheetDialog.setOnShowListener(dialog -> {
+            View bottomSheet = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                bottomSheet.setBackgroundResource(android.R.color.transparent);
+            }
+        });
+
+        TextView tvExpiringSubtitle = bottomSheetView.findViewById(R.id.tvExpiringSubtitle);
+        if (tvExpiringSubtitle != null && notification != null && notification.getMessage() != null) {
+            tvExpiringSubtitle.setText(notification.getMessage());
+        }
+
+        View btnCloseBottomSheet = bottomSheetView.findViewById(R.id.btnCloseBottomSheet);
+        if (btnCloseBottomSheet != null) {
+            btnCloseBottomSheet.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
+
+        View btnLater = bottomSheetView.findViewById(R.id.btnLater);
+        if (btnLater != null) {
+            btnLater.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
+
+        View btnRenewPremium = bottomSheetView.findViewById(R.id.btnRenewPremium);
+        if (btnRenewPremium != null) {
+            btnRenewPremium.setOnClickListener(v -> {
+                bottomSheetDialog.dismiss();
+                Intent intent = new Intent(NotificationActivity.this, UpgradePremiumActivity.class);
+                startActivity(intent);
             });
         }
 

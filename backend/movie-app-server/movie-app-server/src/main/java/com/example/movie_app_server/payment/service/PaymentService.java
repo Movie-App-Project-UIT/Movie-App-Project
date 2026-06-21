@@ -6,6 +6,7 @@ import com.example.movie_app_server.payment.config.MoMoConfig;
 import com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan;
 import com.example.movie_app_server.interaction.entity.subscription.UserSubscription;
 import com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus;
+import com.example.movie_app_server.interaction.entity.enums.NotificationType;
 import com.example.movie_app_server.payment.entity.Transaction;
 import com.example.movie_app_server.interaction.repository.SubscriptionPlanRepository;
 import com.example.movie_app_server.interaction.repository.UserSubscriptionRepository;
@@ -288,8 +289,11 @@ public class PaymentService {
                 user,
                 "Nâng cấp thành công",
                 "Chào mừng bạn đến với Premium! Bạn đã mở khóa tất cả đặc quyền xem phim.",
-                com.example.movie_app_server.interaction.entity.enums.NotificationType.SUBSCRIPTION_NEW_PLAN
+                NotificationType.SUBSCRIPTION_NEW_PLAN
         );
+
+        // Xóa thông báo sắp hết hạn (nếu có) vì user đã gia hạn thành công
+        notificationService.clearExpiringNotification(user);
     }
 
     public void simulateSuccess(Long packageId, String userUid) {

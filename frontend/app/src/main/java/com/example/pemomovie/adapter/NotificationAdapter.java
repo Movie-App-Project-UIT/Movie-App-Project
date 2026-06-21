@@ -97,9 +97,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         switch (type) {
             case "SUBSCRIPTION_EXPIRING":
-                holder.ivIcon.setImageResource(R.drawable.ic_notification); // Thay bằng ic_clock nếu có
-                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_avatar_border);
-                holder.ivIcon.setColorFilter(Color.parseColor("#F44336")); // Red
+                holder.ivIcon.setImageResource(R.drawable.ic_alarm_clock);
+                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_gradient_red);
+                holder.ivIcon.setBackgroundTintList(null);
+                holder.ivIcon.setColorFilter(Color.WHITE);
                 
                 borderDrawable.setStroke(dpToPx(1), Color.parseColor("#F44336")); // Red border
                 

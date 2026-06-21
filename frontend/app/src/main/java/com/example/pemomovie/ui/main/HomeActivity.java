@@ -252,6 +252,7 @@ public class HomeActivity extends AppCompatActivity {
     private List<com.example.pemomovie.dto.NotificationDto> dbNotifications = new java.util.ArrayList<>();
     private boolean hasAdminGift = false;
     private boolean hasPremiumNotif = false;
+    private boolean hasExpiringNotif = false;
 
     private void showNotificationDropdown(View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -270,24 +271,34 @@ public class HomeActivity extends AppCompatActivity {
 
         View layoutEmptyNotification = popupView.findViewById(R.id.layoutEmptyNotification);
         View layoutNotificationList = popupView.findViewById(R.id.layoutNotificationList);
+        View layoutNotifExpiring = popupView.findViewById(R.id.layoutNotifExpiring);
         View layoutNotifAdminGift = popupView.findViewById(R.id.layoutNotifAdminGift);
         View layoutNotifSuccess = popupView.findViewById(R.id.layoutNotifSuccess);
 
+        String currentExpiringMessage = "Gói Premium của bạn sắp hết hạn.";
+
         // Hiển thị dropdown dựa trên dữ liệu thật từ Database
-        if (hasPremiumNotif || hasAdminGift) {
+        if (hasPremiumNotif || hasAdminGift || hasExpiringNotif) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.VISIBLE);
+            if (layoutNotifExpiring != null) layoutNotifExpiring.setVisibility(hasExpiringNotif ? View.VISIBLE : View.GONE);
             if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(hasAdminGift ? View.VISIBLE : View.GONE);
             if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(hasPremiumNotif ? View.VISIBLE : View.GONE);
             
             String giftTime = "Vừa xong";
             String successTime = "Vừa xong";
+            String expiringTime = "Vừa xong";
             for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
                 if (notif.getRead() == null || !notif.getRead()) {
                     if ("GIFT_RECEIVED".equals(notif.getType())) {
                         giftTime = getTimeAgo(notif.getCreatedAt());
                     } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
                         successTime = getTimeAgo(notif.getCreatedAt());
+                    } else if ("SUBSCRIPTION_EXPIRING".equals(notif.getType())) {
+                        expiringTime = getTimeAgo(notif.getCreatedAt());
+                        if (notif.getMessage() != null) {
+                            currentExpiringMessage = notif.getMessage();
+                        }
                     }
                 }
             }
@@ -298,15 +309,43 @@ public class HomeActivity extends AppCompatActivity {
             TextView tvSuccessTime = popupView.findViewById(R.id.tvSuccessTime);
             if (tvSuccessTime != null) tvSuccessTime.setText(successTime);
             
+            TextView tvExpiringTime = popupView.findViewById(R.id.tvExpiringTime);
+            if (tvExpiringTime != null) tvExpiringTime.setText(expiringTime);
+            
+            TextView tvExpiringMessageDropdown = popupView.findViewById(R.id.tvExpiringMessageDropdown);
+            if (tvExpiringMessageDropdown != null) tvExpiringMessageDropdown.setText(currentExpiringMessage);
+            
         } else {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
             if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.GONE);
         }
 
         // Ẩn/hiện đường gạch phân cách ở giữa dựa trên số lượng thông báo hiển thị
+        View dividerExpiring = popupView.findViewById(R.id.dividerExpiring);
+        if (dividerExpiring != null) {
+            dividerExpiring.setVisibility((hasExpiringNotif && (hasAdminGift || hasPremiumNotif)) ? View.VISIBLE : View.GONE);
+        }
+
         View dividerDropdown = popupView.findViewById(R.id.dividerDropdown);
         if (dividerDropdown != null) {
             dividerDropdown.setVisibility((hasAdminGift && hasPremiumNotif) ? View.VISIBLE : View.GONE);
+        }
+
+        final String finalExpiringMsg = currentExpiringMessage;
+
+        if (layoutNotifExpiring != null) {
+            layoutNotifExpiring.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                showExpiringPremiumBottomSheet(finalExpiringMsg);
+            });
+            
+            View btnRenewDropdown = popupView.findViewById(R.id.btnRenewDropdown);
+            if (btnRenewDropdown != null) {
+                btnRenewDropdown.setOnClickListener(v -> {
+                    popupWindow.dismiss();
+                    showExpiringPremiumBottomSheet(finalExpiringMsg);
+                });
+            }
         }
 
         if (layoutNotifAdminGift != null) {
@@ -353,6 +392,7 @@ public class HomeActivity extends AppCompatActivity {
                         markNotificationAsReadOnBackend(notif.getId());
                     }
                 }
+                hasExpiringNotif = false;
                 hasAdminGift = false;
                 hasPremiumNotif = false;
                 updateNotificationBadge(0);
@@ -400,6 +440,7 @@ public class HomeActivity extends AppCompatActivity {
                                     dbNotifications.clear();
                                     dbNotifications.addAll(response2.body());
                                     
+                                    hasExpiringNotif = false;
                                     hasAdminGift = false;
                                     hasPremiumNotif = false;
                                     int unreadCount = 0;
@@ -411,6 +452,8 @@ public class HomeActivity extends AppCompatActivity {
                                                 hasAdminGift = true;
                                             } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
                                                 hasPremiumNotif = true;
+                                            } else if ("SUBSCRIPTION_EXPIRING".equals(notif.getType())) {
+                                                hasExpiringNotif = true;
                                             }
                                         }
                                     }
@@ -519,5 +562,44 @@ public class HomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             return "Vừa xong";
         }
+    }
+
+    private void showExpiringPremiumBottomSheet(String message) {
+        com.google.android.material.bottomsheet.BottomSheetDialog bottomSheetDialog = new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_bottom_sheet_expiring_premium, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+
+        bottomSheetDialog.setOnShowListener(dialog -> {
+            View bottomSheet = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                bottomSheet.setBackgroundResource(android.R.color.transparent);
+            }
+        });
+
+        TextView tvExpiringSubtitle = bottomSheetView.findViewById(R.id.tvExpiringSubtitle);
+        if (tvExpiringSubtitle != null && message != null) {
+            tvExpiringSubtitle.setText(message);
+        }
+
+        View btnCloseBottomSheet = bottomSheetView.findViewById(R.id.btnCloseBottomSheet);
+        if (btnCloseBottomSheet != null) {
+            btnCloseBottomSheet.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
+
+        View btnLater = bottomSheetView.findViewById(R.id.btnLater);
+        if (btnLater != null) {
+            btnLater.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
+
+        View btnRenewPremium = bottomSheetView.findViewById(R.id.btnRenewPremium);
+        if (btnRenewPremium != null) {
+            btnRenewPremium.setOnClickListener(v -> {
+                bottomSheetDialog.dismiss();
+                Intent intent = new Intent(HomeActivity.this, UpgradePremiumActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        bottomSheetDialog.show();
     }
 }
