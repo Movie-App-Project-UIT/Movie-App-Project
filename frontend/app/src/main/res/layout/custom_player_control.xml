@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom">
 
     <!-- Overlay tôis -->
     <View
@@ -24,6 +25,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
+            android:src="@drawable/ic_rw"
             app:tint="@android:color/white" />
 
         <!-- Play -->
@@ -32,6 +34,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
+            android:src="@drawable/ic_play"
             app:tint="@android:color/white" />
 
         <!-- Pause -->
@@ -40,6 +43,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
+            android:src="@drawable/ic_pause"
             app:tint="@android:color/white" />
 
         <!-- Forward -->
@@ -48,6 +52,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
+            android:src="@drawable/ic_fw"
             app:tint="@android:color/white" />
 
     </LinearLayout>
@@ -108,7 +113,8 @@
                 android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_fullscreen"
-                app:tint="@android:color/white" />
+                app:tint="@android:color/white"
+                android:layout_marginEnd="2dp"/>
 
         </LinearLayout>
 
@@ -116,7 +122,7 @@
         <androidx.media3.ui.DefaultTimeBar
             android:id="@id/exo_progress"
             android:layout_width="match_parent"
-            android:layout_height="26dp"
+            android:layout_height="wrap_content"
             app:ad_marker_color="#66FFFFFF"
             app:played_color="#D70466"
             app:scrubber_color="#D70466"

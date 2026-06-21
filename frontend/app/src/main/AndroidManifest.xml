@@ -55,7 +55,8 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.main.PlayActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity
             android:name=".ui.main.MovieActivity"
             android:exported="false" />

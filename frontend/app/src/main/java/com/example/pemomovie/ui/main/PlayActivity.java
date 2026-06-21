@@ -263,6 +263,13 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        updateFullscreenIcon();
+    }
+
     // Đổi trạng thái bật / tắt cc
     private void updateSubtitleButton() {
 
