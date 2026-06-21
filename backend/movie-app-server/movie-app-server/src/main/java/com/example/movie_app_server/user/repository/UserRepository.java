@@ -13,4 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Kiểm tra hoặc tìm kiếm nhanh bằng Email
     Optional<User> findByEmail(String email);
 
+    @org.springframework.data.jpa.repository.Query("SELECT u FROM User u WHERE " +
+            "(:isPremium IS NULL OR (:isPremium = true AND u.tier = 'PREMIUM') OR (:isPremium = false AND u.tier = 'FREE')) AND " +
+            "(:search IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    java.util.List<User> searchAndFilterUsers(@org.springframework.data.repository.query.Param("isPremium") Boolean isPremium,
+                                              @org.springframework.data.repository.query.Param("search") String search);
 }

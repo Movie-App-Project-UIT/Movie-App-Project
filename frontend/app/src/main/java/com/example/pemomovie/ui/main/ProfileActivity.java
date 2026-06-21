@@ -149,6 +149,19 @@ public class ProfileActivity extends AppCompatActivity {
                             imgAvatar.setImageResource(R.drawable.ic_avatar);
                         }
                     }
+// Xử lý hiển thị nút Admin
+                    android.view.View layoutAdmin = findViewById(R.id.layoutAdmin);
+                    if (layoutAdmin != null) {
+                        if ("ADMIN".equals(profile.getRole())) {
+                            layoutAdmin.setVisibility(android.view.View.VISIBLE);
+                            findViewById(R.id.btnAdminDashboard).setOnClickListener(v -> {
+                                Intent intent = new Intent(ProfileActivity.this, AdminDashboardActivity.class);
+                                startActivity(intent);
+                            });
+                        } else {
+                            layoutAdmin.setVisibility(android.view.View.GONE);
+                        }
+                    }
 
                     // Logic hiển thị bảng Premium
                     LinearLayout layoutPremium = findViewById(R.id.layoutPremium);
@@ -174,3 +187,4 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 }
+

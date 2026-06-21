@@ -40,6 +40,9 @@ public class Notification {
     @Builder.Default
     private Boolean isRead = false;
 
+    @Column(name = "related_id")
+    private Long relatedId;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

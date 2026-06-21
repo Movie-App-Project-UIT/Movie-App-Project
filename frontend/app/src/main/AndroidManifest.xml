@@ -60,6 +60,37 @@
             android:name=".ui.main.MovieActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.main.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminMovieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminCategoryActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name=".ui.admin.AdminCategoryDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminSubscriptionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminSubscriptionDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminSubscriptionGiftActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminUserDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.ProfileActivity"
             android:exported="false" />
         <activity
@@ -86,6 +117,11 @@
         <activity
             android:name=".ui.main.PaymentSuccessActivity"
             android:exported="false" />
+            android:name=".ui.admin.AdminMovieAddActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.admin.AdminMovieDetailActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

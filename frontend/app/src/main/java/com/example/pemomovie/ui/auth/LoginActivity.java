@@ -169,10 +169,21 @@ public class LoginActivity extends AppCompatActivity {
         ApiClient.getApiService().syncUser(request).enqueue(new Callback<UserProfileDto>() {
             @Override
             public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    // Chuyển hướng đến màn hình chính
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    
+                    String role = response.body().getRole();
+                    // Lưu role vào SharedPreferences để dùng lại sau
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("user_role", role);
+                    editor.apply();
+
+                    Intent intent;
+                    if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
+                        intent = new Intent(LoginActivity.this, com.example.pemomovie.ui.admin.AdminMovieActivity.class);
+                    } else {
+                        intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    }
                     startActivity(intent);
                     finish();
                 } else {

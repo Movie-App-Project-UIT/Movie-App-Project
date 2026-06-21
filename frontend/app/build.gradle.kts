@@ -62,7 +62,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     
     // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
     // Firebase Auth
     implementation("com.google.firebase:firebase-auth")
     

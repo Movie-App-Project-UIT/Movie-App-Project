@@ -10,13 +10,17 @@ import java.util.List;
 @Builder
 public class MediaDetailResponse {
     private Long id;
+    private Integer tmdbId;
     private String title;
     private String overview;
     private Float voteAverage;
     private String posterUrl;
     private String backdropUrl;
     private Integer duration;
+    @com.fasterxml.jackson.annotation.JsonProperty("isPremium")
     private boolean isPremium;
+    @com.fasterxml.jackson.annotation.JsonProperty("isDeleted")
+    private boolean isDeleted;
     private String mediaType;
     private String language;
 

@@ -41,18 +41,25 @@ public class MediaService {
                 .isPremium(media.isPremium())
                 .mediaType(media.getMediaType().name())
                 .isPlayable(media.getVideoUrl() != null && !media.getVideoUrl().trim().isEmpty()) // Trim khoảng trắng an toàn hơn
+                .genres(media.getGenres().stream().map(g -> g.getName()).collect(Collectors.toList()))
+                .isDeleted(media.isDeleted())
+                .language(media.getLanguage() != null ? media.getLanguage() : "N/A")
+                .country(media.getCountry() != null ? media.getCountry().getName() : "N/A")
+                .hiddenByGenreId(media.getHiddenByGenreId())
+                // TODO: XÓA ĐOẠN FAKE DATA NÀY KHI CÓ HỆ THỐNG ĐẾM LƯỢT XEM THỰC TẾ
+                .viewCount(media.getId() != null ? (int) (media.getId() * 1234 % 50000) : 0) // Tạo lượt xem giả ngẫu nhiên nhưng cố định theo ID phim
                 .build();
     }
 
     // --- LOGIC LẤY DANH SÁCH & TÌM KIẾM ---
     public List<MediaItemDto> searchMedia(String query) {
-        return mediaRepository.findByTitleContainingIgnoreCase(query, org.springframework.data.domain.PageRequest.of(0, 20)).stream()
+        return mediaRepository.findByTitleContainingIgnoreCaseAndIsDeletedFalse(query, org.springframework.data.domain.PageRequest.of(0, 20)).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
     }
 
     // --- LOGIC LỌC PHIM ---
-    public Page<MediaItemDto> filterMedia(Long genreId, Long countryId, Long ageRatingId,
+    public Page<MediaItemDto> filterMedia(String keyword, Long genreId, Long countryId, Long ageRatingId,
                                           Integer releaseYear, Boolean isPlayable, String mediaType, Pageable pageable) {
         
         java.time.LocalDate startDate = null;
@@ -63,18 +70,18 @@ public class MediaService {
         }
 
         Page<Media> mediaPage = mediaRepository.filterMediaDynamically(
-                genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
+                keyword, genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
 
         return mediaPage.map(this::convertToItemDto);
     }
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
-        List<MediaItemDto> topRated = mediaRepository.findTop10ByOrderByVoteAverageDesc().stream()
+        List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseOrderByVoteAverageDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByOrderByIdDesc().stream()
+        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByIdDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
@@ -98,11 +105,26 @@ public class MediaService {
         return response;
     }
 
-    // --- LOGIC LẤY CHI TIẾT PHIM ---
+    // --- LOGIC LẤY CHI TIẾT PHIM (DÀNH CHO NGƯỜI DÙNG) ---
     public MediaDetailResponse getMediaDetail(Long id) {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
 
+        if (media.isDeleted()) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
+
+        return convertToDetailResponse(media);
+    }
+
+    // --- LOGIC LẤY CHI TIẾT PHIM (DÀNH CHO ADMIN) ---
+    public MediaDetailResponse getMediaDetailAdmin(Long id) {
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+        return convertToDetailResponse(media);
+    }
+
+    public MediaDetailResponse convertToDetailResponse(Media media) {
         String tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w185";
 
         List<CreditDto> directors = media.getCredits().stream()
@@ -142,6 +164,7 @@ public class MediaService {
 
         return MediaDetailResponse.builder()
                 .id(media.getId())
+                .tmdbId(media.getTmdbId())
                 .title(media.getTitle())
                 .overview(media.getOverview())
                 .voteAverage(media.getVoteAverage())
@@ -150,6 +173,7 @@ public class MediaService {
                 .releaseDate(media.getReleaseDate())
                 .mediaType(media.getMediaType().name())
                 .isPremium(media.isPremium())
+                .isDeleted(media.isDeleted())
                 .trailerUrl(media.getTrailerUrl())
                 .duration(media.getDuration())
                 .language(media.getLanguage())
@@ -167,6 +191,10 @@ public class MediaService {
     public String getPlayableVideoUrl(Long mediaId, String firebaseUid) {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+
+        if (media.isDeleted()) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
 
         if (media.isPremium()) {
             if (!userService.hasPremiumAccess(firebaseUid)) {

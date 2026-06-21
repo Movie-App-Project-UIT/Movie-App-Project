@@ -51,6 +51,10 @@ public class Review {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "is_hidden", nullable = false)
+    @Builder.Default
+    private boolean isHidden = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

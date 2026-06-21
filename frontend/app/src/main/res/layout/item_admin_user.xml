@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_avatar"
+            android:background="@drawable/bg_circle_button"
+            android:backgroundTint="#374151"
+            android:padding="8dp"
+            app:tint="@color/gray_text_light"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/txtUserName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nguyễn Văn A"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/imgAvatar"
+            app:layout_constraintTop_toTopOf="@id/imgAvatar"
+            app:layout_constraintBottom_toTopOf="@id/txtUserEmail"
+            app:layout_constraintEnd_toStartOf="@id/lblPremiumStatus"/>
+
+        <TextView
+            android:id="@+id/txtUserEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="user@example.com"
+            android:textColor="@color/gray_text_light"
+            android:textSize="12sp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/imgAvatar"
+            app:layout_constraintTop_toBottomOf="@id/txtUserName"
+            app:layout_constraintBottom_toBottomOf="@id/imgAvatar"
+            app:layout_constraintEnd_toStartOf="@id/lblPremiumStatus"/>
+
+        <LinearLayout
+            android:id="@+id/lblPremiumStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintEnd_toStartOf="@id/btnAction"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="16dp">
+
+            <TextView
+                android:id="@+id/txtTier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PREMIUM"
+                android:textColor="#F59E0B"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_circle_button"
+                android:backgroundTint="#4DF59E0B"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"/>
+
+            <TextView
+                android:id="@+id/txtStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hoạt động"
+                android:textColor="#10B981"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_circle_button"
+                android:backgroundTint="#3310B981"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnAction"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_button"
+            android:backgroundTint="#33EF4444"
+            android:src="@drawable/ic_delete"
+            app:tint="#EF4444"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
