@@ -42,12 +42,7 @@ public class DetailActivity extends AppCompatActivity {
         });
 
 
-        TextView txtIMDb = findViewById(R.id.txt_IMDb);
-        if (txtIMDb != null) {
-            Shader textShader = new LinearGradient(0, 0, 0, txtIMDb.getTextSize(),
-                    new int[]{Color.parseColor("#6C29D6"), Color.parseColor("#F43393")}, null, Shader.TileMode.CLAMP);
-            txtIMDb.getPaint().setShader(textShader);
-        }
+
 
         ImageButton btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {

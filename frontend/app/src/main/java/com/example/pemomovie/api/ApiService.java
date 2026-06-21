@@ -163,6 +163,9 @@ public interface ApiService {
             @retrofit2.http.Query("size") int size
     );
 
+    @GET("/api/v1/notifications/my")
+    Call<List<com.example.pemomovie.dto.NotificationDto>> getMyNotifications();
+
     @GET("/api/v1/notifications/{userId}")
     Call<List<com.example.pemomovie.dto.NotificationDto>> getUserNotifications(@retrofit2.http.Path("userId") Long userId);
 

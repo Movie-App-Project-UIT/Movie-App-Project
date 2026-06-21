@@ -292,7 +292,7 @@ public class HomeActivity extends AppCompatActivity {
                         tvTitle.setText(notif.getTitle());
                         tvMessage.setText(notif.getMessage());
                         
-                        if (!notif.isRead()) {
+                        if (notif.getRead() == null || !notif.getRead()) {
                             itemView.setBackgroundColor(Color.parseColor("#1AFFFFFF"));
                         }
 
@@ -301,9 +301,9 @@ public class HomeActivity extends AppCompatActivity {
                             itemView.setOnClickListener(v -> {
                                 popupWindow.dismiss();
                                 // Kích hoạt gói quà tặng
-                                apiService.claimGift(notif.getId()).enqueue(new Callback<okhttp3.ResponseBody>() {
+                                apiService.claimGift(notif.getId()).enqueue(new Callback<Map<String, String>>() {
                                     @Override
-                                    public void onResponse(Call<okhttp3.ResponseBody> c, Response<okhttp3.ResponseBody> r) {
+                                    public void onResponse(Call<Map<String, String>> c, Response<Map<String, String>> r) {
                                         if (r.isSuccessful()) {
                                             Toast.makeText(HomeActivity.this, "Đã kích hoạt gói Premium quà tặng thành công!", Toast.LENGTH_LONG).show();
                                             startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
@@ -312,7 +312,7 @@ public class HomeActivity extends AppCompatActivity {
                                         }
                                     }
                                     @Override
-                                    public void onFailure(Call<okhttp3.ResponseBody> c, Throwable t) {}
+                                    public void onFailure(Call<Map<String, String>> c, Throwable t) {}
                                 });
                             });
                         } else if ("SUBSCRIPTION_SUCCESS".equals(notif.getType())) {
