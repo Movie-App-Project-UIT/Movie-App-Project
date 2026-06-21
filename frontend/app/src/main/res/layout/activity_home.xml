@@ -26,37 +26,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="520dp">
 
-                <ImageView
-                    android:id="@+id/bannerImage"
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/bannerViewPager"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/yn" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_gravity="bottom"
-                    android:background="@drawable/banner_overlay"/>
-
-                <!--tên phim hiển thị giữa poster-->
-                <com.example.pemomovie.custom.GlowTextView
-                    android:id="@+id/movieTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your Name"
-                    android:textSize="40sp"
-                    android:fontFamily="@font/meddon"
-                    android:layout_gravity="center_horizontal|bottom"
-                    android:layout_marginBottom="50dp"
-                    android:ellipsize="end"
-                    android:singleLine="false"
-                    android:scrollHorizontally="false"
-                    android:lines="2"
-                    android:gravity="center"
-                    android:breakStrategy="simple"/>
-
-                <!---->
+                    android:layout_height="match_parent" />
+                    
                 <LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center"
@@ -85,8 +59,6 @@
                         android:textSize="16sp"
                         android:text="Chi tiết"/>
                 </LinearLayout>
-
-                <!-- removed headerhome -->
             </FrameLayout>
 
             <!--List section-->

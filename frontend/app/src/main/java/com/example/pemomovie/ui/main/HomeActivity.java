@@ -53,10 +53,10 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private ImageView bannerImage;
-    private TextView movieTitle;
+    private androidx.viewpager2.widget.ViewPager2 bannerViewPager;
     private RecyclerView sectionListHome;
     private Handler handler;
+    private Runnable sliderRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +69,7 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
-        bannerImage = findViewById(R.id.bannerImage);
-        movieTitle = findViewById(R.id.movieTitle);
+        bannerViewPager = findViewById(R.id.bannerViewPager);
         sectionListHome = findViewById(R.id.sectionListHome);
         sectionListHome.setLayoutManager(new LinearLayoutManager(this));
 
@@ -80,13 +79,21 @@ public class HomeActivity extends AppCompatActivity {
         ImageView btnProfile = findViewById(R.id.btnProfile);
         btnProfile.setOnClickListener(v -> showProfileDropdown(v));
 
+        sliderRunnable = () -> {
+            if (bannerViewPager != null && bannerViewPager.getAdapter() != null) {
+                int currentItem = bannerViewPager.getCurrentItem();
+                int totalItems = bannerViewPager.getAdapter().getItemCount();
+                if (totalItems > 0) {
+                    int nextItem = (currentItem + 1) % totalItems;
+                    bannerViewPager.setCurrentItem(nextItem, true);
+                }
+            }
+        };
+
         ImageButton btnNotification = findViewById(R.id.btnNotification);
         if (btnNotification != null) {
             btnNotification.setOnClickListener(v -> showNotificationDropdown(v));
         }
-
-        Button btnPlay = findViewById(R.id.btnPlay);
-        Button btnDetail = findViewById(R.id.btnDetail);
 
         fetchHomepageData();
     }
@@ -104,35 +111,46 @@ public class HomeActivity extends AppCompatActivity {
                     if (trending != null && !trending.isEmpty()) {
                         sections.add(new Section("Đang thịnh hành", trending));
 
-                        // Set banner to the first trending movie
-                        MediaItemDto bannerMovie = trending.get(0);
-                        movieTitle.setText(bannerMovie.getTitle());
-                        Glide.with(HomeActivity.this)
-                             .load(bannerMovie.getPosterUrl())
-                             .placeholder(R.drawable.yn)
-                             .into(bannerImage);
-
-                        Button btnDetail = findViewById(R.id.btnDetail);
-                        btnDetail.setOnClickListener(v -> {
-                            Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                            intent.putExtra("MOVIE_ID", bannerMovie.getId());
-                            startActivity(intent);
-                        });
-
+                        // Set banner ViewPager
+                        List<MediaItemDto> bannerMovies = trending.size() > 5 ? trending.subList(0, 5) : trending;
+                        com.example.pemomovie.adapter.BannerAdapter bannerAdapter = new com.example.pemomovie.adapter.BannerAdapter(HomeActivity.this, bannerMovies);
+                        bannerViewPager.setAdapter(bannerAdapter);
+                        
+                        int startPosition = (Integer.MAX_VALUE / 2) - ((Integer.MAX_VALUE / 2) % bannerMovies.size());
+                        bannerViewPager.setCurrentItem(startPosition, false);
+                        
                         Button btnPlay = findViewById(R.id.btnPlay);
-                        btnPlay.setOnClickListener(v -> {
-                            Intent intent = new Intent(HomeActivity.this, PlayActivity.class);
-                            intent.putExtra("MOVIE_ID", bannerMovie.getId());
-                            startActivity(intent);
+                        Button btnDetail = findViewById(R.id.btnDetail);
+
+                        bannerViewPager.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+                            @Override
+                            public void onPageSelected(int position) {
+                                super.onPageSelected(position);
+                                handler.removeCallbacks(sliderRunnable);
+                                handler.postDelayed(sliderRunnable, 5000);
+                                
+                                int realPosition = position % bannerMovies.size();
+                                MediaItemDto currentMovie = bannerMovies.get(realPosition);
+                                
+                                if (btnDetail != null) {
+                                    btnDetail.setOnClickListener(v -> {
+                                        Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                                        intent.putExtra("MOVIE_ID", currentMovie.getId());
+                                        startActivity(intent);
+                                    });
+                                }
+
+                                if (btnPlay != null) {
+                                    btnPlay.setOnClickListener(v -> {
+                                        Intent intent = new Intent(HomeActivity.this, PlayActivity.class);
+                                        intent.putExtra("MOVIE_ID", currentMovie.getId());
+                                        startActivity(intent);
+                                    });
+                                }
+                            }
                         });
                     }
 
-                    TextView tvSectionSeeAll = findViewById(R.id.sectionSeeAll);
-                    GradientTextView.applyHorizontalGradient(
-                            tvSectionSeeAll,
-                            Color.parseColor("#6C29D6"), // tím
-                            Color.parseColor("#F43393")  // hồng
-                    );
 
                     List<MediaItemDto> topRated = data.get("topRated");
                     if (topRated != null && !topRated.isEmpty()) {
@@ -409,10 +427,21 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (handler != null && sliderRunnable != null) {
+            handler.removeCallbacks(sliderRunnable);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         loadHomeProfileAvatar();
         fetchNotifications();
+        if (handler != null && sliderRunnable != null) {
+            handler.postDelayed(sliderRunnable, 5000);
+        }
     }
 
     private void loadHomeProfileAvatar() {

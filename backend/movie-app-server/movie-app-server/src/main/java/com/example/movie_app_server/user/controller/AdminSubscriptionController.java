@@ -107,6 +107,7 @@ public class AdminSubscriptionController {
                         .status(SubscriptionStatus.PENDING_GIFT)
                         .startDate(java.time.LocalDateTime.now())
                         .endDate(java.time.LocalDateTime.now().plusDays(plan.getDurationDays()))
+                        .isGift(true)
                         .build();
                 UserSubscription savedSub = userSubscriptionRepository.save(userSubscription);
 
@@ -130,23 +131,9 @@ public class AdminSubscriptionController {
         SubscriptionPlan plan = subscriptionPlanRepository.findById(id).orElse(null);
         if (plan == null) return ResponseEntity.notFound().build();
 
-        List<User> giftedUsers = userSubscriptionRepository.findByPlanAndStatus(plan, SubscriptionStatus.PENDING_GIFT)
-                .stream().map(UserSubscription::getUser).collect(Collectors.toList());
-        List<User> activeUsers = userSubscriptionRepository.findByPlanAndStatus(plan, SubscriptionStatus.ACTIVE)
-                .stream().map(UserSubscription::getUser).collect(Collectors.toList());
-
-        // Gộp cả 2 danh sách nếu muốn hiển thị tất cả user có liên quan, ở đây chỉ lấy PENDING_GIFT tạm thời,
-        // Hoặc có thể lấy tất cả nếu user đã nhận. Nhưng yêu cầu là "danh sách khách hàng được tặng"
-        // Ở đây lấy tất cả user đã được tặng (Pending)
-        // Nếu user claim rồi thì sẽ thành ACTIVE.
-        
-        // Để hiển thị chuẩn danh sách khách hàng được tặng, ta có thể gộp cả 2:
-        java.util.Set<User> allGifted = new java.util.HashSet<>();
-        allGifted.addAll(giftedUsers);
-        // Nhưng wait, ACTIVE users có thể là tự mua, không phải tặng! 
-        // Trong trường hợp này ta chỉ hiển thị PENDING_GIFT hoặc phải lưu thêm cờ isGifted = true.
-        // Để tránh sửa Entity, ta trả về PENDING_GIFT (hoặc chấp nhận hiển thị tất cả ACTIVE users).
-        // Ta sẽ trả về PENDING_GIFT vì đó chắc chắn là người chưa kích hoạt gói tặng.
+        // Lấy tất cả user đã được nhận gói quà (Dù đang PENDING_GIFT hay đã ACTIVE)
+        List<User> giftedUsers = userSubscriptionRepository.findByPlanAndIsGift(plan, true)
+                .stream().map(UserSubscription::getUser).distinct().collect(Collectors.toList());
         
         return ResponseEntity.ok(giftedUsers);
     }

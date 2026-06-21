@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="160dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dropdown"
+    android:paddingVertical="8dp"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/btnSortNewest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mới nhất"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:background="?attr/selectableItemBackground" />
+
+    <TextView
+        android:id="@+id/btnSortOldest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cũ nhất"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:background="?attr/selectableItemBackground" />
+
+    <TextView
+        android:id="@+id/btnSortRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Điểm TMDB"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:background="?attr/selectableItemBackground" />
+
+</LinearLayout>

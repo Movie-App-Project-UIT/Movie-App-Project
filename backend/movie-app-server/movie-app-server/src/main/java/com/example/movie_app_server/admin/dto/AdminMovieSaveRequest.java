@@ -13,4 +13,11 @@ public class AdminMovieSaveRequest {
     private String title;
     private String overview;
     private String language;
+    private java.util.List<AdminSubtitleRequest> subtitles;
+
+    @Data
+    public static class AdminSubtitleRequest {
+        private String language;
+        private String fileUrl;
+    }
 }

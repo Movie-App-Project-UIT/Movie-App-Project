@@ -77,7 +77,7 @@ public class MediaService {
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
-        List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseOrderByVoteAverageDesc().stream()
+        List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(8.0f).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
@@ -92,9 +92,14 @@ public class MediaService {
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        // Nếu hệ thống mới chạy chưa có lượt xem nào → dùng danh sách Mới thêm gần đây làm mặc định
+        // Nếu hệ thống mới chạy chưa có lượt xem nào → dùng danh sách theo lượt xem giả lập làm mặc định
         if (trending.isEmpty()) {
-            trending = recentlyAdded;
+            trending = mediaRepository.findAll().stream()
+                    .filter(m -> !m.isDeleted())
+                    .map(this::convertToItemDto)
+                    .sorted((a, b) -> Integer.compare(b.getViewCount(), a.getViewCount()))
+                    .limit(10)
+                    .collect(Collectors.toList());
         }
 
         java.util.Map<String, List<MediaItemDto>> response = new java.util.HashMap<>();

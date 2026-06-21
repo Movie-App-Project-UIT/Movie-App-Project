@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     Intent intent;
                     if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
-                        intent = new Intent(LoginActivity.this, com.example.pemomovie.ui.admin.AdminMovieActivity.class);
+                        intent = new Intent(LoginActivity.this, com.example.pemomovie.ui.main.AdminDashboardActivity.class);
                     } else {
                         intent = new Intent(LoginActivity.this, HomeActivity.class);
                     }
