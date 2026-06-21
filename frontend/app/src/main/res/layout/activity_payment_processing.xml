@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0B10">
+
+    <!-- Container for Glowing Circle and Icon -->
+    <FrameLayout
+        android:id="@+id/iconContainer"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        app:layout_constraintBottom_toTopOf="@+id/txtStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginBottom="32dp">
+
+        <!-- Glowing Circle Background -->
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indeterminate="true"
+            android:indeterminateTint="#8B5CF6"
+            style="?android:attr/progressBarStyleLarge" />
+
+        <!-- Center Icon -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_history" 
+            app:tint="#A78BFA"/> <!-- Sử dụng icon có sẵn hoặc thay thế bằng icon thẻ ngân hàng -->
+            
+    </FrameLayout>
+
+    <!-- Status Text -->
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đang xác nhận\nthanh toán..."
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/txtSubStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iconContainer"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Sub Status Text -->
+    <TextView
+        android:id="@+id/txtSubStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vui lòng không đóng ứng dụng"
+        android:textColor="#9CA3AF"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/loadingDots"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtStatus"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Loading Dots -->
+    <LinearLayout
+        android:id="@+id/loadingDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtSubStatus">
+
+        <View
+            android:id="@+id/dot1"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_circle_filled"
+            android:backgroundTint="#8B5CF6"
+            android:layout_marginEnd="8dp"/>
+        <View
+            android:id="@+id/dot2"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_circle_filled"
+            android:backgroundTint="#4B5563"
+            android:layout_marginEnd="8dp"/>
+        <View
+            android:id="@+id/dot3"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_circle_filled"
+            android:backgroundTint="#4B5563"
+            android:layout_marginEnd="8dp"/>
+        <View
+            android:id="@+id/dot4"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_circle_filled"
+            android:backgroundTint="#4B5563"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
