@@ -40,7 +40,7 @@ public class PaymentService {
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository;
 
-    public String createPaymentUrl(Long packageId, String paymentMethod, String firebaseUid, String ipAddress) {
+    public String createPaymentUrl(Long packageId, String paymentMethod, String firebaseUid, String ipAddress, Long customAmount) {
         User user = userRepository.findByFirebaseUid(firebaseUid)
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
@@ -48,7 +48,7 @@ public class PaymentService {
                 .orElseThrow(() -> new AppException("Package not found", HttpStatus.NOT_FOUND));
 
         String txnRef = VNPayConfig.getRandomNumber(8);
-        long amount = subPackage.getPrice().longValue();
+        long amount = (customAmount != null && customAmount > 0) ? customAmount : subPackage.getPrice().longValue();
 
         if ("MOMO".equalsIgnoreCase(paymentMethod)) {
             return createMoMoPaymentUrl(txnRef, amount, user, subPackage);
@@ -70,7 +70,7 @@ public class PaymentService {
         vnp_Params.put("vnp_CurrCode", "VND");
         // vnp_Params.put("vnp_BankCode", "NCB"); // Bỏ dòng này đi để VNPay hiện màn hình chọn phương thức thanh toán (Có quét QR)
         vnp_Params.put("vnp_TxnRef", txnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + txnRef);
+        vnp_Params.put("vnp_OrderInfo", "ThanhToanDonHang_" + txnRef);
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnp_ReturnUrl());
@@ -85,7 +85,38 @@ public class PaymentService {
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
-        String queryUrl = VNPayConfig.hashAllFields(vnp_Params, vnPayConfig.getSecretKey());
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                try {
+                    // Build hash data
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20"));
+                    
+                    // Build query
+                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()).replace("+", "%20"));
+                    query.append('=');
+                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20"));
+                    
+                    if (itr.hasNext()) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        String queryUrl = query.toString();
+        String vnp_SecureHash = VNPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
 
         // Lưu transaction PENDING
@@ -250,6 +281,27 @@ public class PaymentService {
                 .status(SubscriptionStatus.ACTIVE)
                 .build();
         userSubscriptionRepository.save(newSub);
+    }
+
+    public void simulateSuccess(Long packageId, String userUid) {
+        User user = userRepository.findByFirebaseUid(userUid)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        SubscriptionPlan plan = planRepository.findById(packageId)
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
+
+        Transaction mockTxn = Transaction.builder()
+                .user(user)
+                .subscriptionPlan(plan)
+                .amount(plan.getPrice().longValue())
+                .paymentMethod("TEST")
+                .status("SUCCESS")
+                .txnRef("TEST-" + System.currentTimeMillis())
+                .payDate(LocalDateTime.now())
+                .build();
+        
+        transactionRepository.save(mockTxn);
+        upgradeUserVip(mockTxn);
     }
 
     public String processIpnWebhook(Map<String, String> params) {

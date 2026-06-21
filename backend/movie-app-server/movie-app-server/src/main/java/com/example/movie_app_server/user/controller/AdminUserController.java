@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.admin.dto.AdminUserDetailDto;
 import com.example.movie_app_server.interaction.dto.ReviewResponseDto;
@@ -57,7 +57,6 @@ public class AdminUserController {
                     .isActive(user.isActive())
                     .createdAt(user.getCreatedAt());
 
-            // Lấy thông tin gói Premium nếu có
             UserSubscription activeSub = userSubscriptionRepository
                     .findFirstByUserAndStatusOrderByEndDateDesc(user, SubscriptionStatus.ACTIVE).orElse(null);
             
@@ -66,7 +65,6 @@ public class AdminUserController {
                 builder.planEndDate(activeSub.getEndDate());
             }
 
-            // Lấy danh sách reviews
             List<Review> reviews = reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
             List<ReviewResponseDto> reviewDtos = reviews.stream().map(r -> ReviewResponseDto.builder()
                     .id(r.getId())

@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.media.dto.MediaItemDto;
 import com.example.movie_app_server.media.dto.MediaDetailResponse;

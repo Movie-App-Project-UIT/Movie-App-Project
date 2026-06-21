@@ -21,7 +21,6 @@ public class PaymentController {
         return (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    // API để App gọi lấy URL thanh toán VNPay
     @PostMapping("/create-url")
     public ResponseEntity<String> createPaymentUrl(@RequestParam Long packageId, 
                                                    @RequestParam(defaultValue = "VNPAY") String paymentMethod,

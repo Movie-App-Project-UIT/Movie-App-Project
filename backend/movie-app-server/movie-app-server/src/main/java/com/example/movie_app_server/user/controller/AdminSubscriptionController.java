@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.admin.dto.GiftSubscriptionRequest;
 import com.example.movie_app_server.interaction.entity.enums.NotificationType;
@@ -10,6 +10,7 @@ import com.example.movie_app_server.interaction.repository.UserSubscriptionRepos
 import com.example.movie_app_server.interaction.service.NotificationService;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
+import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class AdminSubscriptionController {
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final AdminHistoryService adminHistoryService;
 
     @GetMapping
     public ResponseEntity<List<SubscriptionPlan>> getAllSubscriptions() {

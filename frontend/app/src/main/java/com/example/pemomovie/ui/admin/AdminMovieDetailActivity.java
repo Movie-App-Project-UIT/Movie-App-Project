@@ -53,7 +53,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadSubtitle, btnViewReviews;
     private ProgressBar progressBar;
     private RecyclerView rvSubtitles;
-    
+
     private AdminSubtitleAdapter subtitleAdapter;
     private ApiService apiService;
 
@@ -80,7 +80,6 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         etTmdbId = findViewById(R.id.etTmdbId);
         etSubtitleLanguage = findViewById(R.id.etSubtitleLanguage);
         etVoteAverage = findViewById(R.id.etVoteAverage);
-        
         swPremium = findViewById(R.id.swPremium);
         swDeleted = findViewById(R.id.swDeleted);
         ivPoster = findViewById(R.id.ivPoster);
@@ -113,7 +112,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         });
 
         btnUploadVideo.setOnClickListener(v -> videoPickerLauncher.launch("video/*"));
-        
+
         btnUploadSubtitle.setOnClickListener(v -> {
             String lang = etSubtitleLanguage.getText().toString().trim();
             if (lang.isEmpty()) {
@@ -181,7 +180,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
 
         String mimeType = getContentResolver().getType(uri);
         if (mimeType == null) mimeType = "multipart/form-data";
-        
+
         RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
@@ -200,7 +199,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 btnSave.setEnabled(true);
                 btnUploadVideo.setEnabled(true);
                 btnUploadSubtitle.setEnabled(true);
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     String url = response.body();
                     if (type.equals("video")) {
@@ -314,7 +313,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         } else {
             etVoteAverage.setText("Chưa có");
         }
-        
+
         String genresStr = data.getGenres() != null ? String.join(", ", data.getGenres()) : "Không có dữ liệu";
         etGenre.setText(genresStr);
         etCountry.setText(data.getCountryName() != null ? data.getCountryName() : "Không có dữ liệu");
@@ -324,7 +323,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         } else if (data.getTrailerUrl() != null) {
             etVideoUrl.setText(data.getTrailerUrl()); // default to trailer if no videoUrl
         }
-        
+
         swPremium.setChecked(data.isPremium());
         swDeleted.setChecked(data.isDeleted());
 
@@ -352,6 +351,9 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
+                    // For update mode, we need TMDB ID for the save request if we don't have it elsewhere?
+                    // Actually, update doesn't strictly need TMDB ID because we update by ID, but the DTO expects it.
+                    // We can pass null or 0 since backend ignores it on update.
                     populateUI(response.body(), null);
                 } else {
                     Toast.makeText(AdminMovieDetailActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();

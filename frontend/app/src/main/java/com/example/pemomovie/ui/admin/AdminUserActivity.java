@@ -44,6 +44,11 @@ public class AdminUserActivity extends AppCompatActivity {
 
         AdminNavigationHelper.setupBottomNavigation(this);
 
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+
         RecyclerView rvUsers = findViewById(R.id.rvUsers);
         edtSearch = findViewById(R.id.edtSearch);
         chipGroupFilter = findViewById(R.id.chipGroupFilter);
