@@ -46,7 +46,7 @@ public class User {
     @Builder.Default
     private Tier tier = Tier.FREE;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
     @Builder.Default
     private boolean isActive = true;
 
