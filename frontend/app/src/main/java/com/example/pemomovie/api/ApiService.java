@@ -20,6 +20,10 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import com.example.pemomovie.dto.MediaDetailResponse;
+
 public interface ApiService {
     @POST("/api/v1/users/sync")
     Call<UserProfileDto> syncUser(@Body SyncUserRequest request);
@@ -40,7 +44,7 @@ public interface ApiService {
     Call<Map<String, List<MediaItemDto>>> getHomepageData();
 
     @GET("/api/v1/media/{id}")
-    Call<com.example.pemomovie.dto.MediaDetailResponse> getMediaDetail(@retrofit2.http.Path("id") Long id);
+    Call<MediaDetailResponse> getMediaDetail(@Path("id") Long id);
 
     // --- ADMIN API ---
     @GET("/api/v1/admin/movies")
@@ -119,6 +123,17 @@ public interface ApiService {
     @POST("/api/v1/users/avatar")
     Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
 
+    @POST("/api/v1/payments/create-url")
+    Call<ResponseBody> createPaymentUrl(
+            @Query("packageId") Long packageId,
+            @Query("paymentMethod") String paymentMethod,
+            @Query("amount") Long amount
+    );
+
+    @POST("/api/v1/payments/test-success")
+    Call<ResponseBody> simulateSuccess(
+            @Query("packageId") Long packageId
+    );
     @GET("/api/v1/media/{id}/play")
     Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
 

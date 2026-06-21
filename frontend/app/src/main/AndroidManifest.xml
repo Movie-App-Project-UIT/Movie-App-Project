@@ -99,10 +99,10 @@
         <activity
             android:name=".ui.main.UpgradePremiumActivity"
             android:exported="false" />
-        <activity
-            android:name=".SeeAllActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.main.PaymentActivity"
+                android:exported="false"/>
+        <activity android:name=".ui.main.QrPaymentActivity"
+            android:exported="false"/>
         <activity
             android:name=".ui.main.SeeAllActivity"
             android:exported="false"
@@ -111,6 +111,12 @@
             android:name=".ui.main.WatchingActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.PaymentProcessingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.main.PaymentSuccessActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.admin.AdminMovieAddActivity"
             android:exported="false"/>

@@ -51,8 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
-            app:tabIndicatorColor="#00C853"
-            app:tabSelectedTextColor="#00C853"
+            app:tabIndicator="@drawable/bg_gradient_save_button"
+            app:tabSelectedTextColor="#9D2DBE"
             app:tabTextColor="#BDBDBD">
             
             <com.google.android.material.tabs.TabItem
