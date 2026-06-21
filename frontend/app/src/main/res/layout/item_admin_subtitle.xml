@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_input_field"
+    android:layout_marginBottom="8dp"
+    android:padding="12dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tvSubtitleLanguage"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="vi"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/tvSubtitleUrl"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="https://cloudinary.com/..."
+        android:textColor="#9CA3AF"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginHorizontal="8dp"
+        android:textSize="14sp"/>
+
+    <ImageView
+        android:id="@+id/btnDeleteSubtitle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_close"
+        android:contentDescription="Xóa phụ đề"
+        app:tint="#EF4444"
+        xmlns:app="http://schemas.android.com/apk/res-auto"/>
+
+</LinearLayout>

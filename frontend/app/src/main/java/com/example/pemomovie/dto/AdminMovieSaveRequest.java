@@ -10,8 +10,9 @@ public class AdminMovieSaveRequest {
     private String title;
     private String overview;
     private String language;
+    private java.util.List<AdminSubtitleRequest> subtitles;
 
-    public AdminMovieSaveRequest(Integer tmdbId, String videoUrl, boolean isPremium, boolean isDeleted, String title, String overview, String language) {
+    public AdminMovieSaveRequest(Integer tmdbId, String videoUrl, boolean isPremium, boolean isDeleted, String title, String overview, String language, java.util.List<AdminSubtitleRequest> subtitles) {
         this.tmdbId = tmdbId;
         this.videoUrl = videoUrl;
         this.isPremium = isPremium;
@@ -19,6 +20,20 @@ public class AdminMovieSaveRequest {
         this.title = title;
         this.overview = overview;
         this.language = language;
+        this.subtitles = subtitles;
+    }
+
+    public static class AdminSubtitleRequest {
+        private String language;
+        private String fileUrl;
+
+        public AdminSubtitleRequest(String language, String fileUrl) {
+            this.language = language;
+            this.fileUrl = fileUrl;
+        }
+
+        public String getLanguage() { return language; }
+        public String getFileUrl() { return fileUrl; }
     }
 
     public Integer getTmdbId() { return tmdbId; }
@@ -28,4 +43,5 @@ public class AdminMovieSaveRequest {
     public String getTitle() { return title; }
     public String getOverview() { return overview; }
     public String getLanguage() { return language; }
+    public java.util.List<AdminSubtitleRequest> getSubtitles() { return subtitles; }
 }

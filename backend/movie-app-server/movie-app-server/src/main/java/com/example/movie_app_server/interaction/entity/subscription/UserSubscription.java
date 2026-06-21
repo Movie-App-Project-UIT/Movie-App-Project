@@ -46,4 +46,8 @@ public class UserSubscription {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "is_gift", nullable = false)
+    @Builder.Default
+    private Boolean isGift = false;
 }

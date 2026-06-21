@@ -89,6 +89,11 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
 
+        ImageButton btnNotification = findViewById(R.id.btnNotification);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> showNotificationDropdown(v));
+        }
+
         fetchHomepageData();
     }
 
@@ -241,6 +246,69 @@ public class HomeActivity extends AppCompatActivity {
 
         int yoff = (int) (8 * getResources().getDisplayMetrics().density);
         popupWindow.showAsDropDown(anchorView, 0, yoff);
+    }
+
+    private void showNotificationDropdown(View anchorView) {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.layout_notification_dropdown, null);
+
+        int width = (int) (320 * getResources().getDisplayMetrics().density);
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popupWindow.setElevation(10);
+        }
+
+        View layoutEmptyNotification = popupView.findViewById(R.id.layoutEmptyNotification);
+        View layoutNotificationList = popupView.findViewById(R.id.layoutNotificationList);
+        View layoutNotifAdminGift = popupView.findViewById(R.id.layoutNotifAdminGift);
+        View layoutNotifSuccess = popupView.findViewById(R.id.layoutNotifSuccess);
+
+        android.content.SharedPreferences prefs = getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE);
+        boolean hasPremiumNotif = prefs.getBoolean("has_new_premium_notification", false);
+
+        if (hasPremiumNotif) {
+            if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
+            if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.VISIBLE);
+            if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(View.GONE);
+            if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(View.VISIBLE);
+        } else {
+            if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
+            if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.GONE);
+        }
+
+        if (layoutNotifAdminGift != null) {
+            layoutNotifAdminGift.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                Toast.makeText(HomeActivity.this, "Đã kích hoạt gói Premium quà tặng thành công!", Toast.LENGTH_LONG).show();
+            });
+        }
+
+        if (layoutNotifSuccess != null) {
+            layoutNotifSuccess.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Đánh dấu đã đọc
+        View tvMarkAsRead = popupView.findViewById(R.id.tvMarkAsRead);
+        if (tvMarkAsRead != null) {
+            tvMarkAsRead.setOnClickListener(v -> {
+                prefs.edit().putBoolean("has_new_premium_notification", false).apply();
+                popupWindow.dismiss();
+                Toast.makeText(HomeActivity.this, "Đã đánh dấu đọc tất cả", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        int xoff = anchorView.getWidth() - width;
+        int yoff = (int) (8 * getResources().getDisplayMetrics().density);
+        popupWindow.showAsDropDown(anchorView, xoff, yoff);
     }
 
     @Override

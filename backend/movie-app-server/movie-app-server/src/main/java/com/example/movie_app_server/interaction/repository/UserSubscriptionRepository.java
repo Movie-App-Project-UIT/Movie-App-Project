@@ -24,4 +24,8 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
     List<UserSubscription> findByPlanAndStatus(
             com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan plan,
             com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus status);
+
+    List<UserSubscription> findByPlanAndIsGift(
+            com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan plan,
+            Boolean isGift);
 }
