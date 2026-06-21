@@ -39,6 +39,7 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -172,7 +173,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     }
 
     private void uploadFile(Uri uri, String type) {
-        File file = getFileFromUri(uri);
+        File file = getFileFromUri(uri, type);
         if (file == null) {
             Toast.makeText(this, "Lỗi đọc file từ bộ nhớ", Toast.LENGTH_SHORT).show();
             return;
@@ -190,27 +191,31 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         btnUploadSubtitle.setEnabled(false);
         Toast.makeText(this, "Đang tải file lên Cloudinary, vui lòng đợi...", Toast.LENGTH_SHORT).show();
 
-        Call<String> call = type.equals("video") ? apiService.uploadVideoAdmin(body) : apiService.uploadSubtitleAdmin(body);
+        Call<ResponseBody> call = type.equals("video") ? apiService.uploadVideoAdmin(body) : apiService.uploadSubtitleAdmin(body);
 
-        call.enqueue(new Callback<String>() {
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 progressBar.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 btnUploadVideo.setEnabled(true);
                 btnUploadSubtitle.setEnabled(true);
-
+                
                 if (response.isSuccessful() && response.body() != null) {
-                    String url = response.body();
-                    if (type.equals("video")) {
-                        etVideoUrl.setText(url);
-                        Toast.makeText(AdminMovieDetailActivity.this, "Tải Video lên thành công!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        String lang = etSubtitleLanguage.getText().toString().trim();
-                        subtitleAdapter.getSubtitles().add(new AdminMovieSaveRequest.AdminSubtitleRequest(lang, url));
-                        subtitleAdapter.notifyDataSetChanged();
-                        etSubtitleLanguage.setText(""); // Reset
-                        Toast.makeText(AdminMovieDetailActivity.this, "Tải Phụ đề lên thành công!", Toast.LENGTH_SHORT).show();
+                    try {
+                        String url = response.body().string();
+                        if (type.equals("video")) {
+                            etVideoUrl.setText(url);
+                            Toast.makeText(AdminMovieDetailActivity.this, "Tải Video lên thành công!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String lang = etSubtitleLanguage.getText().toString().trim();
+                            subtitleAdapter.getSubtitles().add(new AdminMovieSaveRequest.AdminSubtitleRequest(lang, url));
+                            subtitleAdapter.notifyDataSetChanged();
+                            etSubtitleLanguage.setText(""); // Reset
+                            Toast.makeText(AdminMovieDetailActivity.this, "Tải Phụ đề lên thành công!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (java.io.IOException e) {
+                        Toast.makeText(AdminMovieDetailActivity.this, "Lỗi đọc dữ liệu Server", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(AdminMovieDetailActivity.this, "Lỗi Upload Server: " + response.code(), Toast.LENGTH_SHORT).show();
@@ -218,7 +223,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 btnUploadVideo.setEnabled(true);
@@ -228,12 +233,12 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         });
     }
 
-    private File getFileFromUri(Uri uri) {
+    private File getFileFromUri(Uri uri, String type) {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             if (inputStream == null) return null;
 
-            String fileName = "upload_temp";
+            String fileName = "upload_temp_" + System.currentTimeMillis();
             Cursor cursor = getContentResolver().query(uri, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -241,6 +246,13 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                     fileName = cursor.getString(nameIndex);
                 }
                 cursor.close();
+            }
+            
+            // Backend validation requires specific extensions
+            if (type.equals("video") && !fileName.matches(".*\\.(mp4|mkv|avi)$")) {
+                fileName += ".mp4";
+            } else if (type.equals("subtitle") && !fileName.matches(".*\\.(srt|vtt)$")) {
+                fileName += ".srt";
             }
 
             File tempFile = new File(getCacheDir(), fileName);

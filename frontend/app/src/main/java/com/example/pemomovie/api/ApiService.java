@@ -166,10 +166,10 @@ public interface ApiService {
 
     @Multipart
     @POST("/api/v1/admin/upload/video")
-    Call<String> uploadVideoAdmin(@Part MultipartBody.Part file);
+    Call<ResponseBody> uploadVideoAdmin(@Part MultipartBody.Part file);
 
     @Multipart
     @POST("/api/v1/admin/upload/subtitle")
-    Call<String> uploadSubtitleAdmin(@Part MultipartBody.Part file);
+    Call<ResponseBody> uploadSubtitleAdmin(@Part MultipartBody.Part file);
 
 }
