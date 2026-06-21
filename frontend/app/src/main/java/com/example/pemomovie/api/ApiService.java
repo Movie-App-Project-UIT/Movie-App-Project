@@ -140,4 +140,12 @@ public interface ApiService {
             @retrofit2.http.Query("page") int page,
             @retrofit2.http.Query("size") int size
     );
+
+    @Multipart
+    @POST("/api/v1/admin/upload/video")
+    Call<String> uploadVideoAdmin(@Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("/api/v1/admin/upload/subtitle")
+    Call<String> uploadSubtitleAdmin(@Part MultipartBody.Part file);
 }

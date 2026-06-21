@@ -67,6 +67,16 @@ public class AdminMovieController {
         if (request.getLanguage() != null && !request.getLanguage().isEmpty()) {
             media.setLanguage(request.getLanguage());
         }
+
+        if (request.getSubtitles() != null && !request.getSubtitles().isEmpty()) {
+            for (AdminMovieSaveRequest.AdminSubtitleRequest subReq : request.getSubtitles()) {
+                media.getSubtitles().add(com.example.movie_app_server.media.entity.Subtitle.builder()
+                        .language(subReq.getLanguage())
+                        .fileUrl(subReq.getFileUrl())
+                        .media(media)
+                        .build());
+            }
+        }
         media = mediaRepository.save(media);
         return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
     }
@@ -120,6 +130,17 @@ public class AdminMovieController {
         }
         if (request.getLanguage() != null && !request.getLanguage().isEmpty()) {
             media.setLanguage(request.getLanguage());
+        }
+
+        media.getSubtitles().clear();
+        if (request.getSubtitles() != null && !request.getSubtitles().isEmpty()) {
+            for (AdminMovieSaveRequest.AdminSubtitleRequest subReq : request.getSubtitles()) {
+                media.getSubtitles().add(com.example.movie_app_server.media.entity.Subtitle.builder()
+                        .language(subReq.getLanguage())
+                        .fileUrl(subReq.getFileUrl())
+                        .media(media)
+                        .build());
+            }
         }
         media = mediaRepository.save(media);
         return ResponseEntity.ok(mediaService.convertToDetailResponse(media));

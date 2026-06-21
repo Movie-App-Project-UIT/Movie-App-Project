@@ -55,6 +55,7 @@ public class TmdbSyncService {
                 .mediaType(MediaType.MOVIE)
                 .language(movieDto.getOriginalLanguage() != null ? new java.util.Locale(movieDto.getOriginalLanguage()).getDisplayLanguage(new java.util.Locale("vi", "VN")) : null)
                 .trailerUrl(trailerUrl)
+                .duration(movieDto.getRuntime())
                 .build();
 
         // Map Genres
