@@ -27,7 +27,7 @@ public class NavigationHelper {
             if (btnGenres != null) btnGenres.setSelected(true);
         } else if (activity instanceof FavoriteActivity) {
             if (btnFavorites != null) btnFavorites.setSelected(true);
-        } else if (activity instanceof ProfileActivity) {
+        } else if (activity instanceof WatchingActivity) {
             if (btnWatching != null) btnWatching.setSelected(true);
         }
 
@@ -61,11 +61,11 @@ public class NavigationHelper {
             });
         }
 
-        // Nút Profile (Thay cho Watching cũ)
+        // Nút Watching (Xem sau)
         if (btnWatching != null) {
             addBounceEffect(btnWatching);
             btnWatching.setOnClickListener(v -> {
-                if (!(activity instanceof ProfileActivity)) {
+                if (!(activity instanceof WatchingActivity)) {
                     startActivityWithAnim(activity, WatchingActivity.class);
                 }
             });

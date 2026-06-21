@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -66,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
-        androidx.cardview.widget.CardView btnLogout = findViewById(R.id.btnLogout);
+        CardView btnLogout = findViewById(R.id.btnLogout);
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
                 FirebaseAuth.getInstance().signOut();
@@ -92,6 +93,15 @@ public class ProfileActivity extends AppCompatActivity {
         if (btnUpgradePremium != null) {
             btnUpgradePremium.setOnClickListener(v -> {
                 Intent intent = new Intent(ProfileActivity.this, UpgradePremiumActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Xử lý nút Xem tất cả Đang xem
+        TextView btnViewAllWatching = findViewById(R.id.btnViewAllWatching);
+        if (btnViewAllWatching != null) {
+            btnViewAllWatching.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, WatchingActivity.class);
                 startActivity(intent);
             });
         }

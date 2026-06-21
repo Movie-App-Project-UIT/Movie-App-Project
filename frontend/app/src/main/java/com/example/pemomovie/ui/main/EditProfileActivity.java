@@ -201,7 +201,11 @@ public class EditProfileActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    Toast.makeText(EditProfileActivity.this, "Không thể tải thông tin hồ sơ", Toast.LENGTH_SHORT).show();
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
+                        android.util.Log.e("EditProfile", "Lỗi tải hồ sơ: Mã " + response.code() + " - " + errorBody);
+                    } catch (Exception e) {}
+                    Toast.makeText(EditProfileActivity.this, "Không thể tải hồ sơ (Lỗi " + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
