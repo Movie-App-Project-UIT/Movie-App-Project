@@ -41,6 +41,12 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         holder.movieRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         holder.movieRecycler.setAdapter(posterAdapter);
 
+        com.example.pemomovie.custom.GradientTextView.applyHorizontalGradient(
+                holder.sectionSeeAll,
+                android.graphics.Color.parseColor("#6C29D6"), // tím
+                android.graphics.Color.parseColor("#F43393")  // hồng
+        );
+
         holder.sectionSeeAll.setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(context, com.example.pemomovie.ui.main.MovieActivity.class);
             intent.setFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

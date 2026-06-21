@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Handler;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,14 +45,19 @@ import retrofit2.Response;
 public class MovieActivity extends AppCompatActivity {
 
     private EditText edtSearch;
-    private Button btnSearch;
+    private LinearLayout btnSortOptions;
+    private TextView txtCurrentSort;
+    
+    private Handler searchHandler = new Handler();
+    private Runnable searchRunnable;
+
     private TabLayout tabLayoutMediaType;
     private LinearLayout btnToggleFilter, layoutFiltersContainer;
     private TextView txtToggleFilter;
     
-    private RecyclerView rvCountries, rvGenres, rvAgeRatings, rvYears, rvSorts, rvMovies;
+    private RecyclerView rvCountries, rvGenres, rvYears, rvMovies;
     
-    private FilterChipAdapter countryAdapter, genreAdapter, ageAdapter, yearAdapter, sortAdapter;
+    private FilterChipAdapter countryAdapter, genreAdapter, yearAdapter;
     private PosterAdapter movieAdapter;
 
     private ApiService apiService;
@@ -63,7 +69,7 @@ public class MovieActivity extends AppCompatActivity {
     private Long currentCountryId = null;
     private Long currentAgeRatingId = null;
     private Integer currentReleaseYear = null;
-    private String currentSortBy = "createdAt_desc"; // Mới nhất
+    private String currentSortBy = "Mới nhất"; // "Mới nhất", "Cũ nhất", "Điểm TMDB"
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +99,6 @@ public class MovieActivity extends AppCompatActivity {
 
     private void initViews() {
         edtSearch = findViewById(R.id.edtSearch);
-        btnSearch = findViewById(R.id.btnSearch);
-        GradientTextView.applyHorizontalGradient(btnSearch, Color.parseColor("#6C29D6"), Color.parseColor("#F43393"));
 
         tabLayoutMediaType = findViewById(R.id.tabLayoutMediaType);
         btnToggleFilter = findViewById(R.id.btnToggleFilter);
@@ -103,10 +107,11 @@ public class MovieActivity extends AppCompatActivity {
 
         rvCountries = findViewById(R.id.rvCountries);
         rvGenres = findViewById(R.id.rvGenres);
-        rvAgeRatings = findViewById(R.id.rvAgeRatings);
         rvYears = findViewById(R.id.rvYears);
-        rvSorts = findViewById(R.id.rvSorts);
         rvMovies = findViewById(R.id.rvMovies);
+        
+        btnSortOptions = findViewById(R.id.btnSortOptions);
+        txtCurrentSort = findViewById(R.id.txtCurrentSort);
 
         rvMovies.setLayoutManager(new GridLayoutManager(this, 3));
         movieAdapter = new PosterAdapter(this, new ArrayList<>());
@@ -144,10 +149,25 @@ public class MovieActivity extends AppCompatActivity {
     }
 
     private void setupSearch() {
-        btnSearch.setOnClickListener(v -> {
-            currentKeyword = edtSearch.getText().toString().trim();
-            if (currentKeyword.isEmpty()) currentKeyword = null;
-            loadMovies();
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                searchRunnable = () -> {
+                    currentKeyword = s.toString().trim();
+                    if (currentKeyword.isEmpty()) currentKeyword = null;
+                    loadMovies();
+                };
+                searchHandler.postDelayed(searchRunnable, 500); // 500ms debounce
+            }
         });
     }
 
@@ -165,17 +185,46 @@ public class MovieActivity extends AppCompatActivity {
         rvYears.setAdapter(yearAdapter);
 
         // Sort By
-        List<FilterOption> sorts = new ArrayList<>();
-        sorts.add(new FilterOption(1L, "Mới nhất"));
-        sorts.add(new FilterOption(2L, "Cũ nhất"));
-        sorts.add(new FilterOption(3L, "Điểm TMDB"));
-        sortAdapter = new FilterChipAdapter(sorts, option -> {
-            if (option.getName().equals("Mới nhất")) currentSortBy = "createdAt_desc";
-            else if (option.getName().equals("Cũ nhất")) currentSortBy = "createdAt_asc";
-            else if (option.getName().equals("Điểm TMDB")) currentSortBy = "voteAverage_desc";
-            loadMovies();
-        });
-        rvSorts.setAdapter(sortAdapter);
+        if (btnSortOptions != null) {
+            btnSortOptions.setOnClickListener(v -> {
+                android.view.View popupView = getLayoutInflater().inflate(R.layout.layout_dropdown_sort, null);
+                
+                int width = (int) (160 * getResources().getDisplayMetrics().density);
+                int height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
+                boolean focusable = true;
+                
+                final android.widget.PopupWindow popupWindow = new android.widget.PopupWindow(popupView, width, height, focusable);
+                popupWindow.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    popupWindow.setElevation(10);
+                }
+
+                android.widget.TextView btnSortNewest = popupView.findViewById(R.id.btnSortNewest);
+                android.widget.TextView btnSortOldest = popupView.findViewById(R.id.btnSortOldest);
+                android.widget.TextView btnSortRating = popupView.findViewById(R.id.btnSortRating);
+
+                android.view.View.OnClickListener listener = new android.view.View.OnClickListener() {
+                    @Override
+                    public void onClick(android.view.View view) {
+                        String title = ((android.widget.TextView) view).getText().toString();
+                        if (txtCurrentSort != null) {
+                            txtCurrentSort.setText("Sắp xếp: " + title);
+                        }
+                        currentSortBy = title;
+                        loadMovies();
+                        popupWindow.dismiss();
+                    }
+                };
+
+                btnSortNewest.setOnClickListener(listener);
+                btnSortOldest.setOnClickListener(listener);
+                btnSortRating.setOnClickListener(listener);
+
+                // Show as dropdown aligned to the end
+                int yoff = (int) (4 * getResources().getDisplayMetrics().density);
+                popupWindow.showAsDropDown(btnSortOptions, 0, yoff, android.view.Gravity.END);
+            });
+        }
     }
 
     private void loadDynamicFilters() {
@@ -215,23 +264,7 @@ public class MovieActivity extends AppCompatActivity {
             public void onFailure(Call<List<CountryDto>> call, Throwable t) {}
         });
 
-        // Age Ratings
-        apiService.getAgeRatings().enqueue(new Callback<List<AgeRatingDto>>() {
-            @Override
-            public void onResponse(Call<List<AgeRatingDto>> call, Response<List<AgeRatingDto>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<FilterOption> options = new ArrayList<>();
-                    options.add(new FilterOption((Long)null, "Tất cả"));
-                    for (AgeRatingDto a : response.body()) options.add(new FilterOption(a.getId(), a.getName()));
-                    ageAdapter = new FilterChipAdapter(options, opt -> {
-                        currentAgeRatingId = opt.getId(); loadMovies();
-                    });
-                    rvAgeRatings.setAdapter(ageAdapter);
-                }
-            }
-            @Override
-            public void onFailure(Call<List<AgeRatingDto>> call, Throwable t) {}
-        });
+        // Age Ratings đã bị ẩn
     }
 
     private void loadMovies() {

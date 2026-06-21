@@ -35,8 +35,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findMediaNotContainingGenre(@Param("genre") com.example.movie_app_server.media.entity.Genre genre);
 
     // --- Homepage API Queries ---
-    // Phim được đánh giá cao nhất (Top Rated)
-    List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();
+    // Phim được đánh giá cao nhất (Top Rated) > 8.0
+    List<Media> findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(Float voteAverage);
 
     // Phim mới cập nhật (Recently Added)
     List<Media> findTop10ByIsDeletedFalseOrderByIdDesc();
