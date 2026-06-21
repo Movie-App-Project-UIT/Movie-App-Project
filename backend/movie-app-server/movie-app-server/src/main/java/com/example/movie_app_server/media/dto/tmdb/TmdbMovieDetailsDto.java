@@ -25,6 +25,9 @@ public class TmdbMovieDetailsDto {
     @JsonProperty("original_language")
     private String originalLanguage;
 
+    @JsonProperty("original_title")
+    private String originalTitle;
+
     private TmdbVideosDto videos;
 
     private java.util.List<TmdbGenreResponseDto.TmdbGenreDto> genres;

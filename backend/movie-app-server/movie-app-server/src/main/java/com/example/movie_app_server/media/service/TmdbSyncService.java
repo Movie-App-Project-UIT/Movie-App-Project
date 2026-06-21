@@ -31,8 +31,25 @@ public class TmdbSyncService {
     private final com.example.movie_app_server.media.repository.CountryRepository countryRepository;
 
     public Media previewMovieFromTmdb(Integer tmdbId) {
-        TmdbMovieDetailsDto movieDto = tmdbClient.getMovieDetails(tmdbId);
+        TmdbMovieDetailsDto movieDto = tmdbClient.getMovieDetails(tmdbId, "vi-VN");
         TmdbCreditsResponseDto creditsDto = tmdbClient.getMovieCredits(tmdbId);
+
+        // Determine if we need to fetch English fallback
+        boolean titleNeedsFallback = !("vi".equals(movieDto.getOriginalLanguage())) 
+                                  && !("en".equals(movieDto.getOriginalLanguage())) 
+                                  && movieDto.getTitle() != null 
+                                  && movieDto.getTitle().equals(movieDto.getOriginalTitle());
+        boolean overviewNeedsFallback = movieDto.getOverview() == null || movieDto.getOverview().isEmpty();
+
+        if (titleNeedsFallback || overviewNeedsFallback) {
+            TmdbMovieDetailsDto englishDto = tmdbClient.getMovieDetails(tmdbId, "en-US");
+            if (titleNeedsFallback && englishDto.getTitle() != null && !englishDto.getTitle().isEmpty()) {
+                movieDto.setTitle(englishDto.getTitle());
+            }
+            if (overviewNeedsFallback && englishDto.getOverview() != null && !englishDto.getOverview().isEmpty()) {
+                movieDto.setOverview(englishDto.getOverview());
+            }
+        }
 
         String trailerUrl = null;
         if (movieDto.getVideos() != null && movieDto.getVideos().getResults() != null) {
@@ -121,8 +138,25 @@ public class TmdbSyncService {
             throw new AppException("Phim bộ này đã tồn tại trong hệ thống!", HttpStatus.CONFLICT);
         }
 
-        TmdbTvDetailsDto tvDto = tmdbClient.getTvDetails(tmdbId);
+        TmdbTvDetailsDto tvDto = tmdbClient.getTvDetails(tmdbId, "vi-VN");
         TmdbCreditsResponseDto creditsDto = tmdbClient.getTvCredits(tmdbId);
+
+        // Determine if we need to fetch English fallback
+        boolean titleNeedsFallback = !("vi".equals(tvDto.getOriginalLanguage())) 
+                                  && !("en".equals(tvDto.getOriginalLanguage())) 
+                                  && tvDto.getName() != null 
+                                  && tvDto.getName().equals(tvDto.getOriginalName());
+        boolean overviewNeedsFallback = tvDto.getOverview() == null || tvDto.getOverview().isEmpty();
+
+        if (titleNeedsFallback || overviewNeedsFallback) {
+            TmdbTvDetailsDto englishDto = tmdbClient.getTvDetails(tmdbId, "en-US");
+            if (titleNeedsFallback && englishDto.getName() != null && !englishDto.getName().isEmpty()) {
+                tvDto.setName(englishDto.getName());
+            }
+            if (overviewNeedsFallback && englishDto.getOverview() != null && !englishDto.getOverview().isEmpty()) {
+                tvDto.setOverview(englishDto.getOverview());
+            }
+        }
 
         String trailerUrl = null;
         if (tvDto.getVideos() != null && tvDto.getVideos().getResults() != null) {

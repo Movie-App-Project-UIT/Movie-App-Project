@@ -35,8 +35,8 @@ public class TmdbClient {
     }
 
     // 1. Gọi API lấy chi tiết phim (Đã bỏ đoạn ?api_key=...)
-    public TmdbMovieDetailsDto getMovieDetails(Integer tmdbId) {
-        String url = baseUrl + "/movie/" + tmdbId + "?language=vi-VN&append_to_response=videos&include_video_language=vi,en";
+    public TmdbMovieDetailsDto getMovieDetails(Integer tmdbId, String language) {
+        String url = baseUrl + "/movie/" + tmdbId + "?language=" + language + "&append_to_response=videos&include_video_language=vi,en";
 
         ResponseEntity<TmdbMovieDetailsDto> response = restTemplate.exchange(
                 url,
@@ -45,6 +45,10 @@ public class TmdbClient {
                 TmdbMovieDetailsDto.class
         );
         return response.getBody();
+    }
+
+    public TmdbMovieDetailsDto getMovieDetails(Integer tmdbId) {
+        return getMovieDetails(tmdbId, "vi-VN");
     }
 
     // 2. Gọi API lấy danh sách Đạo diễn / Diễn viên
@@ -68,9 +72,13 @@ public class TmdbClient {
 
     // --- CÁC HÀM CÀO PHIM BỘ (TV SERIES) ---
 
-    public TmdbTvDetailsDto getTvDetails(Integer tmdbId) {
-        String url = baseUrl + "/tv/" + tmdbId + "?language=vi-VN&append_to_response=videos&include_video_language=vi,en";
+    public TmdbTvDetailsDto getTvDetails(Integer tmdbId, String language) {
+        String url = baseUrl + "/tv/" + tmdbId + "?language=" + language + "&append_to_response=videos&include_video_language=vi,en";
         return restTemplate.exchange(url, HttpMethod.GET, createHeaders(), TmdbTvDetailsDto.class).getBody();
+    }
+
+    public TmdbTvDetailsDto getTvDetails(Integer tmdbId) {
+        return getTvDetails(tmdbId, "vi-VN");
     }
 
     public TmdbCreditsResponseDto getTvCredits(Integer tmdbId) {
