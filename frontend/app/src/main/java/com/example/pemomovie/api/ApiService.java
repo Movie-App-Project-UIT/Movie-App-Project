@@ -132,6 +132,12 @@ public interface ApiService {
 
     @POST("/api/v1/payments/test-success")
     Call<ResponseBody> simulateSuccess(@Query("packageId") Long packageId);
+
+    @GET("/api/v1/reviews/media/{mediaId}")
+    Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviews(@retrofit2.http.Path("mediaId") Long mediaId);
+
+    @POST("/api/v1/reviews")
+    Call<com.example.pemomovie.dto.ReviewResponseDto> postReview(@Body com.example.pemomovie.dto.ReviewRequestDto request);
     @GET("/api/v1/media/{id}/play")
     Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
 
@@ -172,6 +178,9 @@ public interface ApiService {
     @GET("/api/v1/reviews/media/{mediaId}")
     Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 
+    @GET("/api/v1/admin/reviews/media/{mediaId}")
+    Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMediaForAdmin(@retrofit2.http.Path("mediaId") Long mediaId);
+
     @Multipart
     @POST("/api/v1/admin/upload/video")
     Call<ResponseBody> uploadVideoAdmin(@Part MultipartBody.Part file);
@@ -179,5 +188,14 @@ public interface ApiService {
     @Multipart
     @POST("/api/v1/admin/upload/subtitle")
     Call<ResponseBody> uploadSubtitleAdmin(@Part MultipartBody.Part file);
+
+    @retrofit2.http.DELETE("/api/v1/admin/reviews/{id}")
+    Call<Void> deleteReviewAdmin(@retrofit2.http.Path("id") Long id);
+
+    @retrofit2.http.DELETE("/api/v1/reviews/{id}")
+    Call<Void> deleteReview(@retrofit2.http.Path("id") Long id);
+
+    @POST("/api/v1/reviews/{id}/report")
+    Call<Void> reportReview(@retrofit2.http.Path("id") Long id, @Body java.util.Map<String, String> payload);
 
 }
