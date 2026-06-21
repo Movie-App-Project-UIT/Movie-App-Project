@@ -34,6 +34,7 @@ import com.example.pemomovie.R;
 import com.example.pemomovie.adapter.SectionAdapter;
 import com.example.pemomovie.api.ApiClient;
 import com.example.pemomovie.api.ApiService;
+import com.example.pemomovie.custom.GradientTextView;
 import com.example.pemomovie.dto.MediaItemDto;
 import com.example.pemomovie.dto.UserProfileDto;
 import com.example.pemomovie.model.Section;
@@ -125,6 +126,13 @@ public class HomeActivity extends AppCompatActivity {
                             startActivity(intent);
                         });
                     }
+
+                    TextView tvSectionSeeAll = findViewById(R.id.sectionSeeAll);
+                    GradientTextView.applyHorizontalGradient(
+                            tvSectionSeeAll,
+                            Color.parseColor("#6C29D6"), // tím
+                            Color.parseColor("#F43393")  // hồng
+                    );
 
                     List<MediaItemDto> topRated = data.get("topRated");
                     if (topRated != null && !topRated.isEmpty()) {

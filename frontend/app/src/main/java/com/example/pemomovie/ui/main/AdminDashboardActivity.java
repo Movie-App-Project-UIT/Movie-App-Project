@@ -35,6 +35,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         android.view.View btnManageMovies = findViewById(R.id.btnManageMovies);
         android.view.View btnManageCategories = findViewById(R.id.btnManageCategories);
         android.view.View btnManageSubscriptions = findViewById(R.id.btnManageSubscriptions);
+        android.view.View btnManageUsers = findViewById(R.id.btnManageUsers);
+        android.view.View btnManageHistory = findViewById(R.id.btnManageHistory);
 
         if (btnManageMovies != null) {
             btnManageMovies.setOnClickListener(v -> {
@@ -53,6 +55,20 @@ public class AdminDashboardActivity extends AppCompatActivity {
         if (btnManageSubscriptions != null) {
             btnManageSubscriptions.setOnClickListener(v -> {
                 Intent intent = new Intent(this, com.example.pemomovie.ui.admin.AdminSubscriptionActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        if (btnManageUsers != null) {
+            btnManageUsers.setOnClickListener(v -> {
+                Intent intent = new Intent(this, com.example.pemomovie.ui.admin.AdminUserActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        if (btnManageHistory != null) {
+            btnManageHistory.setOnClickListener(v -> {
+                Intent intent = new Intent(this, com.example.pemomovie.ui.admin.AdminHistoryActivity.class);
                 startActivity(intent);
             });
         }

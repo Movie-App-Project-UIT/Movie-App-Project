@@ -116,6 +116,9 @@ public interface ApiService {
     @GET("/api/v1/admin/subscriptions/{id}/gifted-users")
     Call<List<com.example.pemomovie.dto.AdminUserDto>> getGiftedUsers(@retrofit2.http.Path("id") Long id);
 
+    @GET("/api/v1/admin/history")
+    Call<List<com.example.pemomovie.dto.AdminHistoryDto>> getAdminHistory();
+
     @Multipart
     @POST("/api/v1/users/avatar")
     Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
@@ -129,8 +132,8 @@ public interface ApiService {
 
     @POST("/api/v1/payments/test-success")
     Call<ResponseBody> simulateSuccess(
-            @Query("packageId") Long packageId);
-
+            @Query("packageId") Long packageId
+    );
     @GET("/api/v1/media/{id}/play")
     Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
 
@@ -164,4 +167,7 @@ public interface ApiService {
 
     @POST("/api/v1/subscriptions/claim-gift/{notificationId}")
     Call<Map<String, String>> claimGift(@retrofit2.http.Path("notificationId") Long notificationId);
+
+    @GET("/api/v1/reviews/media/{mediaId}")
+    Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 }
