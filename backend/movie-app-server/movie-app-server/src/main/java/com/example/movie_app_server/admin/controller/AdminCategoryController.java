@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.admin.dto.AdminGenreDto;
 import com.example.movie_app_server.media.dto.MediaItemDto;
@@ -7,6 +7,7 @@ import com.example.movie_app_server.media.entity.Media;
 import com.example.movie_app_server.media.repository.GenreRepository;
 import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.service.MediaService;
+import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class AdminCategoryController {
     private final GenreRepository genreRepository;
     private final MediaRepository mediaRepository;
     private final MediaService mediaService;
+    private final AdminHistoryService adminHistoryService;
 
     private AdminGenreDto convertToDto(Genre genre) {
         List<Media> mediaList = mediaRepository.findByGenres_Id(genre.getId());
@@ -73,6 +75,7 @@ public class AdminCategoryController {
                 .isDeleted(false)
                 .build();
         genreRepository.save(genre);
+        adminHistoryService.logAction("CREATE", "CATEGORY", genre.getId().toString(), "Thêm thể loại mới: " + genre.getName());
         return ResponseEntity.ok(convertToDto(genre));
     }
 
@@ -103,6 +106,13 @@ public class AdminCategoryController {
                 mediaRepository.saveAll(allMediaInGenre);
             }
 
+            adminHistoryService.logAction(
+                willDelete ? "DELETE" : "RESTORE",
+                "CATEGORY",
+                genre.getId().toString(),
+                (willDelete ? "Xóa thể loại: " : "Khôi phục thể loại: ") + genre.getName()
+            );
+
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -132,6 +142,7 @@ public class AdminCategoryController {
                 if (!media.getGenres().contains(genre)) {
                     media.getGenres().add(genre);
                     mediaRepository.save(media);
+                    adminHistoryService.logAction("UPDATE", "CATEGORY", genre.getId().toString(), "Thêm phim '" + media.getTitle() + "' vào thể loại: " + genre.getName());
                 }
             });
             return ResponseEntity.ok().<Void>build();
@@ -145,6 +156,7 @@ public class AdminCategoryController {
                 if (media.getGenres().contains(genre)) {
                     media.getGenres().remove(genre);
                     mediaRepository.save(media);
+                    adminHistoryService.logAction("UPDATE", "CATEGORY", genre.getId().toString(), "Xóa phim '" + media.getTitle() + "' khỏi thể loại: " + genre.getName());
                 }
             });
             return ResponseEntity.ok().<Void>build();

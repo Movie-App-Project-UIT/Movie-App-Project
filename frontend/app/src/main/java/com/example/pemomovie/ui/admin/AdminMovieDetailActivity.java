@@ -47,10 +47,10 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
 
     public static MediaDetailResponse previewData; // For caching preview data
 
-    private EditText etTitle, etOverview, etLanguage, etVideoUrl, etGenre, etCountry, etTmdbId, etSubtitleLanguage;
+    private EditText etTitle, etOverview, etLanguage, etVideoUrl, etGenre, etCountry, etTmdbId, etSubtitleLanguage, etVoteAverage;
     private androidx.appcompat.widget.SwitchCompat swPremium, swDeleted;
     private ImageView ivPoster;
-    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadSubtitle;
+    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadSubtitle, btnViewReviews;
     private ProgressBar progressBar;
     private RecyclerView rvSubtitles;
     
@@ -79,6 +79,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         etCountry = findViewById(R.id.etCountry);
         etTmdbId = findViewById(R.id.etTmdbId);
         etSubtitleLanguage = findViewById(R.id.etSubtitleLanguage);
+        etVoteAverage = findViewById(R.id.etVoteAverage);
         
         swPremium = findViewById(R.id.swPremium);
         swDeleted = findViewById(R.id.swDeleted);
@@ -87,6 +88,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         btnLoadTmdb = findViewById(R.id.btnLoadTmdb);
         btnUploadVideo = findViewById(R.id.btnUploadVideo);
         btnUploadSubtitle = findViewById(R.id.btnUploadSubtitle);
+        btnViewReviews = findViewById(R.id.btnViewReviews);
         progressBar = findViewById(R.id.progressBar);
         rvSubtitles = findViewById(R.id.rvSubtitles);
 
@@ -100,7 +102,16 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         setupFilePickers();
 
         btnLoadTmdb.setOnClickListener(v -> handleLoadTmdb());
-        
+
+        btnViewReviews.setOnClickListener(v -> {
+            if (movieId != null && movieId != -1) {
+                AdminMovieReviewBottomSheet bottomSheet = new AdminMovieReviewBottomSheet(movieId);
+                bottomSheet.show(getSupportFragmentManager(), "AdminMovieReviewBottomSheet");
+            } else {
+                Toast.makeText(this, "Vui lòng lưu phim trước khi xem bình luận", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         btnUploadVideo.setOnClickListener(v -> videoPickerLauncher.launch("video/*"));
         
         btnUploadSubtitle.setOnClickListener(v -> {
@@ -297,6 +308,12 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         etTitle.setText(data.getTitle() != null ? data.getTitle() : "");
         etOverview.setText(data.getOverview() != null ? data.getOverview() : "");
         etLanguage.setText(data.getLanguage() != null ? data.getLanguage() : "");
+        
+        if (data.getVoteAverage() != null) {
+            etVoteAverage.setText(String.format("%.1f", data.getVoteAverage()));
+        } else {
+            etVoteAverage.setText("Chưa có");
+        }
         
         String genresStr = data.getGenres() != null ? String.join(", ", data.getGenres()) : "Không có dữ liệu";
         etGenre.setText(genresStr);

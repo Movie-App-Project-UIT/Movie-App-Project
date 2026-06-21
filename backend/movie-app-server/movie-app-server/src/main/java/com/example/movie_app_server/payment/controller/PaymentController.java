@@ -25,6 +25,7 @@ public class PaymentController {
     @PostMapping("/create-url")
     public ResponseEntity<String> createPaymentUrl(@RequestParam Long packageId, 
                                                    @RequestParam(defaultValue = "VNPAY") String paymentMethod,
+                                                   @RequestParam(required = false) Long amount,
                                                    HttpServletRequest request) {
         // Lấy IP của user
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
@@ -32,8 +33,15 @@ public class PaymentController {
             ipAddress = request.getRemoteAddr();
         }
 
-        String paymentUrl = paymentService.createPaymentUrl(packageId, paymentMethod, getUid(), ipAddress);
+        String paymentUrl = paymentService.createPaymentUrl(packageId, paymentMethod, getUid(), ipAddress, amount);
         return ResponseEntity.ok(paymentUrl);
+    }
+
+    // API Test: Giả lập thanh toán thành công
+    @PostMapping("/test-success")
+    public ResponseEntity<String> simulateSuccess(@RequestParam Long packageId) {
+        paymentService.simulateSuccess(packageId, getUid());
+        return ResponseEntity.ok("Thanh toán giả lập thành công!");
     }
 
     // IPN Webhook: VNPay Server sẽ gọi trực tiếp vào đây để báo kết quả

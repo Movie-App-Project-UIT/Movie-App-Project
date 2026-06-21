@@ -7,6 +7,7 @@ import com.example.movie_app_server.media.entity.Media;
 import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.service.MediaService;
 import com.example.movie_app_server.media.service.TmdbSyncService;
+import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class AdminMovieController {
     private final MediaRepository mediaRepository;
     private final MediaService mediaService;
     private final TmdbSyncService tmdbSyncService;
+    private final AdminHistoryService adminHistoryService;
 
     @GetMapping
     public ResponseEntity<List<MediaItemDto>> getAllMovies() {
@@ -39,8 +41,15 @@ public class AdminMovieController {
     @PutMapping("/{id}/soft-delete")
     public ResponseEntity<Void> softDeleteMovie(@PathVariable Long id) {
         return mediaRepository.findById(id).map(media -> {
-            media.setDeleted(!media.isDeleted()); // Toggle
+            boolean isNowDeleted = !media.isDeleted();
+            media.setDeleted(isNowDeleted); // Toggle
             mediaRepository.save(media);
+            adminHistoryService.logAction(
+                isNowDeleted ? "DELETE" : "RESTORE",
+                "MOVIE",
+                media.getId().toString(),
+                (isNowDeleted ? "Xóa phim: " : "Khôi phục phim: ") + media.getTitle()
+            );
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -78,6 +87,7 @@ public class AdminMovieController {
             }
         }
         media = mediaRepository.save(media);
+        adminHistoryService.logAction("CREATE", "MOVIE", media.getId().toString(), "Thêm phim mới: " + media.getTitle());
         return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
     }
 
@@ -143,6 +153,7 @@ public class AdminMovieController {
             }
         }
         media = mediaRepository.save(media);
+        adminHistoryService.logAction("UPDATE", "MOVIE", media.getId().toString(), "Cập nhật thông tin phim: " + media.getTitle());
         return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
     }
 }
