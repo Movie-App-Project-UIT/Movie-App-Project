@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.interaction.entity.Review;
 import com.example.movie_app_server.interaction.repository.ReviewRepository;

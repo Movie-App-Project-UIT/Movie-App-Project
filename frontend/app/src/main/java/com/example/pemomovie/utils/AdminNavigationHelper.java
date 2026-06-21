@@ -18,6 +18,7 @@ public class AdminNavigationHelper {
         View btnAdminDashboard = activity.findViewById(R.id.btnAdminDashboard);
         View btnAdminSubscriptions = activity.findViewById(R.id.btnAdminSubscriptions);
         View btnAdminUsers = activity.findViewById(R.id.btnAdminUsers);
+        View btnAdminHistory = activity.findViewById(R.id.btnAdminHistory);
         View btnAdminProfile = activity.findViewById(R.id.btnAdminProfile);
 
         // Tự động làm sáng (Selected) icon của màn hình hiện tại
@@ -27,6 +28,8 @@ public class AdminNavigationHelper {
             if (btnAdminSubscriptions != null) btnAdminSubscriptions.setSelected(true);
         } else if (activity instanceof AdminUserActivity) {
             if (btnAdminUsers != null) btnAdminUsers.setSelected(true);
+        } else if (activity instanceof com.example.pemomovie.ui.admin.AdminHistoryActivity) {
+            if (btnAdminHistory != null) btnAdminHistory.setSelected(true);
         } else if (activity instanceof AdminProfileActivity) {
             if (btnAdminProfile != null) btnAdminProfile.setSelected(true);
         }
@@ -55,6 +58,15 @@ public class AdminNavigationHelper {
             btnAdminUsers.setOnClickListener(v -> {
                 if (!(activity instanceof AdminUserActivity)) {
                     startActivityWithAnim(activity, AdminUserActivity.class);
+                }
+            });
+        }
+
+        if (btnAdminHistory != null) {
+            addBounceEffect(btnAdminHistory);
+            btnAdminHistory.setOnClickListener(v -> {
+                if (!(activity instanceof com.example.pemomovie.ui.admin.AdminHistoryActivity)) {
+                    startActivityWithAnim(activity, com.example.pemomovie.ui.admin.AdminHistoryActivity.class);
                 }
             });
         }

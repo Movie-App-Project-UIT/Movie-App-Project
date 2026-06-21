@@ -35,6 +35,7 @@ public class AdminCategoryActivity extends AppCompatActivity {
     private List<AdminGenreDto> displayedCategories = new ArrayList<>();
     
     private int sortViewsMode = 0; // 0: None, 1: Desc, 2: Asc
+    private int sortMediaMode = 0; // 0: None, 1: Desc, 2: Asc
     private String searchQuery = "";
     
     @Override
@@ -107,7 +108,18 @@ public class AdminCategoryActivity extends AppCompatActivity {
         if (btnSortViews != null) {
             btnSortViews.setOnClickListener(v -> {
                 sortViewsMode = (sortViewsMode + 1) % 3;
-                updateSortUI(btnSortViews);
+                if (sortViewsMode != 0) sortMediaMode = 0;
+                updateSortUI();
+                applyFilters();
+            });
+        }
+        
+        MaterialCardView btnSortMedia = findViewById(R.id.btnSortMedia);
+        if (btnSortMedia != null) {
+            btnSortMedia.setOnClickListener(v -> {
+                sortMediaMode = (sortMediaMode + 1) % 3;
+                if (sortMediaMode != 0) sortViewsMode = 0;
+                updateSortUI();
                 applyFilters();
             });
         }
@@ -119,21 +131,43 @@ public class AdminCategoryActivity extends AppCompatActivity {
         if (btnFilter != null) btnFilter.setVisibility(View.GONE);
     }
 
-    private void updateSortUI(MaterialCardView btnSortViews) {
-        boolean isActive = sortViewsMode != 0;
-        btnSortViews.setStrokeColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#333333"));
-        TextView tv = findViewById(R.id.tvSortViews);
-        if (tv != null) {
-            tv.setTextColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
-            if (sortViewsMode == 1) tv.setText("Lượt xem: Giảm dần");
-            else if (sortViewsMode == 2) tv.setText("Lượt xem: Tăng dần");
-            else tv.setText("Sắp xếp: Lượt xem");
+    private void updateSortUI() {
+        MaterialCardView btnSortViews = findViewById(R.id.btnSortViews);
+        if (btnSortViews != null) {
+            boolean isActive = sortViewsMode != 0;
+            btnSortViews.setStrokeColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#333333"));
+            TextView tv = findViewById(R.id.tvSortViews);
+            if (tv != null) {
+                tv.setTextColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
+                if (sortViewsMode == 1) tv.setText("Lượt xem: Giảm dần");
+                else if (sortViewsMode == 2) tv.setText("Lượt xem: Tăng dần");
+                else tv.setText("Sắp xếp: Lượt xem");
+            }
+            
+            ImageView iv = findViewById(R.id.ivSortViews);
+            if (iv != null) {
+                iv.setColorFilter(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
+                iv.setRotation(sortViewsMode == 2 ? -90 : 90);
+            }
         }
         
-        ImageView iv = findViewById(R.id.ivSortViews);
-        if (iv != null) {
-            iv.setColorFilter(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
-            iv.setRotation(sortViewsMode == 2 ? -90 : 90);
+        MaterialCardView btnSortMedia = findViewById(R.id.btnSortMedia);
+        if (btnSortMedia != null) {
+            boolean isActive = sortMediaMode != 0;
+            btnSortMedia.setStrokeColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#333333"));
+            TextView tv = findViewById(R.id.tvSortMedia);
+            if (tv != null) {
+                tv.setTextColor(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
+                if (sortMediaMode == 1) tv.setText("Số phim: Giảm dần");
+                else if (sortMediaMode == 2) tv.setText("Số phim: Tăng dần");
+                else tv.setText("Sắp xếp: Số phim");
+            }
+            
+            ImageView iv = findViewById(R.id.ivSortMedia);
+            if (iv != null) {
+                iv.setColorFilter(android.graphics.Color.parseColor(isActive ? "#D946EF" : "#9CA3AF"));
+                iv.setRotation(sortMediaMode == 2 ? -90 : 90);
+            }
         }
     }
 
@@ -149,6 +183,10 @@ public class AdminCategoryActivity extends AppCompatActivity {
             displayedCategories.sort((a, b) -> sortViewsMode == 1 ? 
                 Integer.compare(b.getViewCount(), a.getViewCount()) : 
                 Integer.compare(a.getViewCount(), b.getViewCount()));
+        } else if (sortMediaMode != 0) {
+            displayedCategories.sort((a, b) -> sortMediaMode == 1 ? 
+                Integer.compare(b.getMediaCount(), a.getMediaCount()) : 
+                Integer.compare(a.getMediaCount(), b.getMediaCount()));
         }
         
         if (adapter != null) adapter.setCategories(displayedCategories);
