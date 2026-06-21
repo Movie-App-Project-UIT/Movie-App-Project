@@ -42,10 +42,11 @@
 
     <!-- Subtitle -->
     <TextView
+        android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Bạn nhận được 7 ngày Premium miễn phí\ntừ Admin.\nKích hoạt ngay để tận hưởng tất cả đặc quyền."
+        android:text="Đang tính toán..."
         android:textColor="@color/gray_text_light"
         android:textSize="14sp"
         android:textAlignment="center"
@@ -56,12 +57,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:background="@drawable/bg_plan_info_card"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
+        android:padding="16dp"
         android:layout_marginTop="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
         <ImageView
             android:layout_width="36dp"
@@ -81,12 +86,54 @@
             android:layout_marginStart="16dp"/>
 
         <TextView
+            android:id="@+id/tvDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="7 ngày"
+            android:text="..."
             android:textColor="#B39DFF"
             android:textSize="15sp"
             android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Calculated End Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_time"
+                android:background="@drawable/bg_circle_dot"
+                android:padding="8dp"
+                app:tint="@color/white"
+                android:visibility="invisible"/> <!-- Keep layout aligned but hide icon if no suitable icon, or use calendar icon. Wait, the project might not have ic_calendar. I'll just use ic_calendar if it exists, or ic_clock. Let's use ic_history. No, I will just copy the style but omit the icon to make it simpler, or just use a placeholder. Actually, let's just make the image transparent. -->
+            
+            <View 
+                android:layout_width="36dp" 
+                android:layout_height="36dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ngày hết hạn (Dự kiến)"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:layout_marginStart="16dp"/>
+
+            <TextView
+                android:id="@+id/tvCalculatedEndDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:textColor="#B39DFF"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Buttons -->
@@ -118,14 +165,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Xác nhận kích hoạt"
+            android:text="Xác nhận"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textAlignment="center"
             android:background="@drawable/bg_button_gradient"
             android:paddingVertical="14dp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp"
+            android:enabled="false"
+            android:alpha="0.5"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -56,7 +56,15 @@ public class NotificationService {
     @Transactional
     public List<Notification> getUserNotifications(Long userId) {
         checkAndCreateExpiringNotification(userId);
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        for (Notification n : notifications) {
+            if (n.getType() == NotificationType.GIFT_RECEIVED && n.getRelatedId() != null) {
+                userSubscriptionRepository.findById(n.getRelatedId()).ifPresent(sub -> {
+                    n.setIsClaimed(sub.getStatus() != com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus.PENDING_GIFT);
+                });
+            }
+        }
+        return notifications;
     }
 
     private void checkAndCreateExpiringNotification(Long userId) {

@@ -273,6 +273,7 @@ public class HomeActivity extends AppCompatActivity {
         layoutNotificationList.setVisibility(View.VISIBLE);
         layoutNotificationList.removeAllViews(); // Xóa các view cũ
 
+        final List<NotificationDto> currentNotifications = new ArrayList<>();
         ApiService apiService = ApiClient.getApiService();
         apiService.getMyNotifications().enqueue(new Callback<List<NotificationDto>>() {
             @Override
@@ -281,6 +282,8 @@ public class HomeActivity extends AppCompatActivity {
                     layoutEmptyNotification.setVisibility(View.GONE);
                     layoutNotificationList.setVisibility(View.VISIBLE);
                     layoutNotificationList.removeAllViews();
+                    currentNotifications.clear();
+                    currentNotifications.addAll(response.body());
 
                     for (NotificationDto notif : response.body()) {
                         View itemView = inflater.inflate(R.layout.item_notification, layoutNotificationList, false);
@@ -300,20 +303,8 @@ public class HomeActivity extends AppCompatActivity {
                             ivIcon.setImageResource(R.drawable.ic_crown);
                             itemView.setOnClickListener(v -> {
                                 popupWindow.dismiss();
-                                // Kích hoạt gói quà tặng
-                                apiService.claimGift(notif.getId()).enqueue(new Callback<Map<String, String>>() {
-                                    @Override
-                                    public void onResponse(Call<Map<String, String>> c, Response<Map<String, String>> r) {
-                                        if (r.isSuccessful()) {
-                                            Toast.makeText(HomeActivity.this, "Đã kích hoạt gói Premium quà tặng thành công!", Toast.LENGTH_LONG).show();
-                                            startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-                                        } else {
-                                            Toast.makeText(HomeActivity.this, "Kích hoạt thất bại hoặc đã kích hoạt", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(Call<Map<String, String>> c, Throwable t) {}
-                                });
+                                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                                startActivity(intent);
                             });
                         } else if ("SUBSCRIPTION_SUCCESS".equals(notif.getType())) {
                             ivIcon.setImageResource(R.drawable.ic_check_circle_filled);
@@ -355,9 +346,34 @@ public class HomeActivity extends AppCompatActivity {
         View tvMarkAsRead = popupView.findViewById(R.id.tvMarkAsRead);
         if (tvMarkAsRead != null) {
             tvMarkAsRead.setOnClickListener(v -> {
-                popupWindow.dismiss();
-                // TODO: Call API mark all as read if backend supports it
+                // Tắt highlight cho tất cả các item trong layoutNotificationList
+                for (int i = 0; i < layoutNotificationList.getChildCount(); i++) {
+                    View child = layoutNotificationList.getChildAt(i);
+                    child.setBackgroundColor(Color.TRANSPARENT);
+                }
+                
+                // Cập nhật API cho từng thông báo 
+                for (NotificationDto notif : currentNotifications) {
+                    if (notif.getRead() == null || !notif.getRead()) {
+                        apiService.markNotificationAsRead(notif.getId()).enqueue(new Callback<java.util.Map<String, String>>() {
+                            @Override
+                            public void onResponse(Call<java.util.Map<String, String>> c, Response<java.util.Map<String, String>> r) {}
+                            @Override
+                            public void onFailure(Call<java.util.Map<String, String>> c, Throwable t) {}
+                        });
+                        notif.setRead(true);
+                    }
+                }
                 Toast.makeText(HomeActivity.this, "Đã đánh dấu đọc tất cả", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // Xem tất cả thông báo
+        View btnViewAllNotifications = popupView.findViewById(R.id.btnViewAllNotifications);
+        if (btnViewAllNotifications != null) {
+            btnViewAllNotifications.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                startActivity(new Intent(HomeActivity.this, NotificationActivity.class));
             });
         }
 

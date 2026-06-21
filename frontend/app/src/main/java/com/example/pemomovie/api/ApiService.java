@@ -172,8 +172,11 @@ public interface ApiService {
     @retrofit2.http.PUT("/api/v1/notifications/{id}/read")
     Call<Map<String, String>> markNotificationAsRead(@retrofit2.http.Path("id") Long id);
 
+    @GET("/api/v1/subscriptions/claim-gift/{notificationId}/preview")
+    Call<Map<String, Object>> previewGift(@Path("notificationId") Long notificationId);
+
     @POST("/api/v1/subscriptions/claim-gift/{notificationId}")
-    Call<Map<String, String>> claimGift(@retrofit2.http.Path("notificationId") Long notificationId);
+    Call<Map<String, String>> claimGift(@Path("notificationId") Long notificationId);
 
     @GET("/api/v1/subscriptions/plans")
     Call<List<com.example.pemomovie.dto.AdminSubscriptionDto>> getActivePlans();
