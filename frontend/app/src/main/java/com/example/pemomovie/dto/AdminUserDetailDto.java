@@ -39,9 +39,15 @@ public class AdminUserDetailDto {
         private Long id;
         private String content;
         private String createdAt;
+        private Long parentId;
+        private long reportCount;
 
         public Long getId() { return id; }
         public String getContent() { return content; }
         public String getCreatedAt() { return createdAt; }
+        public Long getParentId() { return parentId; }
+        public void setParentId(Long parentId) { this.parentId = parentId; }
+        public long getReportCount() { return reportCount; }
+        public void setReportCount(long reportCount) { this.reportCount = reportCount; }
     }
 }

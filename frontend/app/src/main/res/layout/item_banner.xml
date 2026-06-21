@@ -17,21 +17,7 @@
         android:layout_gravity="bottom"
         android:background="@drawable/banner_overlay"/>
 
-    <com.example.pemomovie.custom.GlowTextView
-        android:id="@+id/movieTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tên phim"
-        android:textSize="40sp"
-        android:fontFamily="@font/meddon"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="70dp"
-        android:ellipsize="end"
-        android:singleLine="false"
-        android:scrollHorizontally="false"
-        android:lines="2"
-        android:gravity="center"
-        android:breakStrategy="simple"/>
+
 
 
 </FrameLayout>

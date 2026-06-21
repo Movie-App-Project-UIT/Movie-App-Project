@@ -48,10 +48,14 @@ public class Review {
     @Builder.Default
     private List<Review> replies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ReviewReport> reports = new ArrayList<>();
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_hidden", nullable = false)
+    @Column(name = "is_hidden")
     @Builder.Default
     private boolean isHidden = false;
 

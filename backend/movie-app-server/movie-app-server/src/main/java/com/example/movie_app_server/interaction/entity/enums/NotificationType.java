@@ -7,5 +7,6 @@ public enum NotificationType {
     SYSTEM,
     PROMOTION,
     GIFT_RECEIVED,
-    SUBSCRIPTION_HIDDEN
+    SUBSCRIPTION_HIDDEN,
+    REPLY
 }

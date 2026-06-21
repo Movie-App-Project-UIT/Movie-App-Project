@@ -22,7 +22,12 @@ public class ReviewController {
     // API: GET /api/v1/reviews/media/{mediaId} -> Kéo danh sách bình luận về App để hiển thị
     @GetMapping("/media/{mediaId}")
     public ResponseEntity<List<com.example.movie_app_server.interaction.dto.ReviewResponseDto>> getReviews(@PathVariable Long mediaId) {
-        return ResponseEntity.ok(reviewService.getReviewsByMedia(mediaId));
+        String uid = null;
+        try {
+            uid = getUid();
+            if ("anonymousUser".equals(uid)) uid = null;
+        } catch (Exception e) {}
+        return ResponseEntity.ok(reviewService.getReviewsByMedia(mediaId, uid));
     }
 
     // API: POST /api/v1/reviews -> Đăng bình luận mới
@@ -47,6 +52,14 @@ public class ReviewController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id, getUid());
+        return ResponseEntity.ok().build();
+    }
+
+    // API: POST /api/v1/reviews/{id}/report -> Báo cáo bình luận
+    @PostMapping("/{id}/report")
+    public ResponseEntity<Void> reportReview(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String reason = payload.get("reason");
+        reviewService.reportReview(id, getUid(), reason);
         return ResponseEntity.ok().build();
     }
 }

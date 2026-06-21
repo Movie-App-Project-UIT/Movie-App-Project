@@ -4,9 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Collections;
+import java.util.stream.Collectors;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,8 +30,10 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
     private Long movieId;
     private RecyclerView rvReviews;
     private ProgressBar progressBar;
+    private CheckBox cbFilterReported;
     private AdminMovieReviewAdapter adapter;
     private ApiService apiService;
+    private List<ReviewResponseDto> allReviews;
 
     public AdminMovieReviewBottomSheet(Long movieId) {
         this.movieId = movieId;
@@ -41,12 +46,17 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
         
         rvReviews = view.findViewById(R.id.rvReviews);
         progressBar = view.findViewById(R.id.progressBar);
+        cbFilterReported = view.findViewById(R.id.cbFilterReported);
         
         rvReviews.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new AdminMovieReviewAdapter();
         rvReviews.setAdapter(adapter);
         
         apiService = ApiClient.getApiService();
+        
+        cbFilterReported.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applyFilter();
+        });
         
         fetchReviews();
         
@@ -55,18 +65,22 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
     
     private void fetchReviews() {
         progressBar.setVisibility(View.VISIBLE);
-        apiService.getReviewsByMedia(movieId).enqueue(new Callback<List<ReviewResponseDto>>() {
+        apiService.getReviewsByMediaForAdmin(movieId).enqueue(new Callback<List<ReviewResponseDto>>() {
             @Override
             public void onResponse(Call<List<ReviewResponseDto>> call, Response<List<ReviewResponseDto>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    List<ReviewResponseDto> reviews = response.body();
-                    if (reviews.isEmpty()) {
+                    allReviews = new java.util.ArrayList<>();
+                    for (ReviewResponseDto root : response.body()) {
+                        allReviews.add(root);
+                        flattenReplies(allReviews, root.getReplies());
+                    }
+                    if (allReviews.isEmpty()) {
                         if (getContext() != null) {
                             Toast.makeText(getContext(), "Chưa có bình luận nào", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        adapter.setReviews(reviews);
+                        applyFilter();
                     }
                 } else {
                     if (getContext() != null) {
@@ -83,5 +97,25 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+    }
+
+    private void flattenReplies(java.util.List<ReviewResponseDto> targetList, java.util.List<ReviewResponseDto> replies) {
+        if (replies == null) return;
+        for (ReviewResponseDto r : replies) {
+            targetList.add(r);
+            flattenReplies(targetList, r.getReplies());
+        }
+    }
+
+    private void applyFilter() {
+        if (allReviews == null) return;
+        List<ReviewResponseDto> filteredList = new java.util.ArrayList<>(allReviews);
+        if (cbFilterReported.isChecked()) {
+            filteredList = filteredList.stream()
+                .filter(r -> r.getReportCount() > 0)
+                .sorted((r1, r2) -> Long.compare(r2.getReportCount(), r1.getReportCount()))
+                .collect(Collectors.toList());
+        }
+        adapter.setReviews(filteredList);
     }
 }

@@ -326,7 +326,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
             etVoteAverage.setText("Chưa có");
         }
 
-        String genresStr = data.getGenres() != null ? String.join(", ", data.getGenres()) : "Không có dữ liệu";
+        String genresStr = data.getGenres() != null ? String.join(", ", data.getGenres()).replace("Phim ", "").replace("phim ", "") : "Không có dữ liệu";
         etGenre.setText(genresStr);
         etCountry.setText(data.getCountryName() != null ? data.getCountryName() : "Không có dữ liệu");
         

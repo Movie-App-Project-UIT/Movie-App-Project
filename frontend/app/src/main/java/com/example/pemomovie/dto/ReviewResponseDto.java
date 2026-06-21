@@ -6,6 +6,9 @@ public class ReviewResponseDto {
     private Long id;
     private String content;
     private String createdAt;
+    private Long parentId;
+    private String parentUsername;
+    private long reportCount;
     private UserSummaryDto user;
     private List<ReviewResponseDto> replies;
 
@@ -31,6 +34,30 @@ public class ReviewResponseDto {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParentUsername() {
+        return parentUsername;
+    }
+
+    public void setParentUsername(String parentUsername) {
+        this.parentUsername = parentUsername;
+    }
+
+    public long getReportCount() {
+        return reportCount;
+    }
+
+    public void setReportCount(long reportCount) {
+        this.reportCount = reportCount;
     }
 
     public UserSummaryDto getUser() {
