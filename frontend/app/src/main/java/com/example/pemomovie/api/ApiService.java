@@ -112,6 +112,9 @@ public interface ApiService {
     @GET("/api/v1/admin/subscriptions/{id}/gifted-users")
     Call<List<com.example.pemomovie.dto.AdminUserDto>> getGiftedUsers(@retrofit2.http.Path("id") Long id);
 
+    @GET("/api/v1/admin/history")
+    Call<List<com.example.pemomovie.dto.AdminHistoryDto>> getAdminHistory();
+
     @Multipart
     @POST("/api/v1/users/avatar")
     Call<ResponseBody> uploadAvatar(@Part MultipartBody.Part file);
@@ -140,4 +143,7 @@ public interface ApiService {
             @retrofit2.http.Query("page") int page,
             @retrofit2.http.Query("size") int size
     );
+
+    @GET("/api/v1/reviews/media/{mediaId}")
+    Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 }

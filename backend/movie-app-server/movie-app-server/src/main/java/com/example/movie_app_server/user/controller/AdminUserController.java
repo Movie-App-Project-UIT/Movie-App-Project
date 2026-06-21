@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.admin.dto.AdminUserDetailDto;
 import com.example.movie_app_server.interaction.dto.ReviewResponseDto;
@@ -9,6 +9,7 @@ import com.example.movie_app_server.interaction.repository.ReviewRepository;
 import com.example.movie_app_server.interaction.repository.UserSubscriptionRepository;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
+import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class AdminUserController {
     private final UserRepository userRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final ReviewRepository reviewRepository;
+    private final AdminHistoryService adminHistoryService;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers(
@@ -55,7 +57,6 @@ public class AdminUserController {
                     .isActive(user.isActive())
                     .createdAt(user.getCreatedAt());
 
-            // Lấy thông tin gói Premium nếu có
             UserSubscription activeSub = userSubscriptionRepository
                     .findFirstByUserAndStatusOrderByEndDateDesc(user, SubscriptionStatus.ACTIVE).orElse(null);
             
@@ -64,7 +65,6 @@ public class AdminUserController {
                 builder.planEndDate(activeSub.getEndDate());
             }
 
-            // Lấy danh sách reviews
             List<Review> reviews = reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
             List<ReviewResponseDto> reviewDtos = reviews.stream().map(r -> ReviewResponseDto.builder()
                     .id(r.getId())
@@ -81,8 +81,15 @@ public class AdminUserController {
     @PutMapping("/{id}/toggle-status")
     public ResponseEntity<Void> toggleUserStatus(@PathVariable Long id) {
         return userRepository.findById(id).map(user -> {
-            user.setActive(!user.isActive()); // Toggle
+            boolean newStatus = !user.isActive();
+            user.setActive(newStatus);
             userRepository.save(user);
+            adminHistoryService.logAction(
+                newStatus ? "RESTORE" : "DELETE",
+                "USER",
+                user.getId().toString(),
+                (newStatus ? "Mở khóa tài khoản: " : "Khóa tài khoản: ") + user.getEmail()
+            );
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }

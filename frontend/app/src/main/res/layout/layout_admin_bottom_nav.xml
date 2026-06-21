@@ -96,6 +96,33 @@
                 android:duplicateParentState="true"/>
         </LinearLayout>
 
+        <!-- History -->
+        <LinearLayout
+            android:id="@+id/btnAdminHistory"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/btn_nav_selector"
+                android:duplicateParentState="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lịch sử"
+                android:textSize="10sp"
+                android:textColor="@color/btn_nav_selector"
+                android:layout_marginTop="4dp"
+                android:duplicateParentState="true"/>
+        </LinearLayout>
+
         <!-- Profile -->
         <LinearLayout
             android:id="@+id/btnAdminProfile"

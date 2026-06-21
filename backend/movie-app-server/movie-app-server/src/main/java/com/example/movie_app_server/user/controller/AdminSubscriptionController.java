@@ -1,4 +1,4 @@
-package com.example.movie_app_server.admin.controller;
+package com.example.movie_app_server.user.controller;
 
 import com.example.movie_app_server.admin.dto.GiftSubscriptionRequest;
 import com.example.movie_app_server.interaction.entity.enums.NotificationType;
@@ -10,6 +10,7 @@ import com.example.movie_app_server.interaction.repository.UserSubscriptionRepos
 import com.example.movie_app_server.interaction.service.NotificationService;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
+import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class AdminSubscriptionController {
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final AdminHistoryService adminHistoryService;
 
     @GetMapping
     public ResponseEntity<List<SubscriptionPlan>> getAllSubscriptions() {
@@ -35,7 +37,9 @@ public class AdminSubscriptionController {
     @PostMapping
     public ResponseEntity<SubscriptionPlan> createSubscription(@RequestBody SubscriptionPlan plan) {
         plan.setIsActive(true);
-        return ResponseEntity.ok(subscriptionPlanRepository.save(plan));
+        SubscriptionPlan saved = subscriptionPlanRepository.save(plan);
+        adminHistoryService.logAction("CREATE", "SUBSCRIPTION", saved.getId().toString(), "Thêm gói Premium mới: " + saved.getName());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
@@ -45,7 +49,9 @@ public class AdminSubscriptionController {
             plan.setDescription(planDetails.getDescription());
             plan.setPrice(planDetails.getPrice());
             plan.setDurationDays(planDetails.getDurationDays());
-            return ResponseEntity.ok(subscriptionPlanRepository.save(plan));
+            SubscriptionPlan saved = subscriptionPlanRepository.save(plan);
+            adminHistoryService.logAction("UPDATE", "SUBSCRIPTION", saved.getId().toString(), "Cập nhật thông tin gói: " + saved.getName());
+            return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -68,6 +74,13 @@ public class AdminSubscriptionController {
                     );
                 }
             }
+
+            adminHistoryService.logAction(
+                newStatus ? "RESTORE" : "DELETE",
+                "SUBSCRIPTION",
+                plan.getId().toString(),
+                (newStatus ? "Mở bán lại gói: " : "Ngừng bán gói: ") + plan.getName()
+            );
 
             return ResponseEntity.ok().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
@@ -103,6 +116,7 @@ public class AdminSubscriptionController {
                         NotificationType.GIFT_RECEIVED,
                         savedSub.getId()
                 );
+                adminHistoryService.logAction("GIFT", "SUBSCRIPTION", plan.getId().toString(), "Tặng gói '" + plan.getName() + "' cho user: " + user.getEmail());
             });
         }
 

@@ -117,6 +117,9 @@
         <activity
             android:name=".ui.admin.AdminMovieDetailActivity"
             android:exported="false"/>
+        <activity
+            android:name=".ui.admin.AdminHistoryActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
