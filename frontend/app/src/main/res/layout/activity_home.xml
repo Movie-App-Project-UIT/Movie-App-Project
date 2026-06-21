@@ -48,7 +48,13 @@
                     android:textSize="40sp"
                     android:fontFamily="@font/meddon"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:layout_marginBottom="80dp"/>
+                    android:layout_marginBottom="50dp"
+                    android:ellipsize="end"
+                    android:singleLine="false"
+                    android:scrollHorizontally="false"
+                    android:lines="2"
+                    android:gravity="center"
+                    android:breakStrategy="simple"/>
 
                 <!---->
                 <LinearLayout
@@ -89,7 +95,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:layout_marginStart="15dp"
                 android:layout_marginTop="10dp"
                 android:paddingBottom="20dp" />
 
