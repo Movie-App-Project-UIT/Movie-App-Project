@@ -27,10 +27,10 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
 
     public static MediaDetailResponse previewData; // For caching preview data
 
-    private EditText etTitle, etOverview, etLanguage, etVideoUrl, etGenre, etCountry, etTmdbId;
+    private EditText etTitle, etOverview, etLanguage, etVideoUrl, etGenre, etCountry, etTmdbId, etVoteAverage;
     private androidx.appcompat.widget.SwitchCompat swPremium, swDeleted;
     private ImageView ivPoster;
-    private Button btnSave, btnLoadTmdb;
+    private Button btnSave, btnLoadTmdb, btnViewReviews;
     private ProgressBar progressBar;
     private ApiService apiService;
 
@@ -52,14 +52,25 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         etGenre = findViewById(R.id.etGenre);
         etCountry = findViewById(R.id.etCountry);
         etTmdbId = findViewById(R.id.etTmdbId);
+        etVoteAverage = findViewById(R.id.etVoteAverage);
         swPremium = findViewById(R.id.swPremium);
         swDeleted = findViewById(R.id.swDeleted);
         ivPoster = findViewById(R.id.ivPoster);
         btnSave = findViewById(R.id.btnSave);
         btnLoadTmdb = findViewById(R.id.btnLoadTmdb);
+        btnViewReviews = findViewById(R.id.btnViewReviews);
         progressBar = findViewById(R.id.progressBar);
 
         btnLoadTmdb.setOnClickListener(v -> handleLoadTmdb());
+
+        btnViewReviews.setOnClickListener(v -> {
+            if (movieId != null && movieId != -1) {
+                AdminMovieReviewBottomSheet bottomSheet = new AdminMovieReviewBottomSheet(movieId);
+                bottomSheet.show(getSupportFragmentManager(), "AdminMovieReviewBottomSheet");
+            } else {
+                Toast.makeText(this, "Vui lòng lưu phim trước khi xem bình luận", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -144,6 +155,12 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         etTitle.setText(data.getTitle() != null ? data.getTitle() : "");
         etOverview.setText(data.getOverview() != null ? data.getOverview() : "");
         etLanguage.setText(data.getLanguage() != null ? data.getLanguage() : "");
+        
+        if (data.getVoteAverage() != null) {
+            etVoteAverage.setText(String.format("%.1f", data.getVoteAverage()));
+        } else {
+            etVoteAverage.setText("Chưa có");
+        }
         
         String genresStr = data.getGenres() != null ? String.join(", ", data.getGenres()) : "Không có dữ liệu";
         etGenre.setText(genresStr);
