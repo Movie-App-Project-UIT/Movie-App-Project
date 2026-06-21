@@ -300,20 +300,8 @@ public class HomeActivity extends AppCompatActivity {
                             ivIcon.setImageResource(R.drawable.ic_crown);
                             itemView.setOnClickListener(v -> {
                                 popupWindow.dismiss();
-                                // Kích hoạt gói quà tặng
-                                apiService.claimGift(notif.getId()).enqueue(new Callback<Map<String, String>>() {
-                                    @Override
-                                    public void onResponse(Call<Map<String, String>> c, Response<Map<String, String>> r) {
-                                        if (r.isSuccessful()) {
-                                            Toast.makeText(HomeActivity.this, "Đã kích hoạt gói Premium quà tặng thành công!", Toast.LENGTH_LONG).show();
-                                            startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-                                        } else {
-                                            Toast.makeText(HomeActivity.this, "Kích hoạt thất bại hoặc đã kích hoạt", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(Call<Map<String, String>> c, Throwable t) {}
-                                });
+                                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                                startActivity(intent);
                             });
                         } else if ("SUBSCRIPTION_SUCCESS".equals(notif.getType())) {
                             ivIcon.setImageResource(R.drawable.ic_check_circle_filled);

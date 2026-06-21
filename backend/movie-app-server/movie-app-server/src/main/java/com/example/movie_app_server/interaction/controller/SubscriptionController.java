@@ -35,6 +35,45 @@ public class SubscriptionController {
                 .collect(java.util.stream.Collectors.toList()));
     }
 
+    @GetMapping("/claim-gift/{notificationId}/preview")
+    public ResponseEntity<java.util.Map<String, Object>> previewGift(@PathVariable Long notificationId) {
+        String firebaseUid = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userRepository.findByFirebaseUid(firebaseUid).orElse(null);
+        if (currentUser == null) return ResponseEntity.status(401).body(java.util.Map.of("message", "User not found"));
+
+        Notification notification = notificationRepository.findById(notificationId).orElse(null);
+        if (notification == null || !notification.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long userSubscriptionId = notification.getRelatedId();
+        if (userSubscriptionId == null) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Invalid gift notification"));
+        }
+
+        UserSubscription giftSub = userSubscriptionRepository.findById(userSubscriptionId).orElse(null);
+        if (giftSub == null || giftSub.getStatus() != SubscriptionStatus.PENDING_GIFT) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Gift already claimed or not found"));
+        }
+
+        UserSubscription activeSub = userSubscriptionRepository
+                .findFirstByUserAndStatusOrderByEndDateDesc(currentUser, SubscriptionStatus.ACTIVE).orElse(null);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime newEndDate;
+        if (activeSub != null && activeSub.getEndDate().isAfter(now)) {
+            newEndDate = activeSub.getEndDate().plusDays(giftSub.getPlan().getDurationDays());
+        } else {
+            newEndDate = now.plusDays(giftSub.getPlan().getDurationDays());
+        }
+
+        return ResponseEntity.ok(java.util.Map.of(
+                "durationDays", giftSub.getPlan().getDurationDays(),
+                "planName", giftSub.getPlan().getName(),
+                "calculatedEndDate", newEndDate.toString()
+        ));
+    }
+
     @PostMapping("/claim-gift/{notificationId}")
     @Transactional
     public ResponseEntity<java.util.Map<String, String>> claimGift(@PathVariable Long notificationId) {

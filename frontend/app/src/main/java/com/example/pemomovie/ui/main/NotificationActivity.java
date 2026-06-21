@@ -229,7 +229,62 @@ public class NotificationActivity extends AppCompatActivity {
             btnLater.setOnClickListener(v -> bottomSheetDialog.dismiss());
         }
 
-        View btnConfirmActivate = bottomSheetView.findViewById(R.id.btnConfirmActivate);
+        TextView btnConfirmActivate = bottomSheetView.findViewById(R.id.btnConfirmActivate);
+        TextView tvSubtitle = bottomSheetView.findViewById(R.id.tvSubtitle);
+        TextView tvDuration = bottomSheetView.findViewById(R.id.tvDuration);
+        TextView tvCalculatedEndDate = bottomSheetView.findViewById(R.id.tvCalculatedEndDate);
+
+        // Fetch preview data
+        apiService.previewGift(notification.getId()).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, Object> data = response.body();
+                    
+                    int durationDays = 0;
+                    if (data.get("durationDays") instanceof Number) {
+                        durationDays = ((Number) data.get("durationDays")).intValue();
+                    } else if (data.get("durationDays") instanceof String) {
+                        durationDays = Integer.parseInt((String) data.get("durationDays"));
+                    }
+                    
+                    String planName = (String) data.get("planName");
+                    String calculatedEndDateRaw = (String) data.get("calculatedEndDate");
+                    
+                    // Format the date for display
+                    String displayDate = calculatedEndDateRaw;
+                    try {
+                        if (calculatedEndDateRaw != null && calculatedEndDateRaw.contains("T")) {
+                            String[] parts = calculatedEndDateRaw.split("T");
+                            String[] dateParts = parts[0].split("-");
+                            displayDate = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                        }
+                    } catch (Exception ignored) {}
+
+                    if (tvSubtitle != null) {
+                        tvSubtitle.setText("Bạn nhận được " + durationDays + " ngày Premium miễn phí\ntừ Admin.\nKích hoạt ngay để tận hưởng tất cả đặc quyền.");
+                    }
+                    if (tvDuration != null) {
+                        tvDuration.setText(durationDays + " ngày");
+                    }
+                    if (tvCalculatedEndDate != null) {
+                        tvCalculatedEndDate.setText(displayDate);
+                    }
+                    if (btnConfirmActivate != null) {
+                        btnConfirmActivate.setEnabled(true);
+                        btnConfirmActivate.setAlpha(1.0f);
+                    }
+                } else {
+                    if (tvSubtitle != null) tvSubtitle.setText("Lỗi: Không thể xem trước ngày hết hạn.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                if (tvSubtitle != null) tvSubtitle.setText("Lỗi kết nối.");
+            }
+        });
+
         if (btnConfirmActivate != null) {
             btnConfirmActivate.setOnClickListener(v -> {
                 progressBar.setVisibility(View.VISIBLE);
