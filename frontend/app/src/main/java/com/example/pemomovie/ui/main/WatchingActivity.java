@@ -52,6 +52,7 @@ public class WatchingActivity extends AppCompatActivity {
         rvContinue.setLayoutManager(new LinearLayoutManager(this));
         rvContinue.setAdapter(new WatchingAdapter(true));
     }
+
     private void showProfileDropdown(View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.layout_profile_dropdown, null);
@@ -129,6 +130,7 @@ public class WatchingActivity extends AppCompatActivity {
         int yoff = (int) (8 * getResources().getDisplayMetrics().density);
         popupWindow.showAsDropDown(anchorView, 0, yoff);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -139,7 +141,8 @@ public class WatchingActivity extends AppCompatActivity {
         ImageView btnProfile = findViewById(R.id.btnProfile);
         if (btnProfile != null) {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (currentUser != null && currentUser.getPhotoUrl() != null && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
+            if (currentUser != null && currentUser.getPhotoUrl() != null
+                    && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
                 String photoUrl = currentUser.getPhotoUrl().toString().trim();
                 if (photoUrl.startsWith("\"") && photoUrl.endsWith("\"")) {
                     photoUrl = photoUrl.substring(1, photoUrl.length() - 1);

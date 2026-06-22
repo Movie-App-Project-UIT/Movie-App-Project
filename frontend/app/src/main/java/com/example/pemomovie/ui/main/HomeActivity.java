@@ -105,7 +105,8 @@ public class HomeActivity extends AppCompatActivity {
         ApiService apiService = ApiClient.getApiService();
         apiService.getHomepageData().enqueue(new Callback<Map<String, List<MediaItemDto>>>() {
             @Override
-            public void onResponse(Call<Map<String, List<MediaItemDto>>> call, Response<Map<String, List<MediaItemDto>>> response) {
+            public void onResponse(Call<Map<String, List<MediaItemDto>>> call,
+                    Response<Map<String, List<MediaItemDto>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Map<String, List<MediaItemDto>> data = response.body();
                     List<Section> sections = new ArrayList<>();
@@ -116,44 +117,45 @@ public class HomeActivity extends AppCompatActivity {
 
                         // Set banner ViewPager
                         List<MediaItemDto> bannerMovies = trending.size() > 5 ? trending.subList(0, 5) : trending;
-                        com.example.pemomovie.adapter.BannerAdapter bannerAdapter = new com.example.pemomovie.adapter.BannerAdapter(HomeActivity.this, bannerMovies);
+                        com.example.pemomovie.adapter.BannerAdapter bannerAdapter = new com.example.pemomovie.adapter.BannerAdapter(
+                                HomeActivity.this, bannerMovies);
                         bannerViewPager.setAdapter(bannerAdapter);
-                        
+
                         int startPosition = (Integer.MAX_VALUE / 2) - ((Integer.MAX_VALUE / 2) % bannerMovies.size());
                         bannerViewPager.setCurrentItem(startPosition, false);
-                        
+
                         Button btnPlay = findViewById(R.id.btnPlay);
                         Button btnDetail = findViewById(R.id.btnDetail);
 
-                        bannerViewPager.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
-                            @Override
-                            public void onPageSelected(int position) {
-                                super.onPageSelected(position);
-                                handler.removeCallbacks(sliderRunnable);
-                                handler.postDelayed(sliderRunnable, 5000);
-                                
-                                int realPosition = position % bannerMovies.size();
-                                MediaItemDto currentMovie = bannerMovies.get(realPosition);
-                                
-                                if (btnDetail != null) {
-                                    btnDetail.setOnClickListener(v -> {
-                                        Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                                        intent.putExtra("MOVIE_ID", currentMovie.getId());
-                                        startActivity(intent);
-                                    });
-                                }
+                        bannerViewPager.registerOnPageChangeCallback(
+                                new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+                                    @Override
+                                    public void onPageSelected(int position) {
+                                        super.onPageSelected(position);
+                                        handler.removeCallbacks(sliderRunnable);
+                                        handler.postDelayed(sliderRunnable, 5000);
 
-                                if (btnPlay != null) {
-                                    btnPlay.setOnClickListener(v -> {
-                                        Intent intent = new Intent(HomeActivity.this, PlayActivity.class);
-                                        intent.putExtra("MOVIE_ID", currentMovie.getId());
-                                        startActivity(intent);
-                                    });
-                                }
-                            }
-                        });
+                                        int realPosition = position % bannerMovies.size();
+                                        MediaItemDto currentMovie = bannerMovies.get(realPosition);
+
+                                        if (btnDetail != null) {
+                                            btnDetail.setOnClickListener(v -> {
+                                                Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                                                intent.putExtra("MOVIE_ID", currentMovie.getId());
+                                                startActivity(intent);
+                                            });
+                                        }
+
+                                        if (btnPlay != null) {
+                                            btnPlay.setOnClickListener(v -> {
+                                                Intent intent = new Intent(HomeActivity.this, PlayActivity.class);
+                                                intent.putExtra("MOVIE_ID", currentMovie.getId());
+                                                startActivity(intent);
+                                            });
+                                        }
+                                    }
+                                });
                     }
-
 
                     List<MediaItemDto> topRated = data.get("topRated");
                     if (topRated != null && !topRated.isEmpty()) {
@@ -284,6 +286,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+
         if (!unreadList.isEmpty()) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
             if (rvDropdownNotifications != null) {
@@ -301,6 +304,7 @@ public class HomeActivity extends AppCompatActivity {
                         new com.example.pemomovie.adapter.NotificationAdapter.OnNotificationClickListener() {
                             @Override
                             public void onNotificationClick(com.example.pemomovie.dto.NotificationDto notification) {
+
                                 popupWindow.dismiss();
                                 Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
                                 startActivity(intent);
@@ -309,6 +313,7 @@ public class HomeActivity extends AppCompatActivity {
                             @Override
                             public void onActionClick(com.example.pemomovie.dto.NotificationDto notification) {
                                 popupWindow.dismiss();
+
                                 if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
                                     showExpiringPremiumBottomSheet(notification.getMessage() != null ? notification.getMessage() : "Gói Premium của bạn sắp hết hạn.");
                                 } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
@@ -320,6 +325,7 @@ public class HomeActivity extends AppCompatActivity {
                                     startActivity(intent);
                                 }
                             }
+
                         }
                 );
                 rvDropdownNotifications.setAdapter(adapter);
@@ -332,9 +338,11 @@ public class HomeActivity extends AppCompatActivity {
         View tvMarkAsRead = popupView.findViewById(R.id.tvMarkAsRead);
         if (tvMarkAsRead != null) {
             tvMarkAsRead.setOnClickListener(v -> {
+
                 for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
                     if (notif.getRead() == null || !notif.getRead()) {
                         markNotificationAsReadOnBackend(notif.getId());
+
                         notif.setRead(true);
                     }
                 }
@@ -465,7 +473,8 @@ public class HomeActivity extends AppCompatActivity {
         ImageView btnProfile = findViewById(R.id.btnProfile);
         if (btnProfile != null) {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (currentUser != null && currentUser.getPhotoUrl() != null && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
+            if (currentUser != null && currentUser.getPhotoUrl() != null
+                    && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
                 String photoUrl = currentUser.getPhotoUrl().toString().trim();
                 if (photoUrl.startsWith("\"") && photoUrl.endsWith("\"")) {
                     photoUrl = photoUrl.substring(1, photoUrl.length() - 1);

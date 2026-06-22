@@ -37,7 +37,7 @@ public class FavoriteActivity extends AppCompatActivity {
         GradientTextView.applyHorizontalGradient(
                 tvHeaderFav,
                 Color.parseColor("#6C29D6"), // tím
-                Color.parseColor("#F43393")  // hồng
+                Color.parseColor("#F43393") // hồng
         );
 
         // Cài đặt thanh bottom navigation
@@ -47,9 +47,13 @@ public class FavoriteActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         RecyclerView rvFavorites = findViewById(R.id.rvFav);
         rvFavorites.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
+
+
+        // Lấy danh sách yêu thích và cập nhật adapter
+
         
         // Cập nhật giao diện từ bộ nhớ tạm (Cache) trước để giao diện hiện lên lập tức
         updateUI();
@@ -64,6 +68,7 @@ public class FavoriteActivity extends AppCompatActivity {
 
     private void updateUI() {
         RecyclerView rvFavorites = findViewById(R.id.rvFav);
+
         List<MediaItemDto> favList = FavoriteManager.getFavorites(this);
         FavoriteAdapter adapter = new FavoriteAdapter(favList);
         rvFavorites.setAdapter(adapter);
