@@ -60,14 +60,22 @@ public class TmdbSyncService {
                     .orElse(null);
         }
 
+        LocalDate parsedReleaseDate = null;
+        if (movieDto.getReleaseDate() != null && !movieDto.getReleaseDate().isEmpty()) {
+            try {
+                parsedReleaseDate = LocalDate.parse(movieDto.getReleaseDate());
+            } catch (Exception e) {
+                // Ignore parsing error, keep releaseDate as null
+            }
+        }
+
         Media media = Media.builder()
                 .tmdbId(movieDto.getId())
                 .title(movieDto.getTitle())
                 .overview(movieDto.getOverview())
                 .posterPath(movieDto.getPosterPath())
                 .backdropPath(movieDto.getBackdropPath())
-                .releaseDate(movieDto.getReleaseDate() != null && !movieDto.getReleaseDate().isEmpty()
-                        ? LocalDate.parse(movieDto.getReleaseDate()) : null)
+                .releaseDate(parsedReleaseDate)
                 .voteAverage(movieDto.getVoteAverage())
                 .mediaType(MediaType.MOVIE)
                 .language(movieDto.getOriginalLanguage() != null ? java.util.Locale.of(movieDto.getOriginalLanguage()).getDisplayLanguage(java.util.Locale.of("vi", "VN")) : null)
@@ -162,19 +170,28 @@ public class TmdbSyncService {
                     .orElse(null);
         }
 
+        LocalDate parsedReleaseDate = null;
+        if (tvDto.getFirstAirDate() != null && !tvDto.getFirstAirDate().isEmpty()) {
+            try {
+                parsedReleaseDate = LocalDate.parse(tvDto.getFirstAirDate());
+            } catch (Exception e) {
+                // Ignore parsing error, keep releaseDate as null
+            }
+        }
+
         Media media = Media.builder()
                 .tmdbId(tvDto.getId())
                 .title(tvDto.getName())
                 .overview(tvDto.getOverview())
                 .posterPath(tvDto.getPosterPath())
                 .backdropPath(tvDto.getBackdropPath())
-                .releaseDate(tvDto.getFirstAirDate() != null && !tvDto.getFirstAirDate().isEmpty()
-                        ? LocalDate.parse(tvDto.getFirstAirDate()) : null)
+                .releaseDate(parsedReleaseDate)
                 .voteAverage(tvDto.getVoteAverage())
                 .mediaType(MediaType.TV_SERIES)
                 .language(tvDto.getOriginalLanguage() != null ? java.util.Locale.of(tvDto.getOriginalLanguage()).getDisplayLanguage(java.util.Locale.of("vi", "VN")) : null)
                 .trailerUrl(trailerUrl) // Thêm trailerUrl
                 .isPremium(false)
+                .expectedEpisodes(tvDto.getNumberOfEpisodes())
                 .build();
 
         // Map Genres

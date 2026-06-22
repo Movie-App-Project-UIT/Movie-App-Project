@@ -25,6 +25,9 @@ public class TmdbTvDetailsDto {
     @JsonProperty("original_language")
     private String originalLanguage;
 
+    @JsonProperty("number_of_episodes")
+    private Integer numberOfEpisodes;
+
     @JsonProperty("original_name")
     private String originalName;
 

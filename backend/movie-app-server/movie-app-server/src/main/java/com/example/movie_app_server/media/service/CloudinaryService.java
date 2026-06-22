@@ -73,6 +73,8 @@ public class CloudinaryService {
 
         java.net.URL url = new java.net.URL(downloadUrl);
         java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(120000);
         // Cấu hình HttpURLConnection để theo dõi các Redirects (Vì Google Drive hay chuyển hướng URL tải)
         connection.setInstanceFollowRedirects(true);
 
@@ -130,6 +132,8 @@ public class CloudinaryService {
 
         java.net.URL url = new java.net.URL(downloadUrl);
         java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(120000);
         connection.setInstanceFollowRedirects(true);
 
         try (java.io.InputStream inputStream = connection.getInputStream()) {
