@@ -47,9 +47,19 @@ public class PaymentWebActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Mở tất cả link bên trong WebView
-                view.loadUrl(url);
-                return true;
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    view.loadUrl(url);
+                    return true;
+                } else {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        Toast.makeText(PaymentWebActivity.this, "Không tìm thấy ứng dụng hỗ trợ", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
             }
         });
         webView.setWebChromeClient(new WebChromeClient());
