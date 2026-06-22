@@ -107,6 +107,8 @@
                 android:exported="false"/>
         <activity android:name=".ui.main.QrPaymentActivity"
             android:exported="false"/>
+        <activity android:name=".ui.main.PaymentWebActivity"
+            android:exported="false"/>
         <activity
             android:name=".ui.main.SeeAllActivity"
             android:exported="false"

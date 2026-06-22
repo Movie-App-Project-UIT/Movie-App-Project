@@ -48,6 +48,8 @@ public class QrPaymentActivity extends AppCompatActivity {
     private String paymentMethod = "MOMO";
     private CountDownTimer countDownTimer;
     private TextView txtTimer;
+    private boolean isCheckingPayment = false;
+    private String currentPaymentUrl = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,7 @@ public class QrPaymentActivity extends AppCompatActivity {
                     if (response.isSuccessful() && response.body() != null) {
                         try {
                             String paymentUrl = response.body().string();
+                            currentPaymentUrl = paymentUrl;
                             // Render URL này thành mã QR để quét
                             runOnUiThread(() -> {
                                 generateQrCode(paymentUrl, imgQrCode);
@@ -158,39 +161,25 @@ public class QrPaymentActivity extends AppCompatActivity {
             });
         }
 
-        // Nút hoàn tất
+        // Nút hoàn tất dự phòng
         CardView btnPayComplete = findViewById(R.id.btnPayComplete);
         if (btnPayComplete != null) {
             btnPayComplete.setOnClickListener(v -> {
-                Toast.makeText(this, "Đang kiểm tra kết quả thanh toán...", Toast.LENGTH_SHORT).show();
-                ApiClient.getApiService().getMyProfile().enqueue(new Callback<UserProfileDto>() {
-                    @Override
-                    public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            String tier = response.body().getTier();
-                            if ("PREMIUM".equalsIgnoreCase(tier)) {
-                                // Đã lên VIP thành công
-                                Toast.makeText(QrPaymentActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(QrPaymentActivity.this, PaymentProcessingActivity.class);
-                                intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
-                                intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
-                                intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
-                                intent.putExtra("PLAN_PRICE", planPriceStr);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Toast.makeText(QrPaymentActivity.this, "Hệ thống chưa nhận được thanh toán. Vui lòng chờ thêm vài giây rồi thử lại!", Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toast.makeText(QrPaymentActivity.this, "Lỗi kiểm tra thông tin", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                if (!isCheckingPayment) checkPaymentStatus();
+            });
+        }
 
-                    @Override
-                    public void onFailure(Call<UserProfileDto> call, Throwable t) {
-                        Toast.makeText(QrPaymentActivity.this, "Lỗi kết nối Server", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        // Nút mở WebView trực tiếp trong app
+        androidx.cardview.widget.CardView btnOpenWebView = findViewById(R.id.btnOpenWebView);
+        if (btnOpenWebView != null) {
+            btnOpenWebView.setOnClickListener(v -> {
+                if (currentPaymentUrl != null) {
+                    Intent webIntent = new Intent(QrPaymentActivity.this, PaymentWebActivity.class);
+                    webIntent.putExtra("PAYMENT_URL", currentPaymentUrl);
+                    startActivity(webIntent);
+                } else {
+                    Toast.makeText(this, "Đang tải liên kết thanh toán, vui lòng đợi...", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
@@ -253,6 +242,11 @@ public class QrPaymentActivity extends AppCompatActivity {
                 if (txtTimer != null) {
                     txtTimer.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
                 }
+                
+                // Tự động Polling mỗi 3 giây
+                if (seconds % 3 == 0 && !isCheckingPayment) {
+                    checkPaymentStatus();
+                }
             }
 
             @Override
@@ -288,6 +282,35 @@ public class QrPaymentActivity extends AppCompatActivity {
         } catch (WriterException e) {
             e.printStackTrace();
         }
+    }
+
+    private void checkPaymentStatus() {
+        isCheckingPayment = true;
+        ApiClient.getApiService().getMyProfile().enqueue(new Callback<UserProfileDto>() {
+            @Override
+            public void onResponse(Call<UserProfileDto> call, Response<UserProfileDto> response) {
+                isCheckingPayment = false;
+                if (response.isSuccessful() && response.body() != null) {
+                    String tier = response.body().getTier();
+                    if ("PREMIUM".equalsIgnoreCase(tier)) {
+                        if (countDownTimer != null) countDownTimer.cancel();
+                        Toast.makeText(QrPaymentActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(QrPaymentActivity.this, PaymentProcessingActivity.class);
+                        intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
+                        intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+                        intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
+                        intent.putExtra("PLAN_PRICE", planPriceStr);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileDto> call, Throwable t) {
+                isCheckingPayment = false;
+            }
+        });
     }
 
     @Override

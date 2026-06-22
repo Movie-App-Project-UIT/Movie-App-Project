@@ -193,6 +193,33 @@
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Nút mở trình duyệt thanh toán trực tiếp -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnOpenWebView"
+                android:layout_width="240dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:layout_marginBottom="24dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#3B82F6"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mở trang thanh toán trực tiếp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -326,14 +353,24 @@
             android:foreground="?attr/selectableItemBackground"
             android:layout_marginBottom="12dp">
             <LinearLayout
+                android:id="@+id/layoutWaitSignal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_premium_btn"
-                android:gravity="center">
+                android:background="#1F2937"
+                android:gravity="center"
+                android:orientation="horizontal">
+                
+                <ProgressBar
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="12dp"
+                    android:indeterminateTint="@color/white" />
+                    
                 <TextView
+                    android:id="@+id/txtPayComplete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tôi đã thanh toán"
+                    android:text="Đang chờ tín hiệu..."
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
