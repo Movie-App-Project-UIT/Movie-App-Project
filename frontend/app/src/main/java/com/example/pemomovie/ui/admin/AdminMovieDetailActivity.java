@@ -55,6 +55,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private androidx.appcompat.widget.SwitchCompat swPremium, swDeleted;
     private ImageView ivPoster;
     private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadSubtitle, btnViewReviews, btnEditExpectedEpisodes;
+    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadDriveVideo, btnUploadSubtitle, btnUploadDriveSubtitle, btnViewReviews;
     private ProgressBar progressBar;
     private RecyclerView rvSubtitles, rvEpisodesAdmin;
     private android.widget.LinearLayout layoutEpisodes, layoutEpisodeDetails;
@@ -97,7 +98,9 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         btnLoadTmdb = findViewById(R.id.btnLoadTmdb);
         btnUploadVideo = findViewById(R.id.btnUploadVideo);
+        btnUploadDriveVideo = findViewById(R.id.btnUploadDriveVideo);
         btnUploadSubtitle = findViewById(R.id.btnUploadSubtitle);
+        btnUploadDriveSubtitle = findViewById(R.id.btnUploadDriveSubtitle);
         btnViewReviews = findViewById(R.id.btnViewReviews);
         progressBar = findViewById(R.id.progressBar);
         rvSubtitles = findViewById(R.id.rvSubtitles);
@@ -225,6 +228,10 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         });
 
         btnUploadVideo.setOnClickListener(v -> videoPickerLauncher.launch("video/*"));
+        
+        if (btnUploadDriveVideo != null) {
+            btnUploadDriveVideo.setOnClickListener(v -> showDriveLinkDialog());
+        }
 
         btnUploadSubtitle.setOnClickListener(v -> {
             String lang = etSubtitleLanguage.getText().toString().trim();
@@ -234,6 +241,17 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
             }
             subtitlePickerLauncher.launch("*/*");
         });
+
+        if (btnUploadDriveSubtitle != null) {
+            btnUploadDriveSubtitle.setOnClickListener(v -> {
+                String lang = etSubtitleLanguage.getText().toString().trim();
+                if (lang.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập ngôn ngữ (VD: vi, en)", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showDriveSubtitleDialog();
+            });
+        }
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -323,7 +341,9 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         btnSave.setEnabled(false);
         btnUploadVideo.setEnabled(false);
+        if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(false);
         btnUploadSubtitle.setEnabled(false);
+        if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(false);
         Toast.makeText(this, "Đang tải file lên Cloudinary, vui lòng đợi...", Toast.LENGTH_SHORT).show();
 
         Call<ResponseBody> call = type.equals("video") ? apiService.uploadVideoAdmin(body) : apiService.uploadSubtitleAdmin(body);
@@ -334,7 +354,9 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
                 btnUploadSubtitle.setEnabled(true);
+                if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(true);
                 
                 if (response.isSuccessful() && response.body() != null) {
                     try {
@@ -362,8 +384,145 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
                 btnUploadSubtitle.setEnabled(true);
+                if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(true);
                 Toast.makeText(AdminMovieDetailActivity.this, "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showDriveLinkDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Upload qua Google Drive (< 100MB)");
+        
+        final EditText input = new EditText(this);
+        input.setHint("Dán link Google Drive vào đây");
+        input.setPadding(40, 40, 40, 40);
+        builder.setView(input);
+
+        builder.setPositiveButton("Tải lên", (dialog, which) -> {
+            String link = input.getText().toString().trim();
+            if (!link.isEmpty()) {
+                uploadDriveLink(link);
+            } else {
+                Toast.makeText(this, "Vui lòng dán link", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void uploadDriveLink(String link) {
+        progressBar.setVisibility(View.VISIBLE);
+        btnSave.setEnabled(false);
+        btnUploadVideo.setEnabled(false);
+        if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(false);
+        btnUploadSubtitle.setEnabled(false);
+        
+        Toast.makeText(this, "Đang nhờ Server xử lý tải phim, vui lòng đợi...", Toast.LENGTH_LONG).show();
+
+        apiService.uploadVideoFromDrive(link).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressBar.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
+                btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
+                btnUploadSubtitle.setEnabled(true);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String url = response.body().string();
+                        etVideoUrl.setText(url);
+                        Toast.makeText(AdminMovieDetailActivity.this, "Server tải và xử lý xong!", Toast.LENGTH_SHORT).show();
+                    } catch (java.io.IOException e) {
+                        Toast.makeText(AdminMovieDetailActivity.this, "Lỗi đọc URL", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(AdminMovieDetailActivity.this, "Lỗi Server (Có thể vượt 100MB): " + response.code(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
+                btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
+                btnUploadSubtitle.setEnabled(true);
+                if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(true);
+                Toast.makeText(AdminMovieDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showDriveSubtitleDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Thêm Phụ đề qua Google Drive");
+        
+        final EditText input = new EditText(this);
+        input.setHint("Dán link Drive chứa file .srt/.vtt");
+        input.setPadding(40, 40, 40, 40);
+        builder.setView(input);
+
+        builder.setPositiveButton("Tải lên", (dialog, which) -> {
+            String link = input.getText().toString().trim();
+            if (!link.isEmpty()) {
+                uploadDriveSubtitle(link);
+            } else {
+                Toast.makeText(this, "Vui lòng dán link", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void uploadDriveSubtitle(String link) {
+        progressBar.setVisibility(View.VISIBLE);
+        btnSave.setEnabled(false);
+        btnUploadVideo.setEnabled(false);
+        if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(false);
+        btnUploadSubtitle.setEnabled(false);
+        if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(false);
+        
+        Toast.makeText(this, "Đang xử lý phụ đề...", Toast.LENGTH_LONG).show();
+
+        apiService.uploadSubtitleFromDrive(link).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressBar.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
+                btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
+                btnUploadSubtitle.setEnabled(true);
+                if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(true);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String url = response.body().string();
+                        String lang = etSubtitleLanguage.getText().toString().trim();
+                        subtitleAdapter.getSubtitles().add(new AdminMovieSaveRequest.AdminSubtitleRequest(lang, url));
+                        subtitleAdapter.notifyDataSetChanged();
+                        etSubtitleLanguage.setText(""); // Reset
+                        Toast.makeText(AdminMovieDetailActivity.this, "Tải phụ đề thành công!", Toast.LENGTH_SHORT).show();
+                    } catch (java.io.IOException e) {
+                        Toast.makeText(AdminMovieDetailActivity.this, "Lỗi đọc URL phụ đề", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(AdminMovieDetailActivity.this, "Lỗi Server: " + response.code(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
+                btnUploadVideo.setEnabled(true);
+                if (btnUploadDriveVideo != null) btnUploadDriveVideo.setEnabled(true);
+                btnUploadSubtitle.setEnabled(true);
+                if (btnUploadDriveSubtitle != null) btnUploadDriveSubtitle.setEnabled(true);
+                Toast.makeText(AdminMovieDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

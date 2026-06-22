@@ -43,7 +43,7 @@ public class UserSubscription {
     @Builder.Default
     private SubscriptionStatus status = SubscriptionStatus.ACTIVE;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

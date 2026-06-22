@@ -1,5 +1,7 @@
 package com.example.pemomovie.ui.main;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -7,8 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.content.Intent;
-import android.net.Uri;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -17,9 +18,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pemomovie.R;
 
+
+
 public class PaymentWebActivity extends AppCompatActivity {
 
     private WebView webView;
+    private String selectedPlanName;
+    private int selectedPlanDuration;
+    private String planPriceStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +38,17 @@ public class PaymentWebActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Lấy thông tin gói để truyền sang PaymentSuccessActivity
+        selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
+        planPriceStr = getIntent().getStringExtra("PLAN_PRICE");
+
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
         webView = findViewById(R.id.webView);
-        
-        // Cấu hình WebView hỗ trợ thanh toán VNPay/MoMo
+
+        // Cấu hình WebView hỗ trợ thanh toán VNPay
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -47,21 +58,38 @@ public class PaymentWebActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Nếu là Deeplink của MoMo, mở App MoMo
-                if (url != null && url.startsWith("momo://")) {
+                // ✅ Bắt Deep Link từ Backend sau khi thanh toán VNPay xong
+                if (url != null && url.startsWith("pemomovie://payment")) {
+                    Uri uri = Uri.parse(url);
+                    String status = uri.getQueryParameter("status");
+                    if ("success".equals(status)) {
+                        // Không mở PaymentSuccessActivity ngay lập tức nữa.
+                        // Nhường lại cho QrPaymentActivity (đang chạy ngầm) xử lý,
+                        // nó sẽ tự mở PaymentProcessingActivity (Splash)
+                        Toast.makeText(PaymentWebActivity.this, "Đang xử lý giao dịch...", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Thanh toán thất bại
+                        Toast.makeText(PaymentWebActivity.this,
+                                "Thanh toán thất bại hoặc đã bị hủy. Vui lòng thử lại!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    finish();
+                    return true;
+                }
+
+                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    return false; // WebView tự xử lý (sẽ tự động hiện trang Visit Site của Ngrok)
+                } else {
+                    // Mở ứng dụng ngoài (VNPay, ngân hàng,...)
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(intent);
                         return true;
                     } catch (Exception e) {
-                        Toast.makeText(PaymentWebActivity.this, "Bạn chưa cài đặt ứng dụng MoMo", Toast.LENGTH_SHORT).show();
-                        return true; // Vẫn chặn link này lại để WebView không bị lỗi "Webpage not available"
+                        Toast.makeText(PaymentWebActivity.this, "Không tìm thấy ứng dụng hỗ trợ", Toast.LENGTH_SHORT).show();
+                        return true;
                     }
                 }
-                
-                // Các link khác (VNPay, ...) mở bình thường trong WebView
-                view.loadUrl(url);
-                return true;
             }
         });
         webView.setWebChromeClient(new WebChromeClient());

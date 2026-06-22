@@ -34,7 +34,7 @@ public class ReviewReport {
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

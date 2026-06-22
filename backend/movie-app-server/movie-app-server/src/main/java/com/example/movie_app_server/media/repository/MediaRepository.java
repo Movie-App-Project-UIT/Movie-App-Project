@@ -41,8 +41,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     // Lấy Top 10 phim đánh giá cao (không bắt buộc >= 8.0)
     List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();
 
-    // Phim mới cập nhật (Recently Added)
-    List<Media> findTop10ByIsDeletedFalseOrderByIdDesc();
+    // Phim mới cập nhật (Recently Added) - Dùng createdAt thay vì id vì TiDB AUTO_INCREMENT không liên tục
+    List<Media> findTop10ByIsDeletedFalseOrderByCreatedAtDesc();
 
     @Query("SELECT DISTINCT m FROM Media m " +
             "LEFT JOIN m.genres g " +

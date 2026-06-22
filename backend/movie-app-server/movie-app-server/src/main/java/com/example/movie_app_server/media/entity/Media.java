@@ -7,8 +7,10 @@ import com.example.movie_app_server.media.entity.enums.MediaType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +70,9 @@ public class Media {
 
     @Column(name = "expected_episodes")
     private Integer expectedEpisodes;
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     // --- MỐI QUAN HỆ DANH MỤC ---
 

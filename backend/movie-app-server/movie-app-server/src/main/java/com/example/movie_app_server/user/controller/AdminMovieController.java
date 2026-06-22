@@ -12,6 +12,7 @@ import com.example.movie_app_server.media.service.MediaService;
 import com.example.movie_app_server.media.service.TmdbSyncService;
 import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class AdminMovieController {
     private final AdminHistoryService adminHistoryService;
 
     @GetMapping
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<List<MediaItemDto>> getAllMovies() {
         List<MediaItemDto> movies = mediaRepository.findAll().stream()
                 .map(mediaService::convertToItemDto)
@@ -42,6 +44,7 @@ public class AdminMovieController {
     }
 
     @PutMapping("/{id}/soft-delete")
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<Void> softDeleteMovie(@PathVariable Long id) {
         return mediaRepository.findById(id).map(media -> {
             boolean isNowDeleted = !media.isDeleted();
@@ -82,6 +85,7 @@ public class AdminMovieController {
 
     @PostMapping
     @org.springframework.transaction.annotation.Transactional
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<MediaDetailResponse> createMovie(@RequestBody AdminMovieSaveRequest request) {
         Media media;
         try {
@@ -111,6 +115,10 @@ public class AdminMovieController {
             media.setExpectedEpisodes(request.getExpectedEpisodes() != null ? request.getExpectedEpisodes() : 1);
         }
         
+        if (request.getTmdbId() != null && mediaRepository.findByTmdbId(request.getTmdbId()).isPresent()) {
+            throw new com.example.movie_app_server.common.exception.AppException("Phim này đã tồn tại trong hệ thống!", org.springframework.http.HttpStatus.CONFLICT);
+        }
+        Media media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
         media.setVideoUrl(request.getVideoUrl());
         media.setPremium(request.isPremium());
         media.setDeleted(request.isDeleted());
@@ -140,6 +148,7 @@ public class AdminMovieController {
 
     @PutMapping("/{id}")
     @org.springframework.transaction.annotation.Transactional
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<MediaDetailResponse> updateMovie(@PathVariable Long id, @RequestBody AdminMovieSaveRequest request) {
         Media media = mediaRepository.findById(id).orElse(null);
         if (media == null) {

@@ -316,16 +316,25 @@ public class GlobalHeaderHelper {
         View layoutEmptyNotification = popupView.findViewById(R.id.layoutEmptyNotification);
         RecyclerView rvDropdownNotifications = popupView.findViewById(R.id.rvDropdownNotifications);
 
-        if (dbNotifications != null && !dbNotifications.isEmpty()) {
+        List<NotificationDto> unreadNotifications = new ArrayList<>();
+        if (dbNotifications != null) {
+            for (NotificationDto notif : dbNotifications) {
+                if (notif.getRead() == null || !notif.getRead()) {
+                    unreadNotifications.add(notif);
+                }
+            }
+        }
+
+        if (!unreadNotifications.isEmpty()) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
             if (rvDropdownNotifications != null) {
                 rvDropdownNotifications.setVisibility(View.VISIBLE);
                 rvDropdownNotifications.setLayoutManager(new LinearLayoutManager(activity));
                 
-                // Show up to 5 latest notifications
-                List<NotificationDto> displayList = dbNotifications.size() > 5 
-                        ? dbNotifications.subList(0, 5) 
-                        : dbNotifications;
+                // Show up to 5 latest unread notifications
+                List<NotificationDto> displayList = unreadNotifications.size() > 5 
+                        ? unreadNotifications.subList(0, 5) 
+                        : unreadNotifications;
                         
                 NotificationAdapter adapter = new NotificationAdapter(
                         activity,
@@ -334,8 +343,14 @@ public class GlobalHeaderHelper {
                             @Override
                             public void onNotificationClick(NotificationDto notification) {
                                 popupWindow.dismiss();
-                                Intent intent = new Intent(activity, NotificationActivity.class);
-                                activity.startActivity(intent);
+                                if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
+                                    Intent intent = new Intent(activity, com.example.pemomovie.ui.main.PaymentSuccessActivity.class);
+                                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
+                                    activity.startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(activity, NotificationActivity.class);
+                                    activity.startActivity(intent);
+                                }
                             }
 
                             @Override
@@ -344,7 +359,8 @@ public class GlobalHeaderHelper {
                                 if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
                                     showExpiringPremiumBottomSheet(notification.getMessage() != null ? notification.getMessage() : "Gói Premium của bạn sắp hết hạn.");
                                 } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
-                                    Intent intent = new Intent(activity, ProfileActivity.class);
+                                    Intent intent = new Intent(activity, com.example.pemomovie.ui.main.PaymentSuccessActivity.class);
+                                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
                                     activity.startActivity(intent);
                                 } else {
                                     Intent intent = new Intent(activity, NotificationActivity.class);
@@ -365,6 +381,7 @@ public class GlobalHeaderHelper {
             tvMarkAsRead.setOnClickListener(v -> {
                 for (NotificationDto notif : dbNotifications) {
                     if (notif.getRead() == null || !notif.getRead()) {
+                        notif.setRead(true);
                         markNotificationAsReadOnBackend(notif.getId());
                     }
                 }
@@ -372,7 +389,11 @@ public class GlobalHeaderHelper {
                 hasAdminGift = false;
                 hasPremiumNotif = false;
                 updateNotificationBadge(0);
-                popupWindow.dismiss();
+                
+                // Cập nhật giao diện trực tiếp thành dạng trống (Không tự động đóng popup)
+                if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
+                if (rvDropdownNotifications != null) rvDropdownNotifications.setVisibility(View.GONE);
+                
                 Toast.makeText(activity, "Đã đánh dấu đọc tất cả", Toast.LENGTH_SHORT).show();
             });
         }

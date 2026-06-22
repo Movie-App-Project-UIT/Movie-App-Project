@@ -15,8 +15,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+
+        buildConfigField("String", "BASE_URL", "\"https://conch-angelfish-aversion.ngrok-free.dev\"")
     }
 
     buildFeatures {
@@ -33,7 +33,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.pemomovie.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+            buildConfigField("String", "BASE_URL", "\"https://conch-angelfish-aversion.ngrok-free.dev\"")
         }
     }
     compileOptions {
@@ -77,6 +77,7 @@ dependencies {
 
     // ExoPlayer 
     implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.3.1")
     implementation("androidx.media3:media3-ui:1.3.1")
     implementation("androidx.media3:media3-common:1.3.1")
 

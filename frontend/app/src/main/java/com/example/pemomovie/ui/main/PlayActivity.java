@@ -22,6 +22,8 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ScrollView;
+import android.media.AudioManager;
+import android.widget.SeekBar;
 
 import android.net.Uri;
 import android.util.Log;
@@ -53,7 +55,6 @@ import retrofit2.Response;
 
 import com.example.pemomovie.CommentFragment;
 import com.example.pemomovie.R;
-import com.example.pemomovie.RateFragment;
 
 @OptIn(markerClass = UnstableApi.class)
 public class PlayActivity extends AppCompatActivity {
@@ -291,8 +292,10 @@ public class PlayActivity extends AppCompatActivity {
 
     private void setupExoPlayer(String videoUrl, List<SubtitleDto> subtitles) {
         if (exoPlayer == null) {
+            androidx.media3.exoplayer.trackselection.DefaultTrackSelector trackSelector = new androidx.media3.exoplayer.trackselection.DefaultTrackSelector(this);
             // Cấu hình tua lùi 10s và tua tiến 10s mặc định bằng setSeekBackIncrementMs/setSeekForwardIncrementMs
             exoPlayer = new ExoPlayer.Builder(this)
+                    .setTrackSelector(trackSelector)
                     .setSeekBackIncrementMs(10000)
                     .setSeekForwardIncrementMs(10000)
                     .build();
@@ -416,6 +419,153 @@ public class PlayActivity extends AppCompatActivity {
         if (btnPauseCustom != null) {
             btnPauseCustom.setVisibility(isPlaying ? View.VISIBLE : View.GONE);
         }
+    }
+
+    private void updateVolumeIcon(ImageButton btnVolume, int volume) {
+        if (btnVolume != null) {
+            if (volume == 0) {
+                btnVolume.setImageResource(R.drawable.ic_volume_off);
+            } else {
+                btnVolume.setImageResource(R.drawable.ic_volume_up);
+            }
+        }
+    }
+
+    private void showSpeedDialog() {
+        String[] options = {"0.5x", "0.75x", "1.0x (Chuẩn)", "1.25x", "1.5x", "2.0x"};
+        float[] speeds = {0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f};
+        
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Tốc độ phát")
+                .setItems(options, (dialog, which) -> {
+                    float speed = speeds[which];
+                    exoPlayer.setPlaybackParameters(new androidx.media3.common.PlaybackParameters(speed));
+                    Toast.makeText(this, "Tốc độ: " + options[which], Toast.LENGTH_SHORT).show();
+                })
+                .show();
+    }
+
+    private void showSubtitleDialog() {
+        androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
+        java.util.List<androidx.media3.common.TrackSelectionOverride> textOverrides = new java.util.ArrayList<>();
+        java.util.List<String> optionsList = new java.util.ArrayList<>();
+        
+        optionsList.add("Tắt phụ đề");
+        textOverrides.add(null); // Tương ứng với tắt
+        
+        for (androidx.media3.common.Tracks.Group trackGroup : tracks.getGroups()) {
+            if (trackGroup.getType() == C.TRACK_TYPE_TEXT) {
+                androidx.media3.common.TrackGroup group = trackGroup.getMediaTrackGroup();
+                for (int i = 0; i < group.length; i++) {
+                    androidx.media3.common.Format format = group.getFormat(i);
+                    String lang = format.language != null ? format.language : "Không rõ";
+                    String label = format.label != null ? format.label : lang;
+                    optionsList.add(label);
+                    textOverrides.add(new androidx.media3.common.TrackSelectionOverride(group, i));
+                }
+            }
+        }
+
+        String[] options = optionsList.toArray(new String[0]);
+        
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Chọn phụ đề")
+                .setItems(options, (dialog, which) -> {
+                    androidx.media3.common.TrackSelectionOverride override = textOverrides.get(which);
+                    if (override == null) {
+                        // Tắt phụ đề
+                        subtitleEnabled = false;
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                                        .build()
+                        );
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.GONE);
+                        }
+                        updateSubtitleButton();
+                        Toast.makeText(this, "Đã tắt phụ đề", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Bật phụ đề đã chọn
+                        subtitleEnabled = true;
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                        .addOverride(override)
+                                        .build()
+                        );
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.VISIBLE);
+                        }
+                        updateSubtitleButton();
+                        Toast.makeText(this, "Phụ đề: " + options[which], Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+    private void showQualityDialog() {
+        androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
+        java.util.Map<Integer, androidx.media3.common.TrackSelectionOverride> overrideMap = new java.util.HashMap<>();
+        
+        java.util.List<Integer> heights = new java.util.ArrayList<>();
+        
+        for (androidx.media3.common.Tracks.Group trackGroup : tracks.getGroups()) {
+            if (trackGroup.getType() == C.TRACK_TYPE_VIDEO) {
+                androidx.media3.common.TrackGroup group = trackGroup.getMediaTrackGroup();
+                for (int i = 0; i < group.length; i++) {
+                    androidx.media3.common.Format format = group.getFormat(i);
+                    int height = format.height;
+                    // Lọc trùng: nếu cloud sinh ra nhiều bitrate cho cùng 1 độ phân giải
+                    if (height > 0 && !heights.contains(height)) {
+                        heights.add(height);
+                        overrideMap.put(height, new androidx.media3.common.TrackSelectionOverride(group, i));
+                    }
+                }
+            }
+        }
+
+        // Sắp xếp độ phân giải từ cao xuống thấp
+        java.util.Collections.sort(heights, java.util.Collections.reverseOrder());
+
+        String[] options = new String[heights.size() + 1];
+        options[0] = "Tự động (Auto)";
+        for (int i = 0; i < heights.size(); i++) {
+            int h = heights.get(i);
+            options[i + 1] = h >= 720 ? h + "p (HD)" : h + "p";
+        }
+
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Chọn chất lượng")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Auto
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                                        .build()
+                        );
+                        Toast.makeText(this, "Chất lượng: Tự động", Toast.LENGTH_SHORT).show();
+                    } else {
+                        int height = heights.get(which - 1);
+                        androidx.media3.common.TrackSelectionOverride override = overrideMap.get(height);
+                        if (override != null) {
+                            exoPlayer.setTrackSelectionParameters(
+                                    exoPlayer.getTrackSelectionParameters()
+                                            .buildUpon()
+                                            .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                                            .addOverride(override)
+                                            .build()
+                            );
+                            Toast.makeText(this, "Chất lượng: " + height + "p", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
     }
 
 
@@ -718,21 +868,75 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
-            // Nút phụ đề
+            // Cài đặt chọn chất lượng video (Settings)
+            View btnSettings = playerView.findViewById(androidx.media3.ui.R.id.exo_settings);
+            if (btnSettings != null) {
+                btnSettings.setOnClickListener(v -> {
+                    if (exoPlayer != null) {
+                        showQualityDialog();
+                    }
+                });
+            }
+
+            // Tốc độ phát
+            View btnSpeed = playerView.findViewById(R.id.btnSpeed);
+            if (btnSpeed != null) {
+                btnSpeed.setOnClickListener(v -> {
+                    if (exoPlayer != null) {
+                        showSpeedDialog();
+                    }
+                });
+            }
+
+            // Thanh trượt âm lượng
+            ImageButton btnVolume = playerView.findViewById(R.id.btnVolume);
+            SeekBar seekBarVolume = playerView.findViewById(R.id.seekBarVolume);
+            if (btnVolume != null && seekBarVolume != null) {
+                AudioManager audioManager = (AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                if (audioManager != null) {
+                    int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    seekBarVolume.setMax(maxVolume);
+                    seekBarVolume.setProgress(currentVolume);
+
+                    updateVolumeIcon(btnVolume, currentVolume);
+                    // Ẩn thanh trượt mặc định
+                    seekBarVolume.setVisibility(View.GONE);
+
+                    seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if (fromUser) {
+                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                            }
+                            updateVolumeIcon(btnVolume, progress);
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                    });
+
+                    btnVolume.setOnClickListener(v -> {
+                        // Toggle visibility
+                        if (seekBarVolume.getVisibility() == View.VISIBLE) {
+                            seekBarVolume.setVisibility(View.GONE);
+                        } else {
+                            seekBarVolume.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            }
+
+            // Phụ đề (Subtitle)
             btnSubtitle = playerView.findViewById(R.id.btnSubtitle);
             if (btnSubtitle != null) {
-                updateSubtitleButton();
+                updateSubtitleButton(); // Cập nhật icon ban đầu
                 btnSubtitle.setOnClickListener(v -> {
                     if (exoPlayer != null) {
-                        androidx.media3.ui.TrackSelectionDialogBuilder builder = 
-                            new androidx.media3.ui.TrackSelectionDialogBuilder(
-                                PlayActivity.this,
-                                "Chọn phụ đề",
-                                exoPlayer,
-                                androidx.media3.common.C.TRACK_TYPE_TEXT
-                            );
-                        builder.setTheme(androidx.appcompat.R.style.Theme_AppCompat_Dialog);
-                        builder.build().show();
+                        showSubtitleDialog();
                     }
                 });
             }
@@ -751,6 +955,18 @@ public class PlayActivity extends AppCompatActivity {
                                 topInfo.setVisibility(
                                         visible ? View.VISIBLE : View.GONE
                                 );
+                            }
+                            
+                            // Cập nhật lại thanh âm lượng nếu hệ thống thay đổi bằng phím cứng khi ẩn controller
+                            if (visible && playerView != null) {
+                                SeekBar seekBarVolume = playerView.findViewById(R.id.seekBarVolume);
+                                ImageButton btnVolume = playerView.findViewById(R.id.btnVolume);
+                                AudioManager audioManager = (AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                                if (audioManager != null && seekBarVolume != null && btnVolume != null) {
+                                    int currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                                    seekBarVolume.setProgress(currentVol);
+                                    updateVolumeIcon(btnVolume, currentVol);
+                                }
                             }
                         }
                     }

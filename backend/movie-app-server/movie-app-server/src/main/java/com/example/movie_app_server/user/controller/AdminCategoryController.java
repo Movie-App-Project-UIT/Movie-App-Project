@@ -9,6 +9,7 @@ import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.service.MediaService;
 import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/admin/categories")
 @RequiredArgsConstructor
+@org.springframework.transaction.annotation.Transactional
 public class AdminCategoryController {
 
     private final GenreRepository genreRepository;
@@ -63,6 +65,7 @@ public class AdminCategoryController {
     }
 
     @PostMapping
+    @CacheEvict(value = {"genres", "homepageData"}, allEntries = true)
     public ResponseEntity<AdminGenreDto> createCategory(@RequestBody java.util.Map<String, String> body) {
         String name = body.get("name");
         if (name == null || name.trim().isEmpty()) {
@@ -79,6 +82,7 @@ public class AdminCategoryController {
     }
 
     @PutMapping("/{id}/soft-delete")
+    @CacheEvict(value = {"genres", "homepageData"}, allEntries = true)
     public ResponseEntity<Void> softDeleteCategory(@PathVariable Long id) {
         return genreRepository.findById(id).map(genre -> {
             boolean willDelete = !genre.isDeleted();
@@ -135,6 +139,7 @@ public class AdminCategoryController {
     }
 
     @PostMapping("/{id}/media/{mediaId}")
+    @CacheEvict(value = {"genres", "homepageData"}, allEntries = true)
     public ResponseEntity<Void> addMediaToGenre(@PathVariable Long id, @PathVariable Long mediaId) {
         return genreRepository.findById(id).map(genre -> {
             mediaRepository.findById(mediaId).ifPresent(media -> {
@@ -149,6 +154,7 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{id}/media/{mediaId}")
+    @CacheEvict(value = {"genres", "homepageData"}, allEntries = true)
     public ResponseEntity<Void> removeMediaFromGenre(@PathVariable Long id, @PathVariable Long mediaId) {
         return genreRepository.findById(id).map(genre -> {
             mediaRepository.findById(mediaId).ifPresent(media -> {

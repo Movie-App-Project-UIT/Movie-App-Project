@@ -36,12 +36,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentUrl);
     }
 
-    // API Test: Giả lập thanh toán thành công
-    @PostMapping("/test-success")
-    public ResponseEntity<String> simulateSuccess(@RequestParam Long packageId) {
-        paymentService.simulateSuccess(packageId, getUid());
-        return ResponseEntity.ok("Thanh toán giả lập thành công!");
-    }
+
 
     // IPN Webhook: VNPay Server sẽ gọi trực tiếp vào đây để báo kết quả
     @GetMapping("/vnpay-ipn")
@@ -55,36 +50,37 @@ public class PaymentController {
         return ResponseEntity.ok(result);
     }
 
-    // IPN Webhook: MoMo Server sẽ gọi POST JSON vào đây
-    @PostMapping("/momo-ipn")
-    public ResponseEntity<String> momoIpn(@RequestBody Map<String, Object> payload) {
-        paymentService.processMoMoIpnWebhook(payload);
-        // Trả về HTTP 204 No Content theo chuẩn MoMo (hoặc 200 OK rỗng)
-        return ResponseEntity.noContent().build();
-    }
-
     // Return URL: Trình duyệt của user chuyển hướng về đây sau khi thanh toán xong
     @GetMapping("/vnpay-return")
-    public ResponseEntity<String> vnpayReturn(@RequestParam Map<String, String> params) {
-        Map<String, String> originalParams = new HashMap<>(params); // Save original for IPN
-
+    public org.springframework.http.ResponseEntity<Void> vnpayReturn(@RequestParam Map<String, String> params) {
         String secureHash = params.get("vnp_SecureHash");
-        params.remove("vnp_SecureHash");
-        params.remove("vnp_SecureHashType");
+        Map<String, String> verifyParams = new HashMap<>(params);
+        verifyParams.remove("vnp_SecureHash");
+        verifyParams.remove("vnp_SecureHashType");
 
-        String signValue = com.example.movie_app_server.payment.config.VNPayConfig.hashAllFields(params, paymentService.getVnPaySecretKey());
+        String signValue = com.example.movie_app_server.payment.config.VNPayConfig.hashAllFields(verifyParams, paymentService.getVnPaySecretKey());
+
+        String redirectUrl;
         if (!signValue.equals(secureHash)) {
-            return ResponseEntity.badRequest().body("Chữ ký không hợp lệ. Đã có lỗi xảy ra!");
+            // Chữ ký không hợp lệ → thất bại
+            redirectUrl = "pemomovie://payment?status=failed&reason=invalid_signature";
+        } else {
+            String responseCode = params.get("vnp_ResponseCode");
+            String txnRef = params.get("vnp_TxnRef");
+            if ("00".equals(responseCode)) {
+                // Thanh toán thành công → nâng cấp user
+                boolean upgraded = paymentService.processReturnUrl(txnRef);
+                redirectUrl = upgraded
+                        ? "pemomovie://payment?status=success"
+                        : "pemomovie://payment?status=success"; // Kể cả đã SUCCESS rồi (IPN xử lý trước) vẫn redirect success
+            } else {
+                redirectUrl = "pemomovie://payment?status=failed&reason=payment_failed";
+            }
         }
 
-        String responseCode = params.get("vnp_ResponseCode");
-        if ("00".equals(responseCode)) {
-            // Since VNPay server cannot reach localhost IPN URL, we manually call IPN logic here for testing
-            paymentService.processIpnWebhook(originalParams);
-            // Hiển thị giao diện hoặc redirect về App (DeepLink)
-            return ResponseEntity.ok("Thanh toán thành công! Bạn có thể quay lại Ứng dụng.");
-        } else {
-            return ResponseEntity.ok("Thanh toán thất bại hoặc đã bị hủy.");
-        }
+        return org.springframework.http.ResponseEntity
+                .status(org.springframework.http.HttpStatus.FOUND)
+                .header("Location", redirectUrl)
+                .build();
     }
 }

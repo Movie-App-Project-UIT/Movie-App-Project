@@ -2,7 +2,6 @@ package com.example.movie_app_server.payment.service;
 
 import com.example.movie_app_server.common.exception.AppException;
 import com.example.movie_app_server.payment.config.VNPayConfig;
-import com.example.movie_app_server.payment.config.MoMoConfig;
 import com.example.movie_app_server.interaction.entity.subscription.SubscriptionPlan;
 import com.example.movie_app_server.interaction.entity.subscription.UserSubscription;
 import com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus;
@@ -22,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +34,6 @@ import java.util.*;
 @Slf4j
 public class PaymentService {
     private final VNPayConfig vnPayConfig;
-    private final MoMoConfig moMoConfig;
     private final RestTemplate restTemplate;
     private final TransactionRepository transactionRepository;
     private final SubscriptionPlanRepository planRepository;
@@ -52,11 +51,7 @@ public class PaymentService {
         String txnRef = VNPayConfig.getRandomNumber(8);
         long amount = (customAmount != null && customAmount > 0) ? customAmount : subPackage.getPrice().longValue();
 
-        if ("MOMO".equalsIgnoreCase(paymentMethod)) {
-            return createMoMoPaymentUrl(txnRef, amount, user, subPackage);
-        } else {
-            return createVNPayPaymentUrl(txnRef, amount, user, subPackage, ipAddress);
-        }
+        return createVNPayPaymentUrl(txnRef, amount, user, subPackage, ipAddress);
     }
 
     private String createVNPayPaymentUrl(String txnRef, long amount, User user, SubscriptionPlan subPackage, String ipAddress) {
@@ -78,7 +73,7 @@ public class PaymentService {
         vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnp_ReturnUrl());
         vnp_Params.put("vnp_IpAddr", ipAddress);
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
@@ -133,126 +128,6 @@ public class PaymentService {
         transactionRepository.save(transaction);
 
         return paymentUrl;
-    }
-
-    private String createMoMoPaymentUrl(String txnRef, long amount, User user, SubscriptionPlan subPackage) {
-        String requestId = String.valueOf(System.currentTimeMillis());
-        String orderInfo = "Thanh toan VIP: " + txnRef;
-        String rawSignature = "accessKey=" + moMoConfig.getAccessKey()
-                + "&amount=" + amount
-                + "&extraData="
-                + "&ipnUrl=" + moMoConfig.getIpnUrl()
-                + "&orderId=" + txnRef
-                + "&orderInfo=" + orderInfo
-                + "&partnerCode=" + moMoConfig.getPartnerCode()
-                + "&redirectUrl=" + moMoConfig.getReturnUrl()
-                + "&requestId=" + requestId
-                + "&requestType=captureWallet";
-
-        String signature = MoMoConfig.getHmacSHA256(rawSignature, moMoConfig.getSecretKey());
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("partnerCode", moMoConfig.getPartnerCode());
-        requestBody.put("partnerName", "Movie App");
-        requestBody.put("storeId", "MoMoTestStore");
-        requestBody.put("requestId", requestId);
-        requestBody.put("amount", amount);
-        requestBody.put("orderId", txnRef);
-        requestBody.put("orderInfo", orderInfo);
-        requestBody.put("redirectUrl", moMoConfig.getReturnUrl());
-        requestBody.put("ipnUrl", moMoConfig.getIpnUrl());
-        requestBody.put("lang", "vi");
-        requestBody.put("extraData", "");
-        requestBody.put("requestType", "captureWallet");
-        requestBody.put("signature", signature);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
-        try {
-            Map<String, Object> response = restTemplate.postForObject(moMoConfig.getMomoUrl(), entity, Map.class);
-            if (response != null && response.containsKey("payUrl")) {
-                // Lưu transaction PENDING
-                Transaction transaction = Transaction.builder()
-                        .user(user)
-                        .subscriptionPlan(subPackage)
-                        .amount(amount)
-                        .txnRef(txnRef)
-                        .paymentMethod("MOMO")
-                        .status("PENDING")
-                        .build();
-                transactionRepository.save(transaction);
-                
-                return response.get("payUrl").toString();
-            } else {
-                log.error("Lỗi từ MoMo: " + response);
-                throw new AppException("Lỗi kết nối MoMo", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            log.error("Exception gọi MoMo API", e);
-            throw new AppException("Lỗi hệ thống khi gọi MoMo", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public void processMoMoIpnWebhook(Map<String, Object> payload) {
-        try {
-            String partnerCode = (String) payload.get("partnerCode");
-            String orderId = (String) payload.get("orderId");
-            String requestId = (String) payload.get("requestId");
-            Long amount = Long.valueOf(payload.get("amount").toString());
-            String orderInfo = (String) payload.get("orderInfo");
-            String orderType = (String) payload.get("orderType");
-            Long transId = Long.valueOf(payload.get("transId").toString());
-            Integer resultCode = (Integer) payload.get("resultCode");
-            String message = (String) payload.get("message");
-            String payType = (String) payload.get("payType");
-            String responseTime = payload.get("responseTime").toString();
-            String extraData = (String) payload.get("extraData");
-            String signature = (String) payload.get("signature");
-
-            String rawSignature = "accessKey=" + moMoConfig.getAccessKey()
-                    + "&amount=" + amount
-                    + "&extraData=" + extraData
-                    + "&message=" + message
-                    + "&orderId=" + orderId
-                    + "&orderInfo=" + orderInfo
-                    + "&orderType=" + orderType
-                    + "&partnerCode=" + partnerCode
-                    + "&payType=" + payType
-                    + "&requestId=" + requestId
-                    + "&responseTime=" + responseTime
-                    + "&resultCode=" + resultCode
-                    + "&transId=" + transId;
-
-            String expectedSignature = MoMoConfig.getHmacSHA256(rawSignature, moMoConfig.getSecretKey());
-            if (!expectedSignature.equals(signature)) {
-                log.error("MoMo Invalid Signature");
-                return;
-            }
-
-            Transaction transaction = transactionRepository.findByTxnRef(orderId).orElse(null);
-            if (transaction == null || !"PENDING".equals(transaction.getStatus())) {
-                return;
-            }
-
-            if (!amount.equals(transaction.getAmount())) {
-                log.error("MoMo Invalid Amount");
-                return;
-            }
-
-            if (resultCode == 0) { // 0 là thành công
-                transaction.setStatus("SUCCESS");
-                transaction.setGatewayTransactionNo(String.valueOf(transId));
-                transaction.setPayDate(LocalDateTime.now());
-                upgradeUserVip(transaction);
-            } else {
-                transaction.setStatus("FAILED");
-            }
-            transactionRepository.save(transaction);
-        } catch (Exception e) {
-            log.error("Lỗi xử lý MoMo IPN", e);
-        }
     }
 
     private void upgradeUserVip(Transaction transaction) {
@@ -317,6 +192,36 @@ public class PaymentService {
         upgradeUserVip(mockTxn);
     }
 
+    /**
+     * Được gọi từ vnpay-return khi trình duyệt của user redirect về sau khi thanh toán.
+     * Tìm transaction theo txnRef và nâng cấp user nếu trạng thái còn là PENDING.
+     * Trả về true nếu xử lý thành công.
+     */
+    @Transactional
+    public boolean processReturnUrl(String txnRef) {
+        Transaction transaction = transactionRepository.findByTxnRef(txnRef).orElse(null);
+        if (transaction == null) {
+            log.warn("processReturnUrl: Không tìm thấy transaction với txnRef={}", txnRef);
+            return false;
+        }
+        // Tránh nâng cấp 2 lần nếu IPN đã xử lý trước
+        if ("SUCCESS".equals(transaction.getStatus())) {
+            log.info("processReturnUrl: Transaction {} đã SUCCESS rồi, bỏ qua.", txnRef);
+            return true;
+        }
+        if (!"PENDING".equals(transaction.getStatus())) {
+            log.warn("processReturnUrl: Transaction {} có status không hợp lệ: {}", txnRef, transaction.getStatus());
+            return false;
+        }
+        transaction.setStatus("SUCCESS");
+        transaction.setPayDate(LocalDateTime.now());
+        transactionRepository.save(transaction);
+        upgradeUserVip(transaction);
+        log.info("processReturnUrl: Nâng cấp thành công cho user {} qua txnRef={}", transaction.getUser().getFirebaseUid(), txnRef);
+        return true;
+    }
+
+    @Transactional
     public String processIpnWebhook(Map<String, String> params) {
         String secureHash = params.get("vnp_SecureHash");
         if (params.containsKey("vnp_SecureHashType")) {

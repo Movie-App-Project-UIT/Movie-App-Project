@@ -10,6 +10,7 @@ import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.repository.SeasonRepository;
 import com.example.movie_app_server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@org.springframework.transaction.annotation.Transactional
 public class MediaService {
 
     private final MediaRepository mediaRepository;
@@ -55,13 +57,13 @@ public class MediaService {
         return MediaItemDto.builder()
                 .id(media.getId())
                 .title(media.getTitle())
-                .posterUrl(media.getPosterPath() != null ? "https://image.tmdb.org/t/p/w342" + media.getPosterPath() : null)
-                .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w780" + media.getBackdropPath() : null)
+                .posterUrl(media.getPosterPath() != null ? (media.getPosterPath().startsWith("http") ? media.getPosterPath() : "https://image.tmdb.org/t/p/w342" + media.getPosterPath()) : null)
+                .backdropUrl(media.getBackdropPath() != null ? (media.getBackdropPath().startsWith("http") ? media.getBackdropPath() : "https://image.tmdb.org/t/p/w780" + media.getBackdropPath()) : null)
                 .voteAverage(media.getVoteAverage())
                 .isPremium(media.isPremium())
-                .mediaType(media.getMediaType().name())
-                .isPlayable(media.getVideoUrl() != null && !media.getVideoUrl().trim().isEmpty()) // Trim khoảng trắng an toàn hơn
-                .genres(media.getGenres().stream().map(g -> g.getName()).collect(Collectors.toList()))
+                .mediaType(media.getMediaType() != null ? media.getMediaType().name() : "UNKNOWN")
+                .isPlayable(media.getVideoUrl() != null && !media.getVideoUrl().trim().isEmpty())
+                .genres(media.getGenres() != null ? media.getGenres().stream().map(g -> g.getName()).collect(Collectors.toList()) : new java.util.ArrayList<>())
                 .isDeleted(media.isDeleted())
                 .language(media.getLanguage() != null ? media.getLanguage() : "N/A")
                 .country(media.getCountry() != null ? media.getCountry().getName() : "N/A")
@@ -99,13 +101,14 @@ public class MediaService {
     }
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
+    @Cacheable("homepageData")
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
         // Lấy 10 phim được đánh giá cao nhất (bắt buộc >= 8.0)
         List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(8.0f).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByIdDesc().stream()
+        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByCreatedAtDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
@@ -121,7 +124,9 @@ public class MediaService {
             trending = mediaRepository.findAll().stream()
                     .filter(m -> !m.isDeleted())
                     .map(this::convertToItemDto)
-                    .sorted((a, b) -> Integer.compare(b.getViewCount(), a.getViewCount()))
+                    .sorted((a, b) -> Integer.compare(
+                            b.getViewCount() != null ? b.getViewCount() : 0,
+                            a.getViewCount() != null ? a.getViewCount() : 0))
                     .limit(10)
                     .collect(Collectors.toList());
         }
@@ -203,8 +208,8 @@ public class MediaService {
                 .title(media.getTitle())
                 .overview(media.getOverview())
                 .voteAverage(media.getVoteAverage())
-                .posterUrl(media.getPosterPath() != null ? "https://image.tmdb.org/t/p/w500" + media.getPosterPath() : null)
-                .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath() : null)
+                .posterUrl(media.getPosterPath() != null ? (media.getPosterPath().startsWith("http") ? media.getPosterPath() : "https://image.tmdb.org/t/p/w500" + media.getPosterPath()) : null)
+                .backdropUrl(media.getBackdropPath() != null ? (media.getBackdropPath().startsWith("http") ? media.getBackdropPath() : "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath()) : null)
                 .releaseDate(media.getReleaseDate())
                 .releaseYear(media.getReleaseDate() != null ? media.getReleaseDate().getYear() : null)
                 .viewCount(media.getViewCount())

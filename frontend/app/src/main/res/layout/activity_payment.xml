@@ -249,53 +249,12 @@
                 android:layout_marginBottom="16dp"
                 android:gravity="start"/>
 
-            <!-- Momo -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cardPayMomo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_plan_selected"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-                
-                <ImageView
-                    android:id="@+id/icMomo"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/logo_momo"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ví điện tử MoMo"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="16dp"
-                    app:layout_constraintStart_toEndOf="@id/icMomo"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <ImageView
-                    android:id="@+id/icCheckMomo"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_check_circle_filled"
-                    app:tint="#8B5CF6"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <!-- VNPay -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardPayVnpay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_plan_unselected"
+                android:background="@drawable/bg_plan_selected"
                 android:padding="16dp"
                 android:layout_marginBottom="24dp">
                 
@@ -324,7 +283,7 @@
                     android:id="@+id/icCheckVnpay"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/bg_circle_outline"
+                    android:src="@drawable/bg_radio_selected"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>

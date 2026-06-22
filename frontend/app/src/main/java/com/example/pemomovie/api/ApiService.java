@@ -221,6 +221,14 @@ public interface ApiService {
     @POST("/api/v1/admin/upload/subtitle")
     Call<ResponseBody> uploadSubtitleAdmin(@Part MultipartBody.Part file);
 
+    @retrofit2.http.FormUrlEncoded
+    @POST("/api/v1/admin/upload/drive-video")
+    Call<ResponseBody> uploadVideoFromDrive(@retrofit2.http.Field("driveUrl") String driveUrl);
+
+    @retrofit2.http.FormUrlEncoded
+    @POST("/api/v1/admin/upload/drive-subtitle")
+    Call<ResponseBody> uploadSubtitleFromDrive(@retrofit2.http.Field("driveUrl") String driveUrl);
+
     @retrofit2.http.DELETE("/api/v1/admin/reviews/{id}")
     Call<Void> deleteReviewAdmin(@retrofit2.http.Path("id") Long id);
 
