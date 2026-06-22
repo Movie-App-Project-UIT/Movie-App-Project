@@ -223,8 +223,10 @@ public class PlayActivity extends AppCompatActivity {
 
     private void setupExoPlayer(String videoUrl, List<SubtitleDto> subtitles) {
         if (exoPlayer == null) {
+            androidx.media3.exoplayer.trackselection.DefaultTrackSelector trackSelector = new androidx.media3.exoplayer.trackselection.DefaultTrackSelector(this);
             // Cấu hình tua lùi 10s và tua tiến 10s mặc định bằng setSeekBackIncrementMs/setSeekForwardIncrementMs
             exoPlayer = new ExoPlayer.Builder(this)
+                    .setTrackSelector(trackSelector)
                     .setSeekBackIncrementMs(10000)
                     .setSeekForwardIncrementMs(10000)
                     .build();
@@ -628,24 +630,7 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
-            // Nút phụ đề
-            btnSubtitle = playerView.findViewById(R.id.btnSubtitle);
-            if (btnSubtitle != null) {
-                updateSubtitleButton();
-                btnSubtitle.setOnClickListener(v -> {
-                    if (exoPlayer != null) {
-                        androidx.media3.ui.TrackSelectionDialogBuilder builder = 
-                            new androidx.media3.ui.TrackSelectionDialogBuilder(
-                                PlayActivity.this,
-                                "Chọn phụ đề",
-                                exoPlayer,
-                                androidx.media3.common.C.TRACK_TYPE_TEXT
-                            );
-                        builder.setTheme(androidx.appcompat.R.style.Theme_AppCompat_Dialog);
-                        builder.build().show();
-                    }
-                });
-            }
+            // Nút phụ đề đã được đổi thành @id/exo_subtitle nên ExoPlayer sẽ tự động quản lý!
 
             // Sự kiện ẩn hiện các controll của video
             playerView.setControllerVisibilityListener(
