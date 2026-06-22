@@ -293,27 +293,38 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chọn tập để chỉnh sửa"
-                <Button
-                    android:id="@+id/btnUploadVideo"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="50dp"
-                    android:backgroundTint="#10B981"
-                    android:text="Upload File MP4"
-                    android:textColor="@color/white"
-                    app:cornerRadius="8dp"/>
-
-                <Button
-                    android:id="@+id/btnUploadDriveVideo"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="#8B5CF6"
-                    android:text="Dán Link Drive"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:id="@+id/btnUploadVideo"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="50dp"
+                        android:backgroundTint="#10B981"
+                        android:text="Upload File MP4"
+                        android:textColor="@color/white"
+                        app:cornerRadius="8dp"/>
+
+                    <Button
+                        android:id="@+id/btnUploadDriveVideo"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#8B5CF6"
+                        android:text="Dán Link Drive"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:cornerRadius="8dp"/>
+                </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvEpisodesAdmin"
@@ -371,19 +382,6 @@
                     android:textStyle="bold"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
-                    app:cornerRadius="8dp"/>
-
-                <Button
-                    android:id="@+id/btnUploadDriveSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="#8B5CF6"
-                    android:text="Link Drive"
-                    android:textColor="@color/white"
-                    app:cornerRadius="8dp"/>
-            </LinearLayout>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -408,6 +406,16 @@
                         android:layout_marginStart="8dp"
                         android:backgroundTint="#3B82F6"
                         android:text="Thêm file SRT"
+                        android:textColor="@color/white"
+                        app:cornerRadius="8dp"/>
+
+                    <Button
+                        android:id="@+id/btnUploadDriveSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#8B5CF6"
+                        android:text="Link Drive"
                         android:textColor="@color/white"
                         app:cornerRadius="8dp"/>
                 </LinearLayout>

@@ -118,7 +118,6 @@ public class AdminMovieController {
         if (request.getTmdbId() != null && mediaRepository.findByTmdbId(request.getTmdbId()).isPresent()) {
             throw new com.example.movie_app_server.common.exception.AppException("Phim này đã tồn tại trong hệ thống!", org.springframework.http.HttpStatus.CONFLICT);
         }
-        Media media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
         media.setVideoUrl(request.getVideoUrl());
         media.setPremium(request.isPremium());
         media.setDeleted(request.isDeleted());
@@ -249,6 +248,12 @@ public class AdminMovieController {
                         .build());
             }
         }
+        
+        if (media.getMediaType() == com.example.movie_app_server.media.entity.enums.MediaType.TV_SERIES) {
+            updateMediaPremiumStatus(media);
+            updateMediaDeletedStatus(media);
+        }
+        
         media = mediaRepository.save(media);
         adminHistoryService.logAction("UPDATE", "MOVIE", media.getId().toString(), "Cập nhật thông tin phim: " + media.getTitle());
         return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
@@ -327,20 +332,7 @@ public class AdminMovieController {
             }
         }
 
-        boolean allDeleted = true;
-        for (Season s : media.getSeasons()) {
-            for (Episode e : s.getEpisodes()) {
-                if (!e.isDeleted()) {
-                    allDeleted = false;
-                    break;
-                }
-            }
-        }
-        if (allDeleted && !media.getSeasons().isEmpty() && !media.getSeasons().get(0).getEpisodes().isEmpty()) {
-            media.setDeleted(true);
-        } else if (!allDeleted && media.isDeleted()) {
-            media.setDeleted(false);
-        }
+        updateMediaDeletedStatus(media);
 
         updateMediaPremiumStatus(media);
         mediaRepository.save(media);
@@ -370,6 +362,23 @@ public class AdminMovieController {
             } else {
                 media.setPremium(false);
             }
+        }
+    }
+
+    private void updateMediaDeletedStatus(Media media) {
+        boolean allDeleted = true;
+        for (Season s : media.getSeasons()) {
+            for (Episode e : s.getEpisodes()) {
+                if (!e.isDeleted()) {
+                    allDeleted = false;
+                    break;
+                }
+            }
+        }
+        if (allDeleted && !media.getSeasons().isEmpty() && !media.getSeasons().get(0).getEpisodes().isEmpty()) {
+            media.setDeleted(true);
+        } else if (!allDeleted && media.isDeleted()) {
+            media.setDeleted(false);
         }
     }
 }
