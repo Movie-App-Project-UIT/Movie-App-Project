@@ -57,6 +57,12 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         }
 
         boolean isViewPrivilege = getIntent().getBooleanExtra("IS_VIEW_PRIVILEGE", false);
+        boolean isFromMyPremium = getIntent().getBooleanExtra("IS_FROM_MY_PREMIUM", false);
+
+        if (isFromMyPremium) {
+            View layoutPlanName = findViewById(R.id.layoutPlanName);
+            if (layoutPlanName != null) layoutPlanName.setVisibility(android.view.View.GONE);
+        }
 
         if (isViewPrivilege) {
             findViewById(R.id.stepper).setVisibility(android.view.View.GONE);
@@ -74,9 +80,16 @@ public class PaymentSuccessActivity extends AppCompatActivity {
                         java.util.Map<String, Object> data = response.body();
                         String planName = (String) data.get("planName");
                         String startIso = (String) data.get("startDate");
+                        String firstStartIso = (String) data.get("firstStartDate");
                         String endIso = (String) data.get("endDate");
 
-                        if (txtPlanName != null && planName != null) txtPlanName.setText(planName);
+                        if (isFromMyPremium) {
+                            View layoutPlanName = findViewById(R.id.layoutPlanName);
+                            if (layoutPlanName != null) layoutPlanName.setVisibility(android.view.View.GONE);
+                            if (firstStartIso != null) startIso = firstStartIso;
+                        } else {
+                            if (txtPlanName != null && planName != null) txtPlanName.setText(planName);
+                        }
 
                         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
                         SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
