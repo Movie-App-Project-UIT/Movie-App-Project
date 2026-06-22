@@ -54,8 +54,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private EditText etTitle, etOverview, etLanguage, etVideoUrl, etGenre, etCountry, etTmdbId, etSubtitleLanguage, etVoteAverage, etExpectedEpisodes;
     private androidx.appcompat.widget.SwitchCompat swPremium, swDeleted;
     private ImageView ivPoster;
-    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadSubtitle, btnViewReviews, btnEditExpectedEpisodes;
-    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadDriveVideo, btnUploadSubtitle, btnUploadDriveSubtitle, btnViewReviews;
+    private Button btnSave, btnLoadTmdb, btnUploadVideo, btnUploadDriveVideo, btnUploadSubtitle, btnUploadDriveSubtitle, btnViewReviews, btnEditExpectedEpisodes;
     private ProgressBar progressBar;
     private RecyclerView rvSubtitles, rvEpisodesAdmin;
     private android.widget.LinearLayout layoutEpisodes, layoutEpisodeDetails;
