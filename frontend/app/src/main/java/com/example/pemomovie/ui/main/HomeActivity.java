@@ -273,122 +273,52 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         View layoutEmptyNotification = popupView.findViewById(R.id.layoutEmptyNotification);
-        View layoutNotificationList = popupView.findViewById(R.id.layoutNotificationList);
-        View layoutNotifExpiring = popupView.findViewById(R.id.layoutNotifExpiring);
-        View layoutNotifAdminGift = popupView.findViewById(R.id.layoutNotifAdminGift);
-        View layoutNotifSuccess = popupView.findViewById(R.id.layoutNotifSuccess);
+        RecyclerView rvDropdownNotifications = popupView.findViewById(R.id.rvDropdownNotifications);
 
-        String currentExpiringMessage = "Gói Premium của bạn sắp hết hạn.";
-
-        // Hiển thị dropdown dựa trên dữ liệu thật từ Database
-        if (hasPremiumNotif || hasAdminGift || hasExpiringNotif) {
+        if (dbNotifications != null && !dbNotifications.isEmpty()) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
-            if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.VISIBLE);
-            if (layoutNotifExpiring != null) layoutNotifExpiring.setVisibility(hasExpiringNotif ? View.VISIBLE : View.GONE);
-            if (layoutNotifAdminGift != null) layoutNotifAdminGift.setVisibility(hasAdminGift ? View.VISIBLE : View.GONE);
-            if (layoutNotifSuccess != null) layoutNotifSuccess.setVisibility(hasPremiumNotif ? View.VISIBLE : View.GONE);
-            
-            String giftTime = "Vừa xong";
-            String successTime = "Vừa xong";
-            String expiringTime = "Vừa xong";
-            for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
-                if (notif.getRead() == null || !notif.getRead()) {
-                    if ("GIFT_RECEIVED".equals(notif.getType())) {
-                        giftTime = getTimeAgo(notif.getCreatedAt());
-                    } else if ("SUBSCRIPTION_NEW_PLAN".equals(notif.getType())) {
-                        successTime = getTimeAgo(notif.getCreatedAt());
-                    } else if ("SUBSCRIPTION_EXPIRING".equals(notif.getType())) {
-                        expiringTime = getTimeAgo(notif.getCreatedAt());
-                        if (notif.getMessage() != null) {
-                            currentExpiringMessage = notif.getMessage();
+            if (rvDropdownNotifications != null) {
+                rvDropdownNotifications.setVisibility(View.VISIBLE);
+                rvDropdownNotifications.setLayoutManager(new LinearLayoutManager(this));
+                
+                // Show up to 5 latest notifications in dropdown
+                List<com.example.pemomovie.dto.NotificationDto> displayList = dbNotifications.size() > 5 
+                        ? dbNotifications.subList(0, 5) 
+                        : dbNotifications;
+                        
+                com.example.pemomovie.adapter.NotificationAdapter adapter = new com.example.pemomovie.adapter.NotificationAdapter(
+                        this,
+                        displayList,
+                        new com.example.pemomovie.adapter.NotificationAdapter.OnNotificationClickListener() {
+                            @Override
+                            public void onNotificationClick(com.example.pemomovie.dto.NotificationDto notification) {
+                                popupWindow.dismiss();
+                                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onActionClick(com.example.pemomovie.dto.NotificationDto notification) {
+                                popupWindow.dismiss();
+                                if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
+                                    showExpiringPremiumBottomSheet(notification.getMessage() != null ? notification.getMessage() : "Gói Premium của bạn sắp hết hạn.");
+                                } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
+                                    Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                                    startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
                         }
-                    }
-                }
+                );
+                rvDropdownNotifications.setAdapter(adapter);
             }
-            
-            TextView tvAdminGiftTime = popupView.findViewById(R.id.tvAdminGiftTime);
-            if (tvAdminGiftTime != null) tvAdminGiftTime.setText(giftTime);
-            
-            TextView tvSuccessTime = popupView.findViewById(R.id.tvSuccessTime);
-            if (tvSuccessTime != null) tvSuccessTime.setText(successTime);
-            
-            TextView tvExpiringTime = popupView.findViewById(R.id.tvExpiringTime);
-            if (tvExpiringTime != null) tvExpiringTime.setText(expiringTime);
-            
-            TextView tvExpiringMessageDropdown = popupView.findViewById(R.id.tvExpiringMessageDropdown);
-            if (tvExpiringMessageDropdown != null) tvExpiringMessageDropdown.setText(currentExpiringMessage);
-            
         } else {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.VISIBLE);
-            if (layoutNotificationList != null) layoutNotificationList.setVisibility(View.GONE);
+            if (rvDropdownNotifications != null) rvDropdownNotifications.setVisibility(View.GONE);
         }
 
-        // Ẩn/hiện đường gạch phân cách ở giữa dựa trên số lượng thông báo hiển thị
-        View dividerExpiring = popupView.findViewById(R.id.dividerExpiring);
-        if (dividerExpiring != null) {
-            dividerExpiring.setVisibility((hasExpiringNotif && (hasAdminGift || hasPremiumNotif)) ? View.VISIBLE : View.GONE);
-        }
-
-        View dividerDropdown = popupView.findViewById(R.id.dividerDropdown);
-        if (dividerDropdown != null) {
-            dividerDropdown.setVisibility((hasAdminGift && hasPremiumNotif) ? View.VISIBLE : View.GONE);
-        }
-
-        final String finalExpiringMsg = currentExpiringMessage;
-
-        if (layoutNotifExpiring != null) {
-            layoutNotifExpiring.setOnClickListener(v -> {
-                popupWindow.dismiss();
-                showExpiringPremiumBottomSheet(finalExpiringMsg);
-            });
-            
-            View btnRenewDropdown = popupView.findViewById(R.id.btnRenewDropdown);
-            if (btnRenewDropdown != null) {
-                btnRenewDropdown.setOnClickListener(v -> {
-                    popupWindow.dismiss();
-                    showExpiringPremiumBottomSheet(finalExpiringMsg);
-                });
-            }
-        }
-
-        if (layoutNotifAdminGift != null) {
-            layoutNotifAdminGift.setOnClickListener(v -> {
-                popupWindow.dismiss();
-                // Mở màn hình chi tiết thông báo để kích hoạt thật
-                Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
-                startActivity(intent);
-            });
-            
-            View btnActivateGift = popupView.findViewById(R.id.btnActivateGift);
-            if (btnActivateGift != null) {
-                btnActivateGift.setOnClickListener(v -> {
-                    popupWindow.dismiss();
-                    Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
-                    startActivity(intent);
-                });
-            }
-        }
-
-        if (layoutNotifSuccess != null) {
-            layoutNotifSuccess.setOnClickListener(v -> {
-                popupWindow.dismiss();
-                Intent intent = new Intent(HomeActivity.this, PaymentSuccessActivity.class);
-                intent.putExtra("IS_VIEW_PRIVILEGE", true);
-                startActivity(intent);
-            });
-        }
-
-        View btnViewPrivileges = popupView.findViewById(R.id.btnViewPrivileges);
-        if (btnViewPrivileges != null) {
-            btnViewPrivileges.setOnClickListener(v -> {
-                popupWindow.dismiss();
-                Intent intent = new Intent(HomeActivity.this, PaymentSuccessActivity.class);
-                intent.putExtra("IS_VIEW_PRIVILEGE", true);
-                startActivity(intent);
-            });
-        }
-
-        // Đánh dấu đã đọc tất cả thông báo thật trong Database
         View tvMarkAsRead = popupView.findViewById(R.id.tvMarkAsRead);
         if (tvMarkAsRead != null) {
             tvMarkAsRead.setOnClickListener(v -> {
