@@ -263,21 +263,7 @@
                 android:enabled="false"
                 android:layout_marginBottom="16dp"/>
                 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Video URL"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
-            <EditText
-                android:id="@+id/etVideoUrl"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_field"
-                android:textColor="@color/white"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="8dp"/>
+
 
             <LinearLayout
                 android:id="@+id/layoutEpisodes"
@@ -297,34 +283,7 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
 
-                    <Button
-                        android:id="@+id/btnUploadVideo"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="50dp"
-                        android:backgroundTint="#10B981"
-                        android:text="Upload File MP4"
-                        android:textColor="@color/white"
-                        app:cornerRadius="8dp"/>
-
-                    <Button
-                        android:id="@+id/btnUploadDriveVideo"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="8dp"
-                        android:backgroundTint="#8B5CF6"
-                        android:text="Dán Link Drive"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:cornerRadius="8dp"/>
-                </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvEpisodesAdmin"
@@ -348,29 +307,41 @@
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
+                <EditText
+                    android:id="@+id/etVideoUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_field"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="8dp"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="16dp">
 
-                    <EditText
-                        android:id="@+id/etVideoUrl"
+                    <Button
+                        android:id="@+id/btnUploadVideo"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="50dp"
-                        android:background="@drawable/bg_input_field"
+                        android:backgroundTint="#10B981"
+                        android:text="Upload File MP4"
                         android:textColor="@color/white"
-                        android:paddingHorizontal="16dp"/>
+                        app:cornerRadius="8dp"/>
 
                     <Button
-                        android:id="@+id/btnUploadVideo"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/btnUploadDriveVideo"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="50dp"
                         android:layout_marginStart="8dp"
-                        android:backgroundTint="#10B981"
-                        android:text="Upload MP4"
+                        android:backgroundTint="#8B5CF6"
+                        android:text="Dán Link Drive"
                         android:textColor="@color/white"
+                        android:textStyle="bold"
                         app:cornerRadius="8dp"/>
                 </LinearLayout>
 
