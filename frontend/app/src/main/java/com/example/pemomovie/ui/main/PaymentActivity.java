@@ -24,9 +24,7 @@ import retrofit2.Response;
 
 public class PaymentActivity extends AppCompatActivity {
 
-    private ConstraintLayout cardPayMomo, cardPayVnpay;
-    private ImageView icCheckMomo, icCheckVnpay;
-    private String selectedMethod = "MOMO"; // Default
+    private String selectedMethod = "VNPAY"; // Chỉ hỗ trợ VNPay
     private Long selectedPlanId = -1L;
     private String selectedPlanName = "";
     private String planPriceStr = "0đ";
@@ -68,16 +66,6 @@ public class PaymentActivity extends AppCompatActivity {
             btnBack.setOnClickListener(v -> finish());
         }
 
-        // Ánh xạ payment methods
-        cardPayMomo = findViewById(R.id.cardPayMomo);
-        cardPayVnpay = findViewById(R.id.cardPayVnpay);
-
-        icCheckMomo = findViewById(R.id.icCheckMomo);
-        icCheckVnpay = findViewById(R.id.icCheckVnpay);
-
-        if (cardPayMomo != null) cardPayMomo.setOnClickListener(v -> selectMethod("MOMO"));
-        if (cardPayVnpay != null) cardPayVnpay.setOnClickListener(v -> selectMethod("VNPAY"));
-
         // Lấy thông tin user hiện tại (email)
         loadUserEmail();
 
@@ -94,32 +82,6 @@ public class PaymentActivity extends AppCompatActivity {
                 intent.putExtra("PAYMENT_METHOD", selectedMethod);
                 startActivity(intent);
             });
-        }
-    }
-
-    private void selectMethod(String method) {
-        selectedMethod = method;
-        
-        // Reset tất cả
-        cardPayMomo.setBackgroundResource(R.drawable.bg_plan_unselected);
-        cardPayVnpay.setBackgroundResource(R.drawable.bg_plan_unselected);
-        
-        icCheckMomo.setImageResource(R.drawable.bg_circle_outline);
-        icCheckMomo.clearColorFilter();
-        icCheckVnpay.setImageResource(R.drawable.bg_circle_outline);
-        icCheckVnpay.clearColorFilter();
-
-        int purpleColor = android.graphics.Color.parseColor("#8B5CF6");
-
-        // Set state cho method được chọn
-        if (method.equals("MOMO")) {
-            cardPayMomo.setBackgroundResource(R.drawable.bg_plan_selected);
-            icCheckMomo.setImageResource(R.drawable.ic_check_circle_filled);
-            icCheckMomo.setColorFilter(purpleColor);
-        } else if (method.equals("VNPAY")) {
-            cardPayVnpay.setBackgroundResource(R.drawable.bg_plan_selected);
-            icCheckVnpay.setImageResource(R.drawable.ic_check_circle_filled);
-            icCheckVnpay.setColorFilter(purpleColor);
         }
     }
 

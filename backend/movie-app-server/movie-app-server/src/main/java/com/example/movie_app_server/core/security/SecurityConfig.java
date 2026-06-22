@@ -42,8 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // 2. WEBHOOK THANH TOÁN (VNPay/MoMo server gọi đến, không có Firebase Token)
-                        .requestMatchers("/api/v1/payments/vnpay-ipn", "/api/v1/payments/momo-ipn", "/api/v1/payments/vnpay-return").permitAll()
+                        // 2. WEBHOOK THANH TOÁN (VNPay server gọi đến, không có Firebase Token)
+                        .requestMatchers("/api/v1/payments/vnpay-ipn", "/api/v1/payments/vnpay-return").permitAll()
 
                         // 3. CÁC API DÀNH RIÊNG CHO ADMIN (Kéo phim, cập nhật phim)
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
