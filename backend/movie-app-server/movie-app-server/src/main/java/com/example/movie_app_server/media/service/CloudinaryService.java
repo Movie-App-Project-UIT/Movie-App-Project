@@ -27,22 +27,23 @@ public class CloudinaryService {
 
     // Hàm upload Video (Dành cho phim)
     public String uploadVideo(MultipartFile file) throws IOException {
+        // Cấu hình tuỳ chỉnh: Chỉ lấy bản gốc (giới hạn ở 720p) và bản 480p
+        String customHlsProfile = "c_limit,w_1280,h_720,vc_h264/c_limit,w_854,h_480,vc_h264/f_m3u8";
+        
         Map uploadResult = cloudinary.uploader().uploadLarge(file.getInputStream(),
                 ObjectUtils.asMap(
                         "resource_type", "video", // BẮT BUỘC: Để Cloudinary biết đây là video và xử lý luồng phát
                         "folder", videoFolder, // Tạo thư mục cho gọn gàng
                         "eager", java.util.Arrays.asList(
-                                new com.cloudinary.EagerTransformation().streamingProfile("hd").format("m3u8")
+                                new com.cloudinary.EagerTransformation().rawTransformation(customHlsProfile)
                         ),
                         "eager_async", true
                 ));
         // Trả về link video dạng m3u8 (Adaptive Bitrate Streaming) thay vì mp4 gốc
         String originalUrl = uploadResult.get("secure_url").toString();
         
-        // Cloudinary trả về link gốc mp4. Ta cần đổi thành định dạng link eager m3u8.
-        // Link gốc: .../video/upload/v123.../movie_app/videos/xyz.mp4
-        // Link HLS: .../video/upload/sp_hd/v123.../movie_app/videos/xyz.m3u8
-        String hlsUrl = originalUrl.replace("/upload/", "/upload/sp_hd/");
+        // Cập nhật lại đường dẫn với cấu hình tuỳ chỉnh
+        String hlsUrl = originalUrl.replace("/upload/", "/upload/" + customHlsProfile + "/");
         hlsUrl = hlsUrl.replaceAll("\\.(mp4|mkv|avi)$", ".m3u8");
         
         return hlsUrl;
