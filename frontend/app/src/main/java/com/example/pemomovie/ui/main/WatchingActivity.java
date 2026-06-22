@@ -50,7 +50,8 @@ public class WatchingActivity extends AppCompatActivity {
 
         RecyclerView rvContinue = findViewById(R.id.rvContinue);
         rvContinue.setLayoutManager(new LinearLayoutManager(this));
-        rvContinue.setAdapter(new WatchingAdapter(true));
+        WatchingAdapter watchingAdapter = new WatchingAdapter(true);
+        rvContinue.setAdapter(watchingAdapter);
     }
     private void showProfileDropdown(View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -133,6 +134,28 @@ public class WatchingActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadHomeProfileAvatar();
+        loadWatchingHistory();
+    }
+
+    private void loadWatchingHistory() {
+        com.example.pemomovie.api.ApiClient.getApiService().getUserHistory().enqueue(new retrofit2.Callback<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>>() {
+            @Override
+            public void onResponse(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, retrofit2.Response<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto> historyList = response.body();
+                    RecyclerView rvContinue = findViewById(R.id.rvContinue);
+                    if (rvContinue != null && rvContinue.getAdapter() instanceof WatchingAdapter) {
+                        WatchingAdapter adapter = (WatchingAdapter) rvContinue.getAdapter();
+                        adapter.setData(historyList);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, Throwable t) {
+                Toast.makeText(WatchingActivity.this, "Lỗi khi tải lịch sử: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadHomeProfileAvatar() {

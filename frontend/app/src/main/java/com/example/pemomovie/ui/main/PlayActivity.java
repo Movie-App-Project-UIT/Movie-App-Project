@@ -66,6 +66,7 @@ public class PlayActivity extends AppCompatActivity {
     private PlayerView playerView;
     private ApiService apiService;
     private Long movieId;
+    private int startPosition = 0;
     private MediaDetailResponse mediaDetail; // Lưu trữ thông tin phim để khôi phục dữ liệu khi xoay màn hình
     private LinearLayout topInfo;
     private boolean viewCountIncremented = false;
@@ -93,6 +94,7 @@ public class PlayActivity extends AppCompatActivity {
         initViews(getResources().getConfiguration().orientation);
 
         movieId = getIntent().getLongExtra("MOVIE_ID", -1L);
+        startPosition = getIntent().getIntExtra("START_POSITION", 0);
         if (movieId != -1L) {
             fetchVideoAndPlay();
         } else {
@@ -257,6 +259,9 @@ public class PlayActivity extends AppCompatActivity {
 
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
+        if (startPosition > 0) {
+            exoPlayer.seekTo(startPosition * 1000L);
+        }
         exoPlayer.play();
         startSavingHistory(); // Bắt đầu đếm giờ và lưu lịch sử xem
 
@@ -723,14 +728,19 @@ public class PlayActivity extends AppCompatActivity {
     private void saveWatchHistory() {
         if (exoPlayer != null && movieId != null) {
             int progressSeconds = (int) (exoPlayer.getCurrentPosition() / 1000);
-            // Hiện tại chỉ hỗ trợ phim lẻ, nếu là phim bộ thì truyền thêm episodeId
-            apiService.updateHistory(new com.example.pemomovie.dto.UpdateHistoryRequest(movieId, null, progressSeconds))
-                    .enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {}
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {}
-                    });
+            int totalDurationSeconds = (int) (exoPlayer.getDuration() / 1000);
+            
+            // Nếu duration hợp lệ (>0) thì mới lưu
+            if (totalDurationSeconds > 0) {
+                // Hiện tại chỉ hỗ trợ phim lẻ, nếu là phim bộ thì truyền thêm episodeId
+                apiService.updateHistory(new com.example.pemomovie.dto.UpdateHistoryRequest(movieId, null, progressSeconds, totalDurationSeconds))
+                        .enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {}
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                        });
+            }
         }
     }
 

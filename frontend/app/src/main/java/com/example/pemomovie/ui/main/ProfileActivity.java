@@ -48,12 +48,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Thiết lập danh sách phim đang xem
-//        RecyclerView rvWatching = findViewById(R.id.rvWatchingMovies);
-//        if (rvWatching != null) {
-//            rvWatching.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-//            rvWatching.setAdapter(new WatchingAdapter());
-//        }
-
+        RecyclerView rvWatching = findViewById(R.id.rvWatchingMovies);
+        if (rvWatching != null) {
+            rvWatching.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            WatchingAdapter watchingAdapter = new WatchingAdapter(false);
+            rvWatching.setAdapter(watchingAdapter);
+        }
         // Set click listener for Back button
         ImageView btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
@@ -180,6 +180,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onResume();
         // Tải lại dữ liệu người dùng mỗi khi màn hình hiển thị (ví dụ: quay lại từ EditProfileActivity)
         loadUserProfile();
+        loadWatchingHistory();
         
         // Cập nhật số lượng phim yêu thích
         TextView txtFavCount = findViewById(R.id.txtFavCount);
@@ -187,6 +188,35 @@ public class ProfileActivity extends AppCompatActivity {
             int favSize = FavoriteManager.getFavorites(this).size();
             txtFavCount.setText(favSize + " phim");
         }
+    }
+
+    private void loadWatchingHistory() {
+        ApiClient.getApiService().getUserHistory().enqueue(new Callback<List<com.example.pemomovie.dto.WatchHistoryItemDto>>() {
+            @Override
+            public void onResponse(Call<List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, Response<List<com.example.pemomovie.dto.WatchHistoryItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<com.example.pemomovie.dto.WatchHistoryItemDto> historyList = response.body();
+                    RecyclerView rvWatching = findViewById(R.id.rvWatchingMovies);
+                    if (rvWatching != null && rvWatching.getAdapter() instanceof WatchingAdapter) {
+                        WatchingAdapter adapter = (WatchingAdapter) rvWatching.getAdapter();
+                        // Chỉ lấy 5 phim gần nhất để hiển thị gọn trên trang cá nhân
+                        List<com.example.pemomovie.dto.WatchHistoryItemDto> displayList = historyList.size() > 5 ? historyList.subList(0, 5) : historyList;
+                        adapter.setData(displayList);
+                        
+                        // Ẩn/hiện toàn bộ khối "Đang xem" dựa trên dữ liệu
+                        View layoutWatching = findViewById(R.id.layoutWatching);
+                        if (layoutWatching != null) {
+                            layoutWatching.setVisibility(displayList.isEmpty() ? View.GONE : View.VISIBLE);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, Throwable t) {
+                // Ignore error silently to not disrupt UI
+            }
+        });
     }
 
     private void loadUserProfile() {

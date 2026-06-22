@@ -218,4 +218,7 @@ public interface ApiService {
 
     @POST("/api/v1/history/update")
     Call<ResponseBody> updateHistory(@Body com.example.pemomovie.dto.UpdateHistoryRequest request);
+
+    @GET("/api/v1/history/me")
+    Call<List<com.example.pemomovie.dto.WatchHistoryItemDto>> getUserHistory();
 }

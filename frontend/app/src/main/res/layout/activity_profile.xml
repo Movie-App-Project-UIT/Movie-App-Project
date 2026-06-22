@@ -444,9 +444,11 @@
 
             <!-- 3. CURRENTLY WATCHING SECTION -->
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutWatching"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
+                android:layout_marginTop="24dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/lblWatching"
@@ -471,29 +473,15 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@id/lblWatching"/>
 
-                <!-- Horizontal Scrollable Movies (Giao diện tĩnh để xem trước) -->
-                <HorizontalScrollView
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvWatchingMovies"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:scrollbars="none"
                     app:layout_constraintTop_toBottomOf="@id/lblWatching"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <!-- Item phim 1 -->
-                        <include layout="@layout/item_watching_movie" />
-
-                        <!-- Item phim 2 (Được lặp lại để tạo cảm giác cuộn) -->
-                        <include layout="@layout/item_watching_movie" />
-
-                    </LinearLayout>
-                </HorizontalScrollView>
+                    app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

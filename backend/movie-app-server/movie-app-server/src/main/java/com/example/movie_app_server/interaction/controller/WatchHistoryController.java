@@ -30,7 +30,8 @@ public class WatchHistoryController {
                     getUid(),
                     request.getMediaId(),
                     request.getEpisodeId(),
-                    request.getProgressSeconds()
+                    request.getProgressSeconds(),
+                    request.getTotalDurationSeconds()
             );
             return ResponseEntity.ok(history);
         } catch (Exception e) {
@@ -48,5 +49,6 @@ public class WatchHistoryController {
         private Long mediaId;
         private Long episodeId; // Có thể null nếu là phim lẻ
         private Integer progressSeconds;
+        private Integer totalDurationSeconds; // Thời lượng thực tế của video
     }
 }
