@@ -40,15 +40,19 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
             holder.btnEpisode.setBackgroundResource(R.drawable.bg_gradient_save_button);
             holder.btnEpisode.setTextColor(Color.WHITE);
         } else {
-            holder.btnEpisode.setBackgroundColor(Color.parseColor("#333333"));
+            holder.btnEpisode.setBackgroundResource(R.drawable.bg_episode_unselected);
             holder.btnEpisode.setTextColor(Color.WHITE);
         }
 
         holder.btnEpisode.setOnClickListener(v -> {
             int previousSelected = selectedPosition;
-            selectedPosition = position;
+            selectedPosition = holder.getAdapterPosition();
             notifyItemChanged(previousSelected);
             notifyItemChanged(selectedPosition);
+            
+            // --- BẮT ĐẦU CODE TEST ---
+            android.widget.Toast.makeText(context, "Đang chọn: " + episodeList.get(selectedPosition), android.widget.Toast.LENGTH_SHORT).show();
+            // --- KẾT THÚC CODE TEST ---
         });
     }
 

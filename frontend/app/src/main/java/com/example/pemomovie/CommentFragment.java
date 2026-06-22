@@ -242,9 +242,7 @@ public class CommentFragment extends Fragment {
         super.onDestroyView();
         if (getActivity() != null) {
             ScrollView svInfo = getActivity().findViewById(R.id.svInfo);
-            FrameLayout detailContainer = getActivity().findViewById(R.id.detailFragmentContainer);
             if (svInfo != null) svInfo.setVisibility(View.VISIBLE);
-            if (detailContainer != null) detailContainer.setVisibility(View.GONE);
         }
     }
 }
