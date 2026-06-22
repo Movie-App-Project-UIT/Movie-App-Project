@@ -24,6 +24,7 @@
             app:tint="@android:color/white" />
 
         <TextView
+            android:id="@+id/tvTopBarTitle"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -175,6 +176,7 @@
 
             <!-- Thông tin gói -->
             <LinearLayout
+                android:id="@+id/layoutPackageInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

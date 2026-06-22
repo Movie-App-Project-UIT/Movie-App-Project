@@ -144,6 +144,9 @@ public interface ApiService {
     @GET("/api/v1/lookups/genres")
     Call<List<com.example.pemomovie.dto.GenreDto>> getGenres();
 
+    @GET("/api/v1/subscriptions/active")
+    Call<java.util.Map<String, Object>> getActiveSubscription();
+
     @GET("/api/v1/lookups/countries")
     Call<List<com.example.pemomovie.dto.CountryDto>> getCountries();
 

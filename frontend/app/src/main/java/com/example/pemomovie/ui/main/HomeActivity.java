@@ -369,7 +369,8 @@ public class HomeActivity extends AppCompatActivity {
         if (layoutNotifSuccess != null) {
             layoutNotifSuccess.setOnClickListener(v -> {
                 popupWindow.dismiss();
-                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                Intent intent = new Intent(HomeActivity.this, PaymentSuccessActivity.class);
+                intent.putExtra("IS_VIEW_PRIVILEGE", true);
                 startActivity(intent);
             });
         }
@@ -378,7 +379,8 @@ public class HomeActivity extends AppCompatActivity {
         if (btnViewPrivileges != null) {
             btnViewPrivileges.setOnClickListener(v -> {
                 popupWindow.dismiss();
-                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                Intent intent = new Intent(HomeActivity.this, PaymentSuccessActivity.class);
+                intent.putExtra("IS_VIEW_PRIVILEGE", true);
                 startActivity(intent);
             });
         }
