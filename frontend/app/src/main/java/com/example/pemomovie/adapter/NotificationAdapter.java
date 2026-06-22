@@ -150,18 +150,48 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 holder.tvBadge.setBackground(badgeDrawable);
                 holder.tvBadge.setVisibility(View.VISIBLE);
 
-                holder.btnAction.setText("Kích hoạt");
-                holder.btnAction.setTextColor(Color.parseColor("#F5D166"));
-                btnDrawable.setColor(Color.parseColor("#332A15")); // Dark gold bg
-                holder.btnAction.setBackground(btnDrawable);
-                holder.btnAction.setVisibility(View.VISIBLE);
+                if (notif.getIsClaimed() != null && notif.getIsClaimed()) {
+                    holder.btnAction.setText("Đã kích hoạt");
+                    holder.btnAction.setTextColor(Color.parseColor("#888888"));
+                    btnDrawable.setColor(Color.parseColor("#333333")); // Dark gray bg
+                    holder.btnAction.setBackground(btnDrawable);
+                    holder.btnAction.setVisibility(View.VISIBLE);
+                    holder.btnAction.setClickable(false);
+                } else {
+                    holder.btnAction.setText("Kích hoạt");
+                    holder.btnAction.setTextColor(Color.parseColor("#F5D166"));
+                    btnDrawable.setColor(Color.parseColor("#332A15")); // Dark gold bg
+                    holder.btnAction.setBackground(btnDrawable);
+                    holder.btnAction.setVisibility(View.VISIBLE);
+                    holder.btnAction.setClickable(true);
+                }
+                break;
+                
+            case "REPLY":
+                holder.ivIcon.setImageResource(R.drawable.ic_chat_bubble_dots);
+                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_gradient_pink);
+                holder.ivIcon.setColorFilter(Color.WHITE);
+                holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#4C1D95")); // Subtle purple border
+                break;
+                
+            case "SYSTEM":
+                holder.ivIcon.setImageResource(R.drawable.ic_megaphone);
+                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_gradient_blue);
+                holder.ivIcon.setColorFilter(Color.WHITE);
+                holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#1E3A8A")); // Subtle dark blue border
                 break;
                 
             default:
                 holder.ivIcon.setImageResource(R.drawable.ic_notification);
-                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_avatar_border);
-                holder.ivIcon.setColorFilter(Color.WHITE);
+                android.graphics.drawable.GradientDrawable defaultIconBg = new android.graphics.drawable.GradientDrawable();
+                defaultIconBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+                defaultIconBg.setColor(Color.parseColor("#4B5563"));
+                holder.ivIcon.setBackground(defaultIconBg);
+                holder.ivIcon.setColorFilter(Color.parseColor("#E5E7EB"));
                 holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#374151"));
                 break;
         }
 
