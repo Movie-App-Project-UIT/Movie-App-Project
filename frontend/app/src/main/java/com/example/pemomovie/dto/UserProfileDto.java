@@ -11,6 +11,9 @@ public class UserProfileDto {
     private boolean isPremium;
     private String role;
     private String tier;
+    private int watchedMoviesCount;
+    private int watchedHours;
+    private int streakDays;
 
     // Getters and setters
     public String getId() { return id; }
@@ -30,4 +33,13 @@ public class UserProfileDto {
     
     public String getTier() { return tier; }
     public void setTier(String tier) { this.tier = tier; }
+
+    public int getWatchedMoviesCount() { return watchedMoviesCount; }
+    public void setWatchedMoviesCount(int watchedMoviesCount) { this.watchedMoviesCount = watchedMoviesCount; }
+    
+    public int getWatchedHours() { return watchedHours; }
+    public void setWatchedHours(int watchedHours) { this.watchedHours = watchedHours; }
+    
+    public int getStreakDays() { return streakDays; }
+    public void setStreakDays(int streakDays) { this.streakDays = streakDays; }
 }

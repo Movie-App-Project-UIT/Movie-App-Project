@@ -334,9 +334,10 @@
                             app:tint="#8B5CF6"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtWatchedCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="0"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
@@ -377,9 +378,10 @@
                             app:tint="#3B82F6"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtWatchedHours"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="50h"
+                            android:text="0h"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
@@ -420,9 +422,10 @@
                             app:tint="#EF4444"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtStreakDays"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12"
+                            android:text="0"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
