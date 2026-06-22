@@ -88,9 +88,8 @@
                     android:id="@+id/btnFavorite"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_heart"
-                    app:tint="@color/btn_nav_selector"/>
+                    android:background="@null"
+                    android:src="@drawable/ic_heart"/>
 
             </LinearLayout>
 

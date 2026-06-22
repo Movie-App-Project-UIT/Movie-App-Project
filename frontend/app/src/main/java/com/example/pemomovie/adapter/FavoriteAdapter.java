@@ -85,6 +85,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
             }
             
             Toast.makeText(context, "Đã bỏ yêu thích phim: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+            
+            // Cập nhật lại giao diện nút tim thành màu xám (unfavorited)
+            holder.btnFavorite.setColorFilter(android.graphics.Color.parseColor("#808080"));
         });
 
         // Bấm vào Thẻ phim để chuyển qua màn hình Chi tiết (DetailActivity)

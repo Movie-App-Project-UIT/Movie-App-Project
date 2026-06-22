@@ -48,6 +48,7 @@ public class DetailActivity extends AppCompatActivity {
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
+
         ScrollView svInfo = findViewById(R.id.svInfo);
         FrameLayout detailContainer = findViewById(R.id.detailFragmentContainer);
 

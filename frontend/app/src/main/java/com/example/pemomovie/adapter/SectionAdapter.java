@@ -48,8 +48,9 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         );
 
         holder.sectionSeeAll.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(context, com.example.pemomovie.ui.main.MovieActivity.class);
-            intent.setFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            android.content.Intent intent = new android.content.Intent(context, com.example.pemomovie.ui.main.SeeAllActivity.class);
+            intent.putExtra("SECTION_TITLE", section.getTitle());
+            intent.putExtra("MOVIE_LIST", new java.util.ArrayList<>(section.getMovies()));
             context.startActivity(intent);
         });
     }
