@@ -64,6 +64,16 @@ public class AdminUploadController {
         return ResponseEntity.ok(subtitleUrl);
     }
 
+    // API Up Video từ Google Drive Link (< 100MB)
+    @PostMapping("/drive-video")
+    public ResponseEntity<String> uploadVideoFromDrive(@RequestParam("driveUrl") String driveUrl) throws Exception {
+        if (driveUrl == null || driveUrl.trim().isEmpty()) {
+            throw new com.example.movie_app_server.common.exception.AppException("Link Drive không được để trống", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        String videoUrl = cloudinaryService.uploadVideoFromDrive(driveUrl);
+        return ResponseEntity.ok(videoUrl);
+    }
+
     private boolean isImage(MultipartFile file) {
         String name = file.getOriginalFilename();
         if (name == null) return false;
