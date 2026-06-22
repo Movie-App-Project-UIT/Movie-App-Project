@@ -77,7 +77,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp">
 
             <!-- Thời gian hiện tại -->
             <TextView
@@ -135,7 +137,9 @@
             app:played_color="#D70466"
             app:scrubber_color="#D70466"
             app:buffered_color="#444444"
-            app:unplayed_color="#888888"/>
+            app:unplayed_color="#888888"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"/>
 
     </LinearLayout>
 

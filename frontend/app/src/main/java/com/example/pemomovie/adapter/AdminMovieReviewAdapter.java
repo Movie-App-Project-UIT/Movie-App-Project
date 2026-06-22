@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.Button;
+import android.widget.Toast;
+import com.example.pemomovie.api.ApiClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminMovieReviewAdapter extends RecyclerView.Adapter<AdminMovieReviewAdapter.ViewHolder> {
     private List<ReviewResponseDto> reviews = new ArrayList<>();
@@ -63,6 +69,73 @@ public class AdminMovieReviewAdapter extends RecyclerView.Adapter<AdminMovieRevi
         } catch (Exception e) {
             holder.tvDate.setText(review.getCreatedAt());
         }
+
+        if (review.getReportCount() > 0) {
+            holder.tvReportCount.setVisibility(View.VISIBLE);
+            holder.tvReportCount.setText("Bị báo cáo: " + review.getReportCount() + " lần");
+        } else {
+            holder.tvReportCount.setVisibility(View.GONE);
+        }
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
+        if (review.getParentId() != null) {
+            params.setMarginStart(120); // indent 120 pixels for replies
+        } else {
+            params.setMarginStart(0);
+        }
+        holder.itemView.setLayoutParams(params);
+
+        holder.btnDelete.setOnClickListener(v -> {
+            android.app.Dialog dialog = new android.app.Dialog(v.getContext());
+            dialog.setContentView(R.layout.dialog_confirm_delete);
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            android.widget.Button btnCancelDelete = dialog.findViewById(R.id.btnCancelDelete);
+            android.widget.Button btnConfirmDelete = dialog.findViewById(R.id.btnConfirmDelete);
+
+            btnCancelDelete.setOnClickListener(v1 -> dialog.dismiss());
+            btnConfirmDelete.setOnClickListener(v1 -> {
+                ApiClient.getApiService().deleteReviewAdmin(review.getId()).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            java.util.Set<Long> idsToRemove = new java.util.HashSet<>();
+                            idsToRemove.add(review.getId());
+                            boolean added;
+                            do {
+                                added = false;
+                                for (ReviewResponseDto r : reviews) {
+                                    if (!idsToRemove.contains(r.getId()) && r.getParentId() != null && idsToRemove.contains(r.getParentId())) {
+                                        idsToRemove.add(r.getId());
+                                        added = true;
+                                    }
+                                }
+                            } while (added);
+
+                            java.util.Iterator<ReviewResponseDto> iterator = reviews.iterator();
+                            while (iterator.hasNext()) {
+                                if (idsToRemove.contains(iterator.next().getId())) {
+                                    iterator.remove();
+                                }
+                            }
+                            notifyDataSetChanged();
+                            Toast.makeText(v.getContext(), "Đã xóa bình luận", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(v.getContext(), "Lỗi khi xóa", Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(v.getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+            });
+            dialog.show();
+        });
     }
 
     @Override
@@ -72,7 +145,8 @@ public class AdminMovieReviewAdapter extends RecyclerView.Adapter<AdminMovieRevi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivAvatar;
-        TextView tvUsername, tvDate, tvContent;
+        TextView tvUsername, tvDate, tvContent, tvReportCount;
+        android.widget.ImageButton btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +154,8 @@ public class AdminMovieReviewAdapter extends RecyclerView.Adapter<AdminMovieRevi
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvContent = itemView.findViewById(R.id.tvContent);
+            tvReportCount = itemView.findViewById(R.id.tvReportCount);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

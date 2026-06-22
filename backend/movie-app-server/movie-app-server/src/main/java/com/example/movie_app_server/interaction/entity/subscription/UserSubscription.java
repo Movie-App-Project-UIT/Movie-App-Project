@@ -39,7 +39,7 @@ public class UserSubscription {
     private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     @Builder.Default
     private SubscriptionStatus status = SubscriptionStatus.ACTIVE;
 

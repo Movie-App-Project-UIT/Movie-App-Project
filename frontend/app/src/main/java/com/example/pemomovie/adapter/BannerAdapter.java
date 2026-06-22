@@ -43,7 +43,6 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
         int realPosition = position % bannerMovies.size();
         MediaItemDto movie = bannerMovies.get(realPosition);
         
-        holder.movieTitle.setText(movie.getTitle());
         
         Glide.with(context)
              .load(movie.getPosterUrl())
@@ -58,12 +57,10 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     public static class BannerViewHolder extends RecyclerView.ViewHolder {
         ImageView bannerImage;
-        TextView movieTitle;
 
         public BannerViewHolder(@NonNull View itemView) {
             super(itemView);
             bannerImage = itemView.findViewById(R.id.bannerImage);
-            movieTitle = itemView.findViewById(R.id.movieTitle);
         }
     }
 }

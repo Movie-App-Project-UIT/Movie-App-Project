@@ -783,7 +783,7 @@
                             android:id="@+id/icSubtitles"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_subtitles"
+                            android:src="@drawable/ic_subtitle"
                             app:tint="#8B5CF6"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"

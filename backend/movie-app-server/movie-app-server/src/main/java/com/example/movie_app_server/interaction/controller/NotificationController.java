@@ -15,6 +15,23 @@ import java.util.Map;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final com.example.movie_app_server.user.repository.UserRepository userRepository;
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Notification>> getMyNotifications() {
+        String uid = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByFirebaseUid(uid)
+                .map(user -> ResponseEntity.ok(notificationService.getUserNotifications(user.getId())))
+                .orElse(ResponseEntity.status(401).build());
+    }
+
+    @GetMapping("/my/unread-count")
+    public ResponseEntity<Map<String, Long>> getMyUnreadCount() {
+        String uid = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByFirebaseUid(uid)
+                .map(user -> ResponseEntity.ok(Map.of("unreadCount", notificationService.countUnreadNotifications(user.getId()))))
+                .orElse(ResponseEntity.status(401).build());
+    }
 
     // Lấy danh sách thông báo của User
     @GetMapping("/{userId}")

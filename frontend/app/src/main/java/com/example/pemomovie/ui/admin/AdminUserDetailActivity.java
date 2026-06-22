@@ -3,9 +3,11 @@ package com.example.pemomovie.ui.admin;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.stream.Collectors;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -33,6 +35,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
     private View cardPremiumInfo;
     private TextView txtPlanName, txtPlanEndDate, txtNoReviews;
     private SwitchMaterial switchStatus;
+    private CheckBox cbFilterReported;
     private RecyclerView rvReviews;
     private AdminUserReviewAdapter reviewAdapter;
     private ApiService apiService;
@@ -76,8 +79,13 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         txtNoReviews = findViewById(R.id.txtNoReviews);
         rvReviews = findViewById(R.id.rvReviews);
         switchStatus = findViewById(R.id.switchStatus);
+        cbFilterReported = findViewById(R.id.cbFilterReported);
 
         btnBack.setOnClickListener(v -> finish());
+        
+        cbFilterReported.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applyReviewFilter();
+        });
 
         rvReviews.setLayoutManager(new LinearLayoutManager(this));
         reviewAdapter = new AdminUserReviewAdapter();
@@ -143,11 +151,23 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         if (currentUser.getReviews() != null && !currentUser.getReviews().isEmpty()) {
             txtNoReviews.setVisibility(View.GONE);
             rvReviews.setVisibility(View.VISIBLE);
-            reviewAdapter.setReviews(currentUser.getReviews());
+            applyReviewFilter();
         } else {
             txtNoReviews.setVisibility(View.VISIBLE);
             rvReviews.setVisibility(View.GONE);
         }
+    }
+    
+    private void applyReviewFilter() {
+        if (currentUser == null || currentUser.getReviews() == null) return;
+        java.util.List<AdminUserDetailDto.ReviewDto> filteredList = new java.util.ArrayList<>(currentUser.getReviews());
+        if (cbFilterReported.isChecked()) {
+            filteredList = filteredList.stream()
+                .filter(r -> r.getReportCount() > 0)
+                .sorted((r1, r2) -> Long.compare(r2.getReportCount(), r1.getReportCount()))
+                .collect(Collectors.toList());
+        }
+        reviewAdapter.setReviews(filteredList);
     }
     
     private void updateStatusLabel() {

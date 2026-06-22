@@ -6,6 +6,7 @@ import com.example.movie_app_server.interaction.entity.Review;
 import com.example.movie_app_server.interaction.entity.enums.SubscriptionStatus;
 import com.example.movie_app_server.interaction.entity.subscription.UserSubscription;
 import com.example.movie_app_server.interaction.repository.ReviewRepository;
+import com.example.movie_app_server.interaction.repository.ReviewReportRepository;
 import com.example.movie_app_server.interaction.repository.UserSubscriptionRepository;
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
@@ -25,6 +26,7 @@ public class AdminUserController {
     private final UserRepository userRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final AdminHistoryService adminHistoryService;
 
     @GetMapping
@@ -66,11 +68,16 @@ public class AdminUserController {
             }
 
             List<Review> reviews = reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
-            List<ReviewResponseDto> reviewDtos = reviews.stream().map(r -> ReviewResponseDto.builder()
-                    .id(r.getId())
-                    .content(r.getContent())
-                    .createdAt(r.getCreatedAt())
-                    .build()).collect(Collectors.toList());
+            List<ReviewResponseDto> reviewDtos = reviews.stream().map(r -> {
+                long reportCount = reviewReportRepository.countByReviewId(r.getId());
+                return ReviewResponseDto.builder()
+                        .id(r.getId())
+                        .parentId(r.getParent() != null ? r.getParent().getId() : null)
+                        .content(r.getContent())
+                        .createdAt(r.getCreatedAt())
+                        .reportCount(reportCount)
+                        .build();
+            }).collect(Collectors.toList());
             
             builder.reviews(reviewDtos);
 

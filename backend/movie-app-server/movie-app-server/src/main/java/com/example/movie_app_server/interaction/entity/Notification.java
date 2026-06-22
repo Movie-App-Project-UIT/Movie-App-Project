@@ -33,7 +33,7 @@ public class Notification {
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private NotificationType type;
 
     @Column(name = "is_read", nullable = false)
@@ -46,4 +46,7 @@ public class Notification {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Transient
+    private Boolean isClaimed;
 }

@@ -41,54 +41,29 @@ public class DetailActivity extends AppCompatActivity {
             return insets;
         });
 
-        //tạo màu linear cho IMDb
-        TextView txtIMDb = findViewById(R.id.txt_IMDb);
-        Shader textShader = new LinearGradient(0, 0, 0, txtIMDb.getTextSize(),
-                new int[]{Color.parseColor("#6C29D6"), Color.parseColor("#F43393")}, null, Shader.TileMode.CLAMP);
-
-        txtIMDb.getPaint().setShader(textShader);
 
 
-        // Xem video
-        ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
-        btnPlay.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
-//            intent.putExtra("MOVIE_ID", bannerMovie.getId());
-//            startActivity(intent);
-        });
 
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
         ScrollView svInfo = findViewById(R.id.svInfo);
         FrameLayout detailContainer = findViewById(R.id.detailFragmentContainer);
 
         // màn hình bình luận
-        ImageButton btnComment = findViewById(R.id.btnComment);
+        android.widget.ImageView btnComment = findViewById(R.id.btnComment);
         btnComment.setOnClickListener(v -> {
 
             //ẩn phần dưới poster để hiển thị fragment
             svInfo.setVisibility(View.GONE);
             detailContainer.setVisibility(View.VISIBLE);
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(
-                            R.anim.slide_up,
-                            0
-                    )
-                    .replace(
-                            R.id.detailFragmentContainer,
-                            new CommentFragment()
-                    )
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        // màn hình đánh giá
-        ImageButton btnRate = findViewById(R.id.btnRate);
-        btnRate.setOnClickListener(v -> {
-
-            //ẩn phần dưới poster để hiển thị fragment
-            svInfo.setVisibility(View.GONE);
-            detailContainer.setVisibility(View.VISIBLE);
+            Long currentMovieId = getIntent().getLongExtra("MOVIE_ID", -1);
+            CommentFragment commentFragment = new CommentFragment();
+            Bundle bundle = new Bundle();
+            bundle.putLong("MEDIA_ID", currentMovieId);
+            commentFragment.setArguments(bundle);
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -98,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
                     )
                     .replace(
                             R.id.detailFragmentContainer,
-                            new RateFragment()
+                            commentFragment
                     )
                     .addToBackStack(null)
                     .commit();
@@ -143,21 +118,75 @@ public class DetailActivity extends AppCompatActivity {
         animator.start();
     }
 
+    private java.util.List<com.example.pemomovie.dto.MediaItemDto> similarMovies = new java.util.ArrayList<>();
+    private PosterAdapter similarAdapter;
+    private com.example.pemomovie.adapter.EpisodeAdapter episodeAdapter;
+    private boolean isMovie = true;
+
     // list poster
     private void showSuggestionList(){
-        // hiển thị list poster theo 2 poster mỗi hàng
-        rvContent.setLayoutManager(new GridLayoutManager(this, 2));
+        rvContent.setLayoutManager(new GridLayoutManager(this, 3));
+        if (similarAdapter == null) {
+            similarAdapter = new PosterAdapter(this, similarMovies);
+        }
+        rvContent.setAdapter(similarAdapter);
+    }
 
-        //adapter....
+    private void loadSimilarMovies(String genreName) {
+        com.example.pemomovie.api.ApiClient.getApiService().getGenres().enqueue(new retrofit2.Callback<java.util.List<com.example.pemomovie.dto.GenreDto>>() {
+            @Override
+            public void onResponse(retrofit2.Call<java.util.List<com.example.pemomovie.dto.GenreDto>> call, retrofit2.Response<java.util.List<com.example.pemomovie.dto.GenreDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Long genreId = null;
+                    for (com.example.pemomovie.dto.GenreDto genre : response.body()) {
+                        if (genre.getName().equalsIgnoreCase(genreName)) {
+                            genreId = genre.getId();
+                            break;
+                        }
+                    }
+                    if (genreId != null) {
+                        fetchMoviesByGenre(genreId);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<java.util.List<com.example.pemomovie.dto.GenreDto>> call, Throwable t) {}
+        });
+    }
+
+    private void fetchMoviesByGenre(Long genreId) {
+        com.example.pemomovie.api.ApiClient.getApiService().filterMedia(null, genreId, null, null, null, null, null, 0, 10).enqueue(new retrofit2.Callback<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> call, retrofit2.Response<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    similarMovies.clear();
+                    similarMovies.addAll(response.body().getContent());
+                    if (rvContent.getAdapter() == similarAdapter) {
+                        similarAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> call, Throwable t) {}
+        });
     }
 
     // list episode
-    private  void showEpisodeList(){
-        // kiểm tra điều kiện nếu là phim bộ thì hiển thị tập phim
-
-        // hiển thị list ập phim theo 3 tập mỗi hàng
+    private void showEpisodeList(){
         rvContent.setLayoutManager(new GridLayoutManager(this, 3));
-        //adapter...
+        if (episodeAdapter == null) {
+            java.util.List<String> episodes = new java.util.ArrayList<>();
+            if (isMovie) {
+                episodes.add("Tập 1");
+            } else {
+                // If it's a series, mock some episodes for now
+                for (int i = 1; i <= 10; i++) {
+                    episodes.add("Tập " + i);
+                }
+            }
+            episodeAdapter = new com.example.pemomovie.adapter.EpisodeAdapter(this, episodes);
+        }
+        rvContent.setAdapter(episodeAdapter);
     }
 
 
@@ -180,32 +209,53 @@ public class DetailActivity extends AppCompatActivity {
 
     private void bindDataToUi(com.example.pemomovie.dto.MediaDetailResponse detail) {
         android.widget.ImageView ivBackdrop = findViewById(R.id.ivBackdrop);
-        TextView txtIMDb = findViewById(R.id.txt_IMDb);
         TextView txtVIP = findViewById(R.id.txt_VIP);
         TextView tvTitle = findViewById(R.id.tvTitle);
-        TextView tvYear = findViewById(R.id.tvYear);
         TextView tvStartRanking = findViewById(R.id.tvStartRanking);
         TextView tvDuration = findViewById(R.id.tvDuration);
-        TextView tvView = findViewById(R.id.tvView);
         TextView tvMediaType = findViewById(R.id.tvMediaType);
         TextView tvCountry = findViewById(R.id.tvCountry);
         TextView tvGenre = findViewById(R.id.tvGenre);
         TextView tvDesc = findViewById(R.id.tvDesc);
+        TextView tvDirector = findViewById(R.id.tvDirector);
+        TextView tvCast = findViewById(R.id.tvCast);
 
         tvTitle.setText(detail.getTitle());
-        tvYear.setText(detail.getReleaseYear() != null ? String.valueOf(detail.getReleaseYear()) : "N/A");
         tvStartRanking.setText(String.format(java.util.Locale.US, "%.1f/10", detail.getVoteAverage()));
-        txtIMDb.setText(String.format(java.util.Locale.US, "IMDb %.1f", detail.getVoteAverage()));
         tvDuration.setText(detail.getDuration() != null ? detail.getDuration() + " phút" : "N/A");
-        tvView.setText(detail.getViewCount() != null ? detail.getViewCount() + " lượt xem" : "N/A");
-        String genresStr = detail.getGenres() != null ? String.join(", ", detail.getGenres()) : "N/A";
+        
+        if (detail.getDirectors() != null && !detail.getDirectors().isEmpty()) {
+            java.util.List<String> dNames = new java.util.ArrayList<>();
+            for (com.example.pemomovie.dto.CreditDto c : detail.getDirectors()) dNames.add(c.getName());
+            tvDirector.setText(String.join(", ", dNames));
+        } else {
+            tvDirector.setText("N/A");
+        }
+
+        if (detail.getCast() != null && !detail.getCast().isEmpty()) {
+            java.util.List<String> cNames = new java.util.ArrayList<>();
+            for (com.example.pemomovie.dto.CreditDto c : detail.getCast()) cNames.add(c.getName());
+            tvCast.setText(String.join(", ", cNames));
+        } else {
+            tvCast.setText("N/A");
+        }
+
+        String genresStr = detail.getGenres() != null ? String.join(", ", detail.getGenres()).replace("Phim ", "").replace("phim ", "") : "N/A";
         tvMediaType.setText(genresStr);
         tvCountry.setText(detail.getCountryName() != null ? detail.getCountryName() : "N/A");
         tvGenre.setText(detail.getLanguage());
         tvDesc.setText(detail.getOverview());
 
         //thêm nếu là phim lẻ thì không hiển thị tabEpisode
-
+        isMovie = "MOVIE".equalsIgnoreCase(detail.getMediaType());
+        TextView tabEpisode = findViewById(R.id.tabEpisode);
+        if (isMovie) {
+            tabEpisode.setVisibility(android.view.View.GONE);
+        } else {
+            tabEpisode.setVisibility(android.view.View.VISIBLE);
+        }
+        TextView tabSuggestion = findViewById(R.id.tabSuggestion);
+        tabSuggestion.post(() -> animateIndicatorTo(tabSuggestion));
         if (detail.isPremium()) {
             txtVIP.setVisibility(android.view.View.VISIBLE);
         } else {
@@ -223,7 +273,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         // Xử lý nút Yêu thích (Tym)
-        ImageButton btnFavorite = findViewById(R.id.btnFavorite);
+        android.widget.ImageView btnFavorite = findViewById(R.id.btnFavorite);
         if (btnFavorite != null) {
             // Chuyển MediaDetailResponse sang MediaItemDto để lưu
             com.example.pemomovie.dto.MediaItemDto currentMovie = new com.example.pemomovie.dto.MediaItemDto();
@@ -254,6 +304,20 @@ public class DetailActivity extends AppCompatActivity {
                     android.widget.Toast.makeText(this, "Đã bỏ yêu thích", android.widget.Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
+        ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+        if (btnPlay != null) {
+            btnPlay.setOnClickListener(v -> {
+                Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                intent.putExtra("MOVIE_ID", detail.getId());
+                startActivity(intent);
+            });
+        }
+        
+        // Cập nhật tab gợi ý tương tự dựa trên genre đầu tiên
+        if (detail.getGenres() != null && !detail.getGenres().isEmpty()) {
+            loadSimilarMovies(detail.getGenres().get(0));
         }
     }
 }

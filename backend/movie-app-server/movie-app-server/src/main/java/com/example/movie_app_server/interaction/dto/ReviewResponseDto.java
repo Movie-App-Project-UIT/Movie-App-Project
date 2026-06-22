@@ -14,5 +14,8 @@ public class ReviewResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private UserSummaryDto user; // Chỉ chứa tên và avatar
+    private Long parentId;
+    private String parentUsername;
+    private long reportCount;
     private List<ReviewResponseDto> replies; // Đệ quy để hiển thị các câu trả lời
 }
