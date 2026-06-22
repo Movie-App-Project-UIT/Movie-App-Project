@@ -61,7 +61,7 @@ public class AdminMovieController {
     }
 
     @GetMapping("/preview-tmdb")
-    public ResponseEntity<MediaDetailResponse> previewFromTmdb(@RequestParam Integer tmdbId, @RequestParam(required = false) String type) {
+    public ResponseEntity<?> previewFromTmdb(@RequestParam Integer tmdbId, @RequestParam(required = false) String type) {
         try {
             Media media;
             if ("TV_SERIES".equalsIgnoreCase(type)) {
@@ -76,10 +76,10 @@ public class AdminMovieController {
                 }
             }
             return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
-        } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
-            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            java.io.StringWriter sw = new java.io.StringWriter();
+            e.printStackTrace(new java.io.PrintWriter(sw));
+            return ResponseEntity.internalServerError().body(sw.toString());
         }
     }
 
@@ -88,21 +88,16 @@ public class AdminMovieController {
     @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<MediaDetailResponse> createMovie(@RequestBody AdminMovieSaveRequest request) {
         Media media;
-        try {
-            if ("TV_SERIES".equalsIgnoreCase(request.getMediaType())) {
-                media = tmdbSyncService.previewTvSeriesFromTmdb(request.getTmdbId());
-            } else if ("MOVIE".equalsIgnoreCase(request.getMediaType())) {
+        if ("TV_SERIES".equalsIgnoreCase(request.getMediaType())) {
+            media = tmdbSyncService.previewTvSeriesFromTmdb(request.getTmdbId());
+        } else if ("MOVIE".equalsIgnoreCase(request.getMediaType())) {
+            media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
+        } else {
+            try {
                 media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
-            } else {
-                try {
-                    media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
-                } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
-                    media = tmdbSyncService.previewTvSeriesFromTmdb(request.getTmdbId());
-                }
+            } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
+                media = tmdbSyncService.previewTvSeriesFromTmdb(request.getTmdbId());
             }
-        } catch (Exception e) {
-            media = new Media();
-            media.setTmdbId(request.getTmdbId());
         }
         
         if (request.getMediaType() != null) {
@@ -169,6 +164,8 @@ public class AdminMovieController {
                 media.setVoteAverage(freshTmdb.getVoteAverage());
                 media.setReleaseDate(freshTmdb.getReleaseDate());
                 media.setCountry(freshTmdb.getCountry());
+                media.setDuration(freshTmdb.getDuration());
+                media.setTrailerUrl(freshTmdb.getTrailerUrl());
                 
                 if (request.getMediaType() != null) {
                     media.setMediaType(com.example.movie_app_server.media.entity.enums.MediaType.valueOf(request.getMediaType()));
