@@ -50,7 +50,7 @@ public class User {
     @Builder.Default
     private boolean isActive = true;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

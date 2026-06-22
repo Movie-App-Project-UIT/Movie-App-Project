@@ -34,7 +34,7 @@ public class Banner {
     @Builder.Default
     private Boolean isActive = true;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

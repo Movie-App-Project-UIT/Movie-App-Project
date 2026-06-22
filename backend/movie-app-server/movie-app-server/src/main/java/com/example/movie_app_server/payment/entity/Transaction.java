@@ -43,7 +43,7 @@ public class Transaction {
     @Builder.Default
     private String status = "PENDING"; // PENDING, SUCCESS, FAILED
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
