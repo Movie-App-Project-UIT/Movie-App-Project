@@ -82,7 +82,7 @@ public class MediaService {
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByIdDesc().stream()
+        List<MediaItemDto> recentlyAdded = mediaRepository.findTop10ByIsDeletedFalseOrderByCreatedAtDesc().stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 

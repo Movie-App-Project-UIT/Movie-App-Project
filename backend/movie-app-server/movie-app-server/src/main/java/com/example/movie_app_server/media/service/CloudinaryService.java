@@ -30,10 +30,22 @@ public class CloudinaryService {
         Map uploadResult = cloudinary.uploader().uploadLarge(file.getInputStream(),
                 ObjectUtils.asMap(
                         "resource_type", "video", // BẮT BUỘC: Để Cloudinary biết đây là video và xử lý luồng phát
-                        "folder", videoFolder // Tạo thư mục cho gọn gàng
+                        "folder", videoFolder, // Tạo thư mục cho gọn gàng
+                        "eager", java.util.Arrays.asList(
+                                new com.cloudinary.EagerTransformation().streamingProfile("hd").format("m3u8")
+                        ),
+                        "eager_async", true
                 ));
-        // Trả về link video (secure_url là link https)
-        return uploadResult.get("secure_url").toString();
+        // Trả về link video dạng m3u8 (Adaptive Bitrate Streaming) thay vì mp4 gốc
+        String originalUrl = uploadResult.get("secure_url").toString();
+        
+        // Cloudinary trả về link gốc mp4. Ta cần đổi thành định dạng link eager m3u8.
+        // Link gốc: .../video/upload/v123.../movie_app/videos/xyz.mp4
+        // Link HLS: .../video/upload/sp_hd/v123.../movie_app/videos/xyz.m3u8
+        String hlsUrl = originalUrl.replace("/upload/", "/upload/sp_hd/");
+        hlsUrl = hlsUrl.replaceAll("\\.(mp4|mkv|avi)$", ".m3u8");
+        
+        return hlsUrl;
     }
 
     // Hàm upload file phụ đề (Dành cho .vtt, .srt)
