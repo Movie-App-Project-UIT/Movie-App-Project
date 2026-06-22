@@ -19,6 +19,13 @@ public class ApiClient {
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(new AuthInterceptor())
+                    .addInterceptor(chain -> {
+                        okhttp3.Request original = chain.request();
+                        okhttp3.Request request = original.newBuilder()
+                                .header("ngrok-skip-browser-warning", "true")
+                                .build();
+                        return chain.proceed(request);
+                    })
                     .addInterceptor(logging)
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
