@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class WatchHistoryItemDto {
     private Long id;
     private Integer progressSeconds; // Số giây đã xem (để vẽ thanh màu đỏ dưới ảnh)
+    private Integer totalDurationSeconds; // Độ dài thực tế của video để chia % chính xác
     private LocalDateTime lastWatchedAt;
     private MediaItemDto media;
 

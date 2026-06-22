@@ -26,7 +26,7 @@ public class WatchHistoryService {
     private final com.example.movie_app_server.media.service.MediaService mediaService;
 
     @Transactional
-    public com.example.movie_app_server.interaction.dto.WatchHistoryItemDto updateHistory(String firebaseUid, Long mediaId, Long episodeId, Integer progressSeconds) {
+    public com.example.movie_app_server.interaction.dto.WatchHistoryItemDto updateHistory(String firebaseUid, Long mediaId, Long episodeId, Integer progressSeconds, Integer totalDurationSeconds) {
         User user = userRepository.findByFirebaseUid(firebaseUid)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Media media = mediaRepository.findById(mediaId)
@@ -49,12 +49,14 @@ public class WatchHistoryService {
         if (existingHistory.isPresent()) {
             history = existingHistory.get();
             history.setProgressSeconds(progressSeconds);
+            if (totalDurationSeconds != null) history.setTotalDurationSeconds(totalDurationSeconds);
         } else {
             history = WatchHistory.builder()
                     .user(user)
                     .media(media)
                     .episode(episode)
                     .progressSeconds(progressSeconds)
+                    .totalDurationSeconds(totalDurationSeconds)
                     .build();
         }
 
@@ -74,6 +76,7 @@ public class WatchHistoryService {
         return com.example.movie_app_server.interaction.dto.WatchHistoryItemDto.builder()
                 .id(h.getId())
                 .progressSeconds(h.getProgressSeconds())
+                .totalDurationSeconds(h.getTotalDurationSeconds())
                 .lastWatchedAt(h.getLastWatchedAt())
                 .media(mediaService.convertToItemDto(h.getMedia()))
                 .episode(h.getEpisode() != null ? mediaService.convertToEpisodeDto(h.getEpisode()) : null)

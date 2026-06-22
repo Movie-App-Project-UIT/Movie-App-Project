@@ -113,4 +113,8 @@ public class MediaItemDto implements Serializable {
 
     public Long getHiddenByGenreId() { return hiddenByGenreId; }
     public void setHiddenByGenreId(Long hiddenByGenreId) { this.hiddenByGenreId = hiddenByGenreId; }
+
+    private Integer duration;
+    public Integer getDuration() { return duration; }
+    public void setDuration(Integer duration) { this.duration = duration; }
 }

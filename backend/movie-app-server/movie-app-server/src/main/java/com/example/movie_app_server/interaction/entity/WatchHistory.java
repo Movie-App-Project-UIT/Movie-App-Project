@@ -40,6 +40,9 @@ public class WatchHistory {
     @Builder.Default
     private Integer progressSeconds = 0;
 
+    @Column(name = "total_duration_seconds")
+    private Integer totalDurationSeconds;
+
     @UpdateTimestamp
     @Column(name = "last_watched_at", nullable = false)
     private LocalDateTime lastWatchedAt;
