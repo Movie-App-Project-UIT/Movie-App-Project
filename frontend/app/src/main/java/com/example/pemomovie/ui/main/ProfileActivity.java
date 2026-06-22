@@ -257,6 +257,22 @@ public class ProfileActivity extends AppCompatActivity {
                         if (layoutUpgradePremium != null) layoutUpgradePremium.setVisibility(View.VISIBLE);
                         if (btnMyPremium != null) btnMyPremium.setVisibility(View.GONE);
                     }
+                    
+                    // Cập nhật thống kê: Phim đã xem, Giờ xem, Ngày liên tiếp
+                    TextView txtWatchedCount = findViewById(R.id.txtWatchedCount);
+                    if (txtWatchedCount != null) {
+                        txtWatchedCount.setText(String.valueOf(profile.getWatchedMoviesCount()));
+                    }
+                    
+                    TextView txtWatchedHours = findViewById(R.id.txtWatchedHours);
+                    if (txtWatchedHours != null) {
+                        txtWatchedHours.setText(profile.getWatchedHours() + "h");
+                    }
+                    
+                    TextView txtStreakDays = findViewById(R.id.txtStreakDays);
+                    if (txtStreakDays != null) {
+                        txtStreakDays.setText(String.valueOf(profile.getStreakDays()));
+                    }
                 }
             }
 

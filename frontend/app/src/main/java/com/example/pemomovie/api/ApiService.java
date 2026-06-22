@@ -216,4 +216,6 @@ public interface ApiService {
     @POST("/api/v1/reviews/{id}/report")
     Call<Void> reportReview(@retrofit2.http.Path("id") Long id, @Body java.util.Map<String, String> payload);
 
+    @POST("/api/v1/history/update")
+    Call<ResponseBody> updateHistory(@Body com.example.pemomovie.dto.UpdateHistoryRequest request);
 }
