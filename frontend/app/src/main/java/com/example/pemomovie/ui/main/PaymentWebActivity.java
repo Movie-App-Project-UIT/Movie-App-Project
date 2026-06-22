@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.content.Intent;
 import android.net.Uri;
+import java.util.HashMap;
+import java.util.Map;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -45,11 +47,20 @@ public class PaymentWebActivity extends AppCompatActivity {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         webView.setWebViewClient(new WebViewClient() {
+            private String lastInterceptedUrl = "";
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("http://") || url.startsWith("https://")) {
-                    view.loadUrl(url);
+                if (url.contains("ngrok-free.dev") && !url.equals(lastInterceptedUrl)) {
+                    lastInterceptedUrl = url;
+                    view.post(() -> {
+                        Map<String, String> extraHeaders = new HashMap<>();
+                        extraHeaders.put("ngrok-skip-browser-warning", "true");
+                        view.loadUrl(url, extraHeaders);
+                    });
                     return true;
+                } else if (url.startsWith("http://") || url.startsWith("https://")) {
+                    return false;
                 } else {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -66,7 +77,9 @@ public class PaymentWebActivity extends AppCompatActivity {
 
         String paymentUrl = getIntent().getStringExtra("PAYMENT_URL");
         if (paymentUrl != null && !paymentUrl.isEmpty()) {
-            webView.loadUrl(paymentUrl);
+            Map<String, String> extraHeaders = new HashMap<>();
+            extraHeaders.put("ngrok-skip-browser-warning", "true");
+            webView.loadUrl(paymentUrl, extraHeaders);
         } else {
             Toast.makeText(this, "URL không hợp lệ", Toast.LENGTH_SHORT).show();
             finish();
