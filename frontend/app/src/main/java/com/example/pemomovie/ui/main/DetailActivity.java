@@ -103,6 +103,9 @@ public class DetailActivity extends AppCompatActivity {
 
         com.example.pemomovie.utils.NavigationHelper.setupBottomNavigation(this);
         
+        // Khởi tạo thanh tìm kiếm chung
+        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
+        
         Long movieId = getIntent().getLongExtra("MOVIE_ID", -1);
         if (movieId != -1) {
             loadMovieDetails(movieId);

@@ -15,33 +15,12 @@
         android:padding="12dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Thanh tìm kiếm -->
-        <LinearLayout
+        <!-- Thanh tìm kiếm dùng chung -->
+        <include
+            android:id="@+id/globalHeaderInclude"
+            layout="@layout/layout_global_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/bg_input_field"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp">
-            
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_search"
-                app:tint="#AAAAAA"/>
-
-            <EditText
-                android:id="@+id/edtSearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Tìm kiếm trên PeMo"
-                android:textSize="14sp"
-                android:background="@null"
-                android:paddingVertical="10dp"
-                android:paddingStart="8dp"
-                android:textColorHint="#AAAAAA"
-                android:textColor="#FFFFFF"/>
-        </LinearLayout>
+            android:layout_height="wrap_content" />
 
         <!-- TabLayout cho Định dạng phim -->
         <com.google.android.material.tabs.TabLayout

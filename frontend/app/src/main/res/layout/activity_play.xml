@@ -7,6 +7,13 @@
     android:orientation="vertical"
     android:background="#000000">
 
+    <include
+        android:id="@+id/globalHeaderInclude"
+        layout="@layout/layout_global_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
     <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
@@ -16,7 +23,6 @@
         app:hide_on_touch="true"
         app:show_timeout="5000"
         app:show_buffering="when_playing"
-        android:layout_marginTop="10dp"
         android:background="@android:color/background_dark"
         app:controller_layout_id="@layout/custom_player_control"/>
 
@@ -33,46 +39,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvTitle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tiếng yêu này anh dịch được không?"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:padding="8dp"/>
-
-            <!-- Lượt xem + thời gian + yêu thích -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:paddingHorizontal="8dp">
 
-                <LinearLayout
-                    android:id="@+id/infoLayout"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvViews"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="120N lượt xem"
-                        android:textColor="#A0A0A0"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/tvTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="9 tháng trước"
-                        android:textColor="#A0A0A0"
-                        android:textSize="15sp"
-                        android:layout_marginStart="10dp"/>
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:text="Tên phim"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="8dp"/>
 
                 <ImageButton
                     android:id="@+id/btnFavorite"
@@ -80,97 +64,96 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_heart"
                     android:background="@android:color/transparent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
-            </RelativeLayout>
+                    android:layout_marginEnd="8dp"/>
+            </LinearLayout>
 
-            <!--Frame Bình luận-->
+            <!-- Danh sách tập phim -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvEpisodes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"/>
+
+            <!-- Khu vực Bình luận -->
             <LinearLayout
-                android:id="@+id/commentFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp"
-                android:background="@drawable/bg_comment_frame"
-                android:clickable="true"
-                android:focusable="true"
-                android:layout_margin="8dp">
+                android:paddingHorizontal="8dp">
 
-                <!-- Tiêu đề bình luận -->
+                <TextView
+                    android:id="@+id/tvCommentTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bình luận (0)"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="8dp"/>
+
+                <!-- Nhập bình luận -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
+                    android:layout_marginBottom="12dp">
 
-                    <TextView
-                        android:id="@+id/tvCommentTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bình luận"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                    <ImageButton
+                        android:id="@+id/btnCancelReply"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/ic_close"
+                        android:background="@android:color/transparent"
+                        android:visibility="gone"
+                        app:tint="#888888" />
 
-                    <TextView
-                        android:id="@+id/tvCommentCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1N"
-                        android:textColor="#A0A0A0"
-                        android:textSize="12sp"
-                        android:layout_marginStart="6dp"/>
+                    <EditText
+                        android:id="@+id/etComment"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Nêu cảm nhận của bạn"
+                        android:textSize="14sp"
+                        android:textColorHint="#888888"
+                        android:textColor="#FFFFFF"
+                        android:paddingHorizontal="16dp"
+                        android:inputType="text"
+                        android:layout_marginStart="8dp"/>
+
+                    <ImageButton
+                        android:id="@+id/btnSendComment"
+                        android:layout_marginStart="8dp"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_send"
+                        app:tint="#FF1493"/>
                 </LinearLayout>
 
-                <!-- Avatar + nội dung bình luận -->
-                <LinearLayout
+                <!-- Danh sách bình luận -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvComment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:nestedScrollingEnabled="false" />
 
-                    <ImageView
-                        android:id="@+id/imgAvatar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_avatar"
-                        android:scaleType="centerCrop"
-                        android:layout_marginEnd="8dp"/>
+                <!-- Nút Tải thêm bình luận -->
+                <TextView
+                    android:id="@+id/btnLoadMoreComments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tải thêm bình luận"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingVertical="12dp"
+                    android:visibility="gone"/>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/txtUserName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="AnThuy"
-                            android:textColor="#FFFFFF"
-                            android:textStyle="bold"
-                            android:textSize="13sp"/>
-
-                        <TextView
-                            android:id="@+id/txtDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="15/6/2026"
-                            android:textColor="#A0A0A0"
-                            android:textSize="11sp"/>
-
-                        <TextView
-                            android:id="@+id/txtComment"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Kỷ niệm mùa hè ùa về, hôm nay là ngày mấy nhỉ"
-                            android:textColor="#FFFFFF"
-                            android:textSize="13sp"
-                            android:layout_marginTop="4dp"/>
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
 
             <!-- Tiêu đề Phim đề xuất -->
@@ -200,12 +183,6 @@
 
     </ScrollView>
 
-    <!--Fragment hiển thị bình luận + đánh giá-->
-    <FrameLayout
-        android:id="@+id/detailFragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone"/>
+
 
 </LinearLayout>

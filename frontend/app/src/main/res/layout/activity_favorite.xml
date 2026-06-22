@@ -8,6 +8,13 @@
     android:background="#050814"
     tools:context=".ui.main.FavoriteActivity">
 
+    <!-- Global Header -->
+    <include
+        android:id="@+id/globalHeaderInclude"
+        layout="@layout/layout_global_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <!-- Tiêu đề -->
     <TextView
         android:id="@+id/tvHeaderFav"
