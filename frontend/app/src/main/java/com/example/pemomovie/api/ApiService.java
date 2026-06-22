@@ -46,6 +46,15 @@ public interface ApiService {
     @GET("/api/v1/media/{id}")
     Call<MediaDetailResponse> getMediaDetail(@Path("id") Long id);
 
+    @POST("/api/v1/media/{id}/view")
+    Call<Void> incrementViewCount(@Path("id") Long id);
+
+    @POST("/api/v1/watchlist/{mediaId}")
+    Call<okhttp3.ResponseBody> toggleWatchlist(@Path("mediaId") Long mediaId);
+
+    @GET("/api/v1/watchlist")
+    Call<List<com.example.pemomovie.dto.WatchlistItemDto>> getMyWatchlist();
+
     // --- ADMIN API ---
     @GET("/api/v1/admin/movies")
     Call<List<MediaItemDto>> getAllMoviesAdmin();

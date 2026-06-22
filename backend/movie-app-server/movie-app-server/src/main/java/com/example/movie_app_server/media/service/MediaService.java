@@ -129,6 +129,12 @@ public class MediaService {
         return convertToDetailResponse(media);
     }
 
+    public void incrementViewCount(Long mediaId) {
+        Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+        media.setViewCount((media.getViewCount() == null ? 0 : media.getViewCount()) + 1);
+        mediaRepository.save(media);
+    }
+
     public MediaDetailResponse convertToDetailResponse(Media media) {
         String tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w185";
 
@@ -176,6 +182,9 @@ public class MediaService {
                 .posterUrl(media.getPosterPath() != null ? "https://image.tmdb.org/t/p/w500" + media.getPosterPath() : null)
                 .backdropUrl(media.getBackdropPath() != null ? "https://image.tmdb.org/t/p/w1280" + media.getBackdropPath() : null)
                 .releaseDate(media.getReleaseDate())
+                .releaseYear(media.getReleaseDate() != null ? media.getReleaseDate().getYear() : null)
+                .viewCount(media.getViewCount())
+                .favoriteCount(media.getWatchlists() != null ? media.getWatchlists().size() : 0)
                 .mediaType(media.getMediaType().name())
                 .isPremium(media.isPremium())
                 .isDeleted(media.isDeleted())

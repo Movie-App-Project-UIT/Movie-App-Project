@@ -95,6 +95,9 @@ public class HomeActivity extends AppCompatActivity {
             btnNotification.setOnClickListener(v -> showNotificationDropdown(v));
         }
 
+        // Đồng bộ danh sách phim yêu thích với Backend khi vừa mở App
+        com.example.pemomovie.utils.FavoriteManager.syncFavoritesWithBackend(this, null);
+
         fetchHomepageData();
     }
 
