@@ -42,6 +42,7 @@ public class FavoriteActivity extends AppCompatActivity {
 
         // Cài đặt thanh bottom navigation
         NavigationHelper.setupBottomNavigation(this);
+        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
     }
 
     @Override

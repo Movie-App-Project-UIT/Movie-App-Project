@@ -44,24 +44,20 @@ import retrofit2.Response;
 
 public class MovieActivity extends AppCompatActivity {
 
-    private EditText edtSearch;
     private LinearLayout btnSortOptions;
     private TextView txtCurrentSort;
-
-    private Handler searchHandler = new Handler();
-    private Runnable searchRunnable;
 
     private TabLayout tabLayoutMediaType;
     private LinearLayout btnToggleFilter, layoutFiltersContainer;
     private TextView txtToggleFilter;
-
+    
     private RecyclerView rvCountries, rvGenres, rvYears, rvMovies;
-
+    
     private FilterChipAdapter countryAdapter, genreAdapter, yearAdapter;
     private PosterAdapter movieAdapter;
 
     private ApiService apiService;
-
+    
     // Filter State
     private String currentKeyword = null;
     private String currentMediaType = null; // null = Tất cả
@@ -88,17 +84,17 @@ public class MovieActivity extends AppCompatActivity {
         initViews();
         setupToggleFilter();
         setupTabLayout();
-        setupSearch();
-
+        
         setupStaticFilters();
         loadDynamicFilters();
-
+        
         // Initial load
         loadMovies();
     }
 
     private void initViews() {
-        edtSearch = findViewById(R.id.edtSearch);
+        // Khởi tạo thanh tìm kiếm chung
+        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
 
         tabLayoutMediaType = findViewById(R.id.tabLayoutMediaType);
         btnToggleFilter = findViewById(R.id.btnToggleFilter);
@@ -109,7 +105,7 @@ public class MovieActivity extends AppCompatActivity {
         rvGenres = findViewById(R.id.rvGenres);
         rvYears = findViewById(R.id.rvYears);
         rvMovies = findViewById(R.id.rvMovies);
-
+        
         btnSortOptions = findViewById(R.id.btnSortOptions);
         txtCurrentSort = findViewById(R.id.txtCurrentSort);
 
@@ -135,59 +131,23 @@ public class MovieActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
-                    case 0:
-                        currentMediaType = null;
-                        break; // Tất cả
-                    case 1:
-                        currentMediaType = "MOVIE";
-                        break; // Phim Lẻ
-                    case 2:
-                        currentMediaType = "TV_SERIES";
-                        break; // Phim Bộ
+                    case 0: currentMediaType = null; break; // Tất cả
+                    case 1: currentMediaType = "MOVIE"; break; // Phim Lẻ
+                    case 2: currentMediaType = "TV_SERIES"; break; // Phim Bộ
                 }
                 loadMovies();
             }
-
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-    }
-
-    private void setupSearch() {
-        edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (searchRunnable != null) {
-                    searchHandler.removeCallbacks(searchRunnable);
-                }
-                searchRunnable = () -> {
-                    currentKeyword = s.toString().trim();
-                    if (currentKeyword.isEmpty())
-                        currentKeyword = null;
-                    loadMovies();
-                };
-                searchHandler.postDelayed(searchRunnable, 500); // 500ms debounce
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
     private void setupStaticFilters() {
         // Years
         List<FilterOption> years = new ArrayList<>();
-        years.add(new FilterOption((Integer) null, "Tất cả"));
+        years.add(new FilterOption((Integer)null, "Tất cả"));
         for (int i = 2026; i >= 2010; i--) {
             years.add(new FilterOption(i, String.valueOf(i)));
         }
@@ -201,15 +161,13 @@ public class MovieActivity extends AppCompatActivity {
         if (btnSortOptions != null) {
             btnSortOptions.setOnClickListener(v -> {
                 android.view.View popupView = getLayoutInflater().inflate(R.layout.layout_dropdown_sort, null);
-
+                
                 int width = (int) (160 * getResources().getDisplayMetrics().density);
                 int height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
                 boolean focusable = true;
-
-                final android.widget.PopupWindow popupWindow = new android.widget.PopupWindow(popupView, width, height,
-                        focusable);
-                popupWindow.setBackgroundDrawable(
-                        new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                
+                final android.widget.PopupWindow popupWindow = new android.widget.PopupWindow(popupView, width, height, focusable);
+                popupWindow.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                     popupWindow.setElevation(10);
                 }
@@ -249,20 +207,16 @@ public class MovieActivity extends AppCompatActivity {
             public void onResponse(Call<List<GenreDto>> call, Response<List<GenreDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<FilterOption> options = new ArrayList<>();
-                    options.add(new FilterOption((Long) null, "Tất cả"));
-                    for (GenreDto g : response.body())
-                        options.add(new FilterOption(g.getId(), g.getName()));
+                    options.add(new FilterOption((Long)null, "Tất cả"));
+                    for (GenreDto g : response.body()) options.add(new FilterOption(g.getId(), g.getName()));
                     genreAdapter = new FilterChipAdapter(options, opt -> {
-                        currentGenreId = opt.getId();
-                        loadMovies();
+                        currentGenreId = opt.getId(); loadMovies();
                     });
                     rvGenres.setAdapter(genreAdapter);
                 }
             }
-
             @Override
-            public void onFailure(Call<List<GenreDto>> call, Throwable t) {
-            }
+            public void onFailure(Call<List<GenreDto>> call, Throwable t) {}
         });
 
         // Countries
@@ -271,20 +225,16 @@ public class MovieActivity extends AppCompatActivity {
             public void onResponse(Call<List<CountryDto>> call, Response<List<CountryDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<FilterOption> options = new ArrayList<>();
-                    options.add(new FilterOption((Long) null, "Tất cả"));
-                    for (CountryDto c : response.body())
-                        options.add(new FilterOption(c.getId(), c.getName()));
+                    options.add(new FilterOption((Long)null, "Tất cả"));
+                    for (CountryDto c : response.body()) options.add(new FilterOption(c.getId(), c.getName()));
                     countryAdapter = new FilterChipAdapter(options, opt -> {
-                        currentCountryId = opt.getId();
-                        loadMovies();
+                        currentCountryId = opt.getId(); loadMovies();
                     });
                     rvCountries.setAdapter(countryAdapter);
                 }
             }
-
             @Override
-            public void onFailure(Call<List<CountryDto>> call, Throwable t) {
-            }
+            public void onFailure(Call<List<CountryDto>> call, Throwable t) {}
         });
 
         // Age Ratings đã bị ẩn
@@ -293,20 +243,19 @@ public class MovieActivity extends AppCompatActivity {
     private void loadMovies() {
         apiService.filterMedia(
                 currentKeyword, currentGenreId, currentCountryId, currentAgeRatingId,
-                currentReleaseYear, currentMediaType, currentSortBy, 0, 50)
-                .enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
-                    @Override
-                    public void onResponse(Call<PageResponseDto<MediaItemDto>> call,
-                            Response<PageResponseDto<MediaItemDto>> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            movieAdapter.updateData(response.body().getContent());
-                        }
-                    }
+                currentReleaseYear, currentMediaType, currentSortBy, 0, 50
+        ).enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
+            @Override
+            public void onResponse(Call<PageResponseDto<MediaItemDto>> call, Response<PageResponseDto<MediaItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    movieAdapter.updateData(response.body().getContent());
+                }
+            }
 
-                    @Override
-                    public void onFailure(Call<PageResponseDto<MediaItemDto>> call, Throwable t) {
-                        Toast.makeText(MovieActivity.this, "Lỗi tải phim", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(Call<PageResponseDto<MediaItemDto>> call, Throwable t) {
+                Toast.makeText(MovieActivity.this, "Lỗi tải phim", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
