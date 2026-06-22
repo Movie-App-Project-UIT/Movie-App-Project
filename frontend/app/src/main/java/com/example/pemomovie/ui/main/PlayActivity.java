@@ -21,6 +21,7 @@ import androidx.media3.common.util.UnstableApi;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.ScrollView;
 
 import android.net.Uri;
 import android.util.Log;
@@ -155,9 +156,6 @@ public class PlayActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Tải danh sách phim đề xuất từ homepage data
-     */
     private void fetchRecommendedMovies() {
         apiService.getHomepageData().enqueue(new Callback<Map<String, List<MediaItemDto>>>() {
             @Override
@@ -296,10 +294,6 @@ public class PlayActivity extends AppCompatActivity {
                         : R.drawable.ic_subtitle_1);
     }
 
-    /**
-     * Cập nhật trạng thái hiển thị nút Play / Pause trên custom controller.
-     * Hiển thị ic_pause khi đang phát, ic_play_ui khi đang dừng.
-     */
     private void updatePlayPauseButtons(boolean isPlaying) {
         if (btnPlayCustom != null) {
             btnPlayCustom.setVisibility(isPlaying ? View.GONE : View.VISIBLE);
@@ -309,9 +303,7 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Cập nhật thông tin phim lên giao diện tương ứng của từng orientation
-     */
+
     private void populateMovieDetails() {
         if (mediaDetail == null) return;
 
@@ -340,9 +332,6 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Setup nút yêu thích dựa theo dữ liệu mediaDetail đã tải
-     */
     private void setupFavoriteButton() {
         if (btnFavorite == null || mediaDetail == null) return;
 
@@ -373,9 +362,7 @@ public class PlayActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Cập nhật icon yêu thích theo trạng thái hiện tại
-     */
+
     private void updateFavoriteIcon() {
         if (btnFavorite == null || mediaDetail == null) return;
         if (FavoriteManager.isFavorite(this, mediaDetail.getId())) {
@@ -387,10 +374,7 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Đẩy SubtitleView lên trên thanh điều khiển khi thanh điều khiển đang hiện.
-     * @param isControlVisible Trạng thái hiển thị của thanh điều khiển
-     */
+
     private void adjustSubtitleViewPosition(boolean isControlVisible) {
         if (playerView == null) return;
         View subtitleView = playerView.getSubtitleView();
@@ -410,10 +394,7 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Khởi tạo giao diện, ánh xạ các view và gán sự kiện tương tác theo hướng màn hình.
-     * @param orientation Hướng màn hình hiện tại
-     */
+
     private void initViews(int orientation) {
         // Thiết lập chế độ Fullscreen ẩn hoàn toàn thanh hệ thống ở chế độ ngang (Landscape) để chỉ hiển thị ExoPlayer
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -498,7 +479,7 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
-            // Cập nhật trạng thái play/pause theo ExoPlayer hiện tại
+            // Play/pause
             if (exoPlayer != null) {
                 updatePlayPauseButtons(exoPlayer.isPlaying());
             } else {
@@ -506,7 +487,7 @@ public class PlayActivity extends AppCompatActivity {
                 updatePlayPauseButtons(false);
             }
 
-            // Gán sự kiện click tường minh cho nút lùi video 10s
+            // Nút lùi 10s
             View btnRew = playerView.findViewById(androidx.media3.ui.R.id.exo_rew);
             if (btnRew != null) {
                 btnRew.setOnClickListener(v -> {
@@ -518,7 +499,7 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
-            // Gán sự kiện click tường minh cho nút tăng video 10s
+            // Nút tăng 10s
             View btnFfwd = playerView.findViewById(androidx.media3.ui.R.id.exo_ffwd);
             if (btnFfwd != null) {
                 btnFfwd.setOnClickListener(v -> {
@@ -559,7 +540,7 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
-            // Lắng nghe sự thay đổi hiển thị của bộ điều khiển để căn chỉnh phụ đề
+            // Sự kiện ẩn hiện các controll của video
             playerView.setControllerVisibilityListener(
                     new PlayerView.ControllerVisibilityListener() {
                         @Override
@@ -584,7 +565,7 @@ public class PlayActivity extends AppCompatActivity {
 
         // Ánh xạ nút yêu thích
         btnFavorite = findViewById(R.id.btnFavorite);
-        // Nếu đã có mediaDetail (ví dụ sau khi xoay màn hình), thiết lập ngay
+        // Nếu đã có mediaDetail thiết lập ngay
         if (mediaDetail != null) {
             setupFavoriteButton();
         }
@@ -602,7 +583,7 @@ public class PlayActivity extends AppCompatActivity {
         }
 
         // Xử lý sự kiện click mở fragment bình luận/đánh giá (chỉ áp dụng ở Portrait layout)
-        LinearLayout contentLayout = findViewById(R.id.svInfo);
+        ScrollView contentLayout = findViewById(R.id.svInfo);
         FrameLayout fragmentContainer = findViewById(R.id.detailFragmentContainer);
         LinearLayout commentFrame = findViewById(R.id.commentFrame);
 

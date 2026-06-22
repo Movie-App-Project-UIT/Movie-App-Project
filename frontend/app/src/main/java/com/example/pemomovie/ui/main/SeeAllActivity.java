@@ -13,12 +13,16 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pemomovie.R;
-import com.example.pemomovie.adapter.PosterAdapter;
+import com.example.pemomovie.adapter.SeeAllAdapter;
 import com.example.pemomovie.custom.GradientTextView;
+import com.example.pemomovie.dto.MediaItemDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SeeAllActivity extends AppCompatActivity {
 
-    private RecyclerView rvMovies;
+    private RecyclerView rvTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,24 +35,30 @@ public class SeeAllActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Tiêu đề section
         TextView tvSectionTitle = findViewById(R.id.tvSectionTitle);
-
-        // Lấy tiêu đề từ Intent (ví dụ: "Phim mới", "Đang thịnh hành")
         String sectionTitle = getIntent().getStringExtra("SECTION_TITLE");
         if (sectionTitle != null) {
             tvSectionTitle.setText(sectionTitle);
         }
-
         GradientTextView.applyHorizontalGradient(
                 tvSectionTitle,
                 Color.parseColor("#6C29D6"), // tím
                 Color.parseColor("#F43393")  // hồng
         );
 
-        //list phim theo hàng dọc mỗi hàng chứa 2 poster_detail_item
-        //rvMovies.setLayoutManager(new GridLayoutManager(this, 2));
+        // Nhận danh sách phim từ Intent
+        @SuppressWarnings("unchecked")
+        List<MediaItemDto> movieList = (ArrayList<MediaItemDto>)
+                getIntent().getSerializableExtra("MOVIE_LIST");
+        if (movieList == null) {
+            movieList = new ArrayList<>();
+        }
 
-        //Nếu click vào ic_heart thì thêm phim vào danh sách yêu thích
-
+        // Hiển thị Grid 2 cột dùng SeeAllAdapter (poster_detail_item)
+        rvTitle = findViewById(R.id.rvTitle);
+        rvTitle.setLayoutManager(new GridLayoutManager(this, 2));
+        SeeAllAdapter adapter = new SeeAllAdapter(this, movieList);
+        rvTitle.setAdapter(adapter);
     }
 }

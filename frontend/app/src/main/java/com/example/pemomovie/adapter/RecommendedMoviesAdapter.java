@@ -83,8 +83,8 @@ public class RecommendedMoviesAdapter extends RecyclerView.Adapter<RecommendedMo
                     holder.btnFavorite.setColorFilter(Color.parseColor("#FF1493"));
                     Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
                 } else {
-                    holder.btnFavorite.setImageResource(R.drawable.ic_favorites);
-                    holder.btnFavorite.setColorFilter(null);
+                    holder.btnFavorite.setImageResource(R.drawable.ic_heart);
+                    holder.btnFavorite.setColorFilter(Color.parseColor("#AAAAAA"));
                     Toast.makeText(context, "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -103,8 +103,8 @@ public class RecommendedMoviesAdapter extends RecyclerView.Adapter<RecommendedMo
             btn.setImageResource(R.drawable.ic_heart);
             btn.setColorFilter(Color.parseColor("#FF1493"));
         } else {
-            btn.setImageResource(R.drawable.ic_favorites);
-            btn.setColorFilter(null);
+            btn.setImageResource(R.drawable.ic_heart);
+            btn.setColorFilter(Color.parseColor("#AAAAAA"));
         }
     }
 

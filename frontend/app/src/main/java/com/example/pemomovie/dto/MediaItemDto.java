@@ -1,6 +1,8 @@
 package com.example.pemomovie.dto;
 
-public class MediaItemDto {
+import java.io.Serializable;
+
+public class MediaItemDto implements Serializable {
     private Long id;
     private String title;
     private String posterUrl;
