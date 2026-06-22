@@ -24,4 +24,7 @@ public class MediaItemDto {
     private Integer viewCount;
     private Long hiddenByGenreId;
     private Integer duration; // Bổ sung thuộc tính duration để hiển thị thanh tiến trình
+    private Integer expectedEpisodes;
+    private Integer availableEpisodes;
+    private Integer hiddenEpisodesCount;
 }

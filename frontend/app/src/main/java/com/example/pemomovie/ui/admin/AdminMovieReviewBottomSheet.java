@@ -62,6 +62,20 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
         
         return view;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        android.app.Dialog dialog = getDialog();
+        if (dialog != null) {
+            View bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet);
+                behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+                bottomSheet.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+            }
+        }
+    }
     
     private void fetchReviews() {
         progressBar.setVisibility(View.VISIBLE);
@@ -81,6 +95,12 @@ public class AdminMovieReviewBottomSheet extends BottomSheetDialogFragment {
                         }
                     } else {
                         applyFilter();
+                        if (getContext() != null) {
+                            TextView tvTitle = getView() != null ? getView().findViewById(R.id.tvTitle) : null;
+                            if (tvTitle != null) {
+                                tvTitle.setText("Danh sách bình luận (" + allReviews.size() + ")");
+                            }
+                        }
                     }
                 } else {
                     if (getContext() != null) {

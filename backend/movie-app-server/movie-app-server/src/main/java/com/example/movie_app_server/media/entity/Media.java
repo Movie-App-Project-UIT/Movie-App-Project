@@ -66,6 +66,9 @@ public class Media {
     @Column(name = "language", length = 50)
     private String language;
 
+    @Column(name = "expected_episodes")
+    private Integer expectedEpisodes;
+
     // --- MỐI QUAN HỆ DANH MỤC ---
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -17,4 +17,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Long
 
     // Tìm lịch sử xem của một tập phim bộ cụ thể
     Optional<WatchHistory> findByUserIdAndEpisodeId(Long userId, Long episodeId);
+
+    // Tìm lịch sử xem MỚI NHẤT của một phim (Bất kể tập nào)
+    Optional<WatchHistory> findFirstByUserIdAndMediaIdOrderByLastWatchedAtDesc(Long userId, Long mediaId);
 }

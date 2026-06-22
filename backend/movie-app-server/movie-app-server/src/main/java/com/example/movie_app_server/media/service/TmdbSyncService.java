@@ -132,12 +132,7 @@ public class TmdbSyncService {
         return mediaRepository.save(media);
     }
 
-    @Transactional
-    public Media syncTvSeriesFromTmdb(Integer tmdbId) {
-        if (mediaRepository.findByTmdbId(tmdbId).isPresent()) {
-            throw new AppException("Phim bộ này đã tồn tại trong hệ thống!", HttpStatus.CONFLICT);
-        }
-
+    public Media previewTvSeriesFromTmdb(Integer tmdbId) {
         TmdbTvDetailsDto tvDto = tmdbClient.getTvDetails(tmdbId, "vi-VN");
         TmdbCreditsResponseDto creditsDto = tmdbClient.getTvCredits(tmdbId);
 
@@ -207,6 +202,18 @@ public class TmdbSyncService {
                     .profilePath(cast.getProfilePath()).media(media).build()));
         }
         media.setCredits(creditEntities);
+
+        return media;
+    }
+
+    @Transactional
+    public Media syncTvSeriesFromTmdb(Integer tmdbId) {
+        if (mediaRepository.findByTmdbId(tmdbId).isPresent()) {
+            throw new AppException("Phim bộ này đã tồn tại trong hệ thống!", HttpStatus.CONFLICT);
+        }
+        
+        Media media = previewTvSeriesFromTmdb(tmdbId);
+        TmdbTvDetailsDto tvDto = tmdbClient.getTvDetails(tmdbId, "vi-VN");
 
         List<Season> seasonEntities = new ArrayList<>();
         if (tvDto.getSeasons() != null) {

@@ -36,12 +36,24 @@ public class AdminMovieSaveRequest {
         public String getFileUrl() { return fileUrl; }
     }
 
+    private Integer expectedEpisodes;
+    private String mediaType;
+
+    public String getMediaType() { return mediaType; }
+    public void setMediaType(String mediaType) { this.mediaType = mediaType; }
+
     public Integer getTmdbId() { return tmdbId; }
     public String getVideoUrl() { return videoUrl; }
+    public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
     public boolean isPremium() { return isPremium; }
+    public void setPremium(boolean premium) { this.isPremium = premium; }
     public boolean isDeleted() { return isDeleted; }
+    public void setDeleted(boolean deleted) { this.isDeleted = deleted; }
     public String getTitle() { return title; }
     public String getOverview() { return overview; }
     public String getLanguage() { return language; }
     public java.util.List<AdminSubtitleRequest> getSubtitles() { return subtitles; }
+    public void setSubtitles(java.util.List<AdminSubtitleRequest> subtitles) { this.subtitles = subtitles; }
+    public Integer getExpectedEpisodes() { return expectedEpisodes; }
+    public void setExpectedEpisodes(Integer expectedEpisodes) { this.expectedEpisodes = expectedEpisodes; }
 }

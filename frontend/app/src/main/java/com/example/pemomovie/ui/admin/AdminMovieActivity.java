@@ -40,9 +40,10 @@ public class AdminMovieActivity extends AppCompatActivity {
     
     private int sortViewsMode = 0; // 0: None, 1: Desc, 2: Asc
     private int sortRatingMode = 0; // 0: None, 1: Desc, 2: Asc
-    private String filterGenre = "Tất cả";
-    private String filterLanguage = "Tất cả";
-    private String filterCountry = "Tất cả";
+    private java.util.Set<String> filterGenres = new java.util.HashSet<>();
+    private java.util.Set<String> filterLanguages = new java.util.HashSet<>();
+    private java.util.Set<String> filterCountries = new java.util.HashSet<>();
+    private Boolean filterIsPremium = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,11 +284,15 @@ public class AdminMovieActivity extends AppCompatActivity {
         List<MediaItemDto> filtered = new java.util.ArrayList<>();
         for (MediaItemDto movie : allMovies) {
             if (movie.isDeleted() == isShowingInactive) {
-                boolean matchGenre = filterGenre.equals("Tất cả") || (movie.getGenres() != null && movie.getGenres().contains(filterGenre));
-                boolean matchLanguage = filterLanguage.equals("Tất cả") || (movie.getLanguage() != null && movie.getLanguage().equals(filterLanguage));
-                boolean matchCountry = filterCountry.equals("Tất cả") || (movie.getCountry() != null && movie.getCountry().equals(filterCountry));
+                boolean matchGenre = filterGenres.isEmpty() || 
+                    (movie.getGenres() != null && movie.getGenres().stream().anyMatch(filterGenres::contains));
+                boolean matchLanguage = filterLanguages.isEmpty() || 
+                    (movie.getLanguage() != null && filterLanguages.contains(movie.getLanguage()));
+                boolean matchCountry = filterCountries.isEmpty() || 
+                    (movie.getCountry() != null && filterCountries.contains(movie.getCountry()));
+                boolean matchPremium = filterIsPremium == null || (movie.isPremium() == filterIsPremium);
                 
-                if (matchGenre && matchLanguage && matchCountry) {
+                if (matchGenre && matchLanguage && matchCountry && matchPremium) {
                     filtered.add(movie);
                 }
             }
@@ -317,17 +322,14 @@ public class AdminMovieActivity extends AppCompatActivity {
         com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(this);
         dialog.setContentView(R.layout.dialog_admin_movie_filter);
         
-        android.widget.Spinner spinnerGenre = dialog.findViewById(R.id.spinnerGenre);
-        android.widget.Spinner spinnerLanguage = dialog.findViewById(R.id.spinnerLanguage);
-        android.widget.Spinner spinnerCountry = dialog.findViewById(R.id.spinnerCountry);
+        RecyclerView rvGenres = dialog.findViewById(R.id.rvGenres);
+        RecyclerView rvLanguages = dialog.findViewById(R.id.rvLanguages);
+        RecyclerView rvCountries = dialog.findViewById(R.id.rvCountries);
+        RecyclerView rvPremium = dialog.findViewById(R.id.rvPremium);
         
         java.util.Set<String> genres = new java.util.LinkedHashSet<>();
         java.util.Set<String> languages = new java.util.LinkedHashSet<>();
         java.util.Set<String> countries = new java.util.LinkedHashSet<>();
-        
-        genres.add("Tất cả");
-        languages.add("Tất cả");
-        countries.add("Tất cả");
         
         for (MediaItemDto m : allMovies) {
             if (m.getGenres() != null) genres.addAll(m.getGenres());
@@ -335,37 +337,67 @@ public class AdminMovieActivity extends AppCompatActivity {
             if (m.getCountry() != null && !m.getCountry().equals("N/A")) countries.add(m.getCountry());
         }
         
-        java.util.List<String> genreList = new java.util.ArrayList<>(genres);
-        java.util.List<String> languageList = new java.util.ArrayList<>(languages);
-        java.util.List<String> countryList = new java.util.ArrayList<>(countries);
+        // Setup Genre Adapter
+        List<com.example.pemomovie.dto.FilterOption> genreOpts = new java.util.ArrayList<>();
+        genreOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, "Tất cả"));
+        for (String g : genres) genreOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, g));
         
-        android.widget.ArrayAdapter<String> genreAdapter = new android.widget.ArrayAdapter<>(this, R.layout.item_spinner, genreList);
-        genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        android.widget.ArrayAdapter<String> languageAdapter = new android.widget.ArrayAdapter<>(this, R.layout.item_spinner, languageList);
-        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        android.widget.ArrayAdapter<String> countryAdapter = new android.widget.ArrayAdapter<>(this, R.layout.item_spinner, countryList);
-        countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        com.example.pemomovie.adapter.MultiSelectFilterChipAdapter genreAdapter = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(genreOpts, opts -> {
+            filterGenres.clear();
+            for (com.example.pemomovie.dto.FilterOption opt : opts) {
+                if (!opt.getName().equals("Tất cả")) filterGenres.add(opt.getName());
+            }
+        });
+        rvGenres.setAdapter(genreAdapter);
+
+        // Setup Language Adapter
+        List<com.example.pemomovie.dto.FilterOption> langOpts = new java.util.ArrayList<>();
+        langOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, "Tất cả"));
+        for (String l : languages) langOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, l));
         
-        spinnerGenre.setAdapter(genreAdapter);
-        spinnerLanguage.setAdapter(languageAdapter);
-        spinnerCountry.setAdapter(countryAdapter);
+        com.example.pemomovie.adapter.MultiSelectFilterChipAdapter langAdapter = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(langOpts, opts -> {
+            filterLanguages.clear();
+            for (com.example.pemomovie.dto.FilterOption opt : opts) {
+                if (!opt.getName().equals("Tất cả")) filterLanguages.add(opt.getName());
+            }
+        });
+        rvLanguages.setAdapter(langAdapter);
+
+        // Setup Country Adapter
+        List<com.example.pemomovie.dto.FilterOption> countryOpts = new java.util.ArrayList<>();
+        countryOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, "Tất cả"));
+        for (String c : countries) countryOpts.add(new com.example.pemomovie.dto.FilterOption((Long) null, c));
         
-        spinnerGenre.setSelection(Math.max(0, genreList.indexOf(filterGenre)));
-        spinnerLanguage.setSelection(Math.max(0, languageList.indexOf(filterLanguage)));
-        spinnerCountry.setSelection(Math.max(0, countryList.indexOf(filterCountry)));
+        com.example.pemomovie.adapter.MultiSelectFilterChipAdapter countryAdapter = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(countryOpts, opts -> {
+            filterCountries.clear();
+            for (com.example.pemomovie.dto.FilterOption opt : opts) {
+                if (!opt.getName().equals("Tất cả")) filterCountries.add(opt.getName());
+            }
+        });
+        rvCountries.setAdapter(countryAdapter);
+
+        // Setup Premium Adapter
+        List<com.example.pemomovie.dto.FilterOption> premiumOpts = new java.util.ArrayList<>();
+        premiumOpts.add(new com.example.pemomovie.dto.FilterOption(0L, "Tất cả"));
+        premiumOpts.add(new com.example.pemomovie.dto.FilterOption(1L, "Premium"));
+        premiumOpts.add(new com.example.pemomovie.dto.FilterOption(2L, "Miễn phí"));
+        com.example.pemomovie.adapter.FilterChipAdapter premiumAdapter = new com.example.pemomovie.adapter.FilterChipAdapter(premiumOpts, opt -> {
+            if (opt.getName().equals("Premium")) filterIsPremium = true;
+            else if (opt.getName().equals("Miễn phí")) filterIsPremium = false;
+            else filterIsPremium = null;
+        });
+        rvPremium.setAdapter(premiumAdapter);
         
         dialog.findViewById(R.id.btnFilterClear).setOnClickListener(v -> {
-            filterGenre = "Tất cả";
-            filterLanguage = "Tất cả";
-            filterCountry = "Tất cả";
+            filterGenres.clear();
+            filterLanguages.clear();
+            filterCountries.clear();
+            filterIsPremium = null;
             filterListByTab();
             dialog.dismiss();
         });
         
         dialog.findViewById(R.id.btnFilterApply).setOnClickListener(v -> {
-            filterGenre = spinnerGenre.getSelectedItem().toString();
-            filterLanguage = spinnerLanguage.getSelectedItem().toString();
-            filterCountry = spinnerCountry.getSelectedItem().toString();
             filterListByTab();
             dialog.dismiss();
         });

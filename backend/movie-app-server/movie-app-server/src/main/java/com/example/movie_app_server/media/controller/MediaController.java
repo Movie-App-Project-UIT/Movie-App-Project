@@ -45,12 +45,14 @@ public class MediaController {
     @GetMapping("/filter")
     public ResponseEntity<Page<MediaItemDto>> filterMedia(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long genreId,
-            @RequestParam(required = false) Long countryId,
+            @RequestParam(required = false) List<Long> genreIds,
+            @RequestParam(required = false) List<Long> countryIds,
+            @RequestParam(required = false) List<String> languages,
             @RequestParam(required = false) Long ageRatingId,
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Boolean isPlayable,
             @RequestParam(required = false) String mediaType, // THÊM DÒNG NÀY (Đại diện cho các Tab)
+            @RequestParam(required = false) Boolean isPremium,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "Mới nhất") String sortBy) {
@@ -63,7 +65,7 @@ public class MediaController {
         }
 
         return ResponseEntity.ok(mediaService.filterMedia(
-                keyword, genreId, countryId, ageRatingId, releaseYear, isPlayable, mediaType, PageRequest.of(page, size, sort)));
+                keyword, genreIds, countryIds, languages, ageRatingId, releaseYear, isPlayable, mediaType, isPremium, PageRequest.of(page, size, sort)));
     }
 
     /**
@@ -84,6 +86,12 @@ public class MediaController {
     public ResponseEntity<String> playMovie(@PathVariable Long id) {
         // Truyền cả ID phim và ID người dùng xuống Service để kiểm tra
         String videoUrl = mediaService.getPlayableVideoUrl(id, getUid());
+        return ResponseEntity.ok(videoUrl);
+    }
+
+    @GetMapping("/{id}/episodes/{episodeId}/play")
+    public ResponseEntity<String> playEpisode(@PathVariable Long id, @PathVariable Long episodeId) {
+        String videoUrl = mediaService.getPlayableEpisodeUrl(id, episodeId, getUid());
         return ResponseEntity.ok(videoUrl);
     }
 

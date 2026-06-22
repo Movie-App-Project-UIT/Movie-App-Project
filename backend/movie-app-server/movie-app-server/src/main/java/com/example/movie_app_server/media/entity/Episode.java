@@ -43,6 +43,18 @@ public class Episode {
     @Column(name = "video_url", length = 500)
     private String videoUrl;
 
+    @Column(name = "is_premium", nullable = false)
+    @Builder.Default
+    private boolean isPremium = false;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private boolean isDeleted = false;
+
+    @Column(name = "view_count", nullable = false)
+    @Builder.Default
+    private Integer viewCount = 0;
+
     @OneToMany(mappedBy = "episode", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default

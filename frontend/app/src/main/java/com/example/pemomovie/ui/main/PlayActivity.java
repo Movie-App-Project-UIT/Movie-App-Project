@@ -66,6 +66,7 @@ public class PlayActivity extends AppCompatActivity {
     private PlayerView playerView;
     private ApiService apiService;
     private Long movieId;
+    private Long episodeId = -1L;
     private int startPosition = 0;
     private MediaDetailResponse mediaDetail; // Lưu trữ thông tin phim để khôi phục dữ liệu khi xoay màn hình
     private LinearLayout topInfo;
@@ -88,6 +89,10 @@ public class PlayActivity extends AppCompatActivity {
     private java.util.List<com.example.pemomovie.dto.ReviewResponseDto> reviewList = new java.util.ArrayList<>();
     private Long replyingToReviewId = null;
 
+    // Episode fields
+    private com.example.pemomovie.adapter.EpisodeAdapter episodeAdapter;
+    private java.util.List<com.example.pemomovie.dto.EpisodeDto> episodesList = new java.util.ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,16 +104,43 @@ public class PlayActivity extends AppCompatActivity {
         initViews(getResources().getConfiguration().orientation);
 
         movieId = getIntent().getLongExtra("MOVIE_ID", -1L);
+        episodeId = getIntent().getLongExtra("EPISODE_ID", -1L);
         startPosition = getIntent().getIntExtra("START_POSITION", 0);
         if (movieId != -1L) {
-            fetchVideoAndPlay();
+            fetchMediaDetailAndPlay();
         } else {
             Toast.makeText(this, "Không tìm thấy ID phim!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void fetchVideoAndPlay() {
-        // Lấy đường dẫn video phát được từ API
+    private void fetchMediaDetailAndPlay() {
+        apiService.getMediaDetail(movieId).enqueue(new Callback<MediaDetailResponse>() {
+            @Override
+            public void onResponse(Call<MediaDetailResponse> call, Response<MediaDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    mediaDetail = response.body();
+                    populateMovieDetails();
+                    setupFavoriteButton();
+                    fetchSimilarMovies();
+                    loadComments();
+
+                    if ("TV_SHOW".equalsIgnoreCase(mediaDetail.getMediaType()) || "TV_SERIES".equalsIgnoreCase(mediaDetail.getMediaType())) {
+                        playEpisode();
+                    } else {
+                        playMovie();
+                    }
+                } else {
+                    Toast.makeText(PlayActivity.this, "Không thể lấy chi tiết phim", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<MediaDetailResponse> call, Throwable t) {
+                Toast.makeText(PlayActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void playMovie() {
         apiService.getPlayableVideoUrl(movieId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -117,59 +149,95 @@ public class PlayActivity extends AppCompatActivity {
                         String videoUrl = response.body().string().trim();
                         if (videoUrl.startsWith("/")) {
                             String baseUrl = com.example.pemomovie.BuildConfig.BASE_URL;
-                            if (baseUrl.endsWith("/")) {
-                                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-                            }
+                            if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
                             videoUrl = baseUrl + videoUrl;
                         }
-                        fetchSubtitlesAndSetupPlayer(videoUrl);
+                        setupExoPlayer(videoUrl, mediaDetail.getSubtitles());
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(PlayActivity.this, "Lỗi đọc đường dẫn video", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("PlayActivity", "Lỗi lấy video: " + t.getMessage());
-                Toast.makeText(PlayActivity.this, "Lỗi kết nối khi lấy video", Toast.LENGTH_SHORT).show();
-            }
+            public void onFailure(Call<ResponseBody> call, Throwable t) {}
         });
     }
 
-    private void fetchSubtitlesAndSetupPlayer(String videoUrl) {
-        // Lấy thông tin chi tiết phim để trích xuất phụ đề
-        apiService.getMediaDetail(movieId).enqueue(new Callback<MediaDetailResponse>() {
-            @Override
-            public void onResponse(Call<MediaDetailResponse> call, Response<MediaDetailResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    mediaDetail = response.body(); // Lưu trữ thông tin chi tiết phim
-                    populateMovieDetails(); // Đổ dữ liệu phim lên các View
-                    List<SubtitleDto> subtitles = mediaDetail.getSubtitles();
-                    setupExoPlayer(videoUrl, subtitles);
-                    // Setup nút yêu thích sau khi có dữ liệu phim
-                    setupFavoriteButton();
-                    // Tải danh sách phim đề xuất sau khi có thông tin phim
-                    fetchSimilarMovies();
-                    // Tải bình luận
-                    loadComments();
-                } else {
-                    // Nếu lỗi lấy chi tiết, vẫn phát video không có phụ đề
-                    setupExoPlayer(videoUrl, null);
-                    fetchSimilarMovies();
+    private void playEpisode() {
+        if (episodeId == -1L) {
+            if (mediaDetail.getSeasons() != null && !mediaDetail.getSeasons().isEmpty()) {
+                com.example.pemomovie.dto.SeasonDto firstSeason = mediaDetail.getSeasons().get(0);
+                if (firstSeason.getEpisodes() != null) {
+                    for (com.example.pemomovie.dto.EpisodeDto ep : firstSeason.getEpisodes()) {
+                        boolean hasData = (ep.getVideoUrl() != null && !ep.getVideoUrl().trim().isEmpty()) || 
+                                          (ep.getSubtitles() != null && !ep.getSubtitles().isEmpty());
+                        if (!ep.isDeleted() && hasData) {
+                            episodeId = ep.getId();
+                            break;
+                        }
+                    }
                 }
             }
+        }
+        
+        if (episodeId == -1L) {
+            Toast.makeText(this, "Không tìm thấy tập phim nào", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            @Override
-            public void onFailure(Call<MediaDetailResponse> call, Throwable t) {
-                Log.e("PlayActivity", "Lỗi lấy chi tiết phim: " + t.getMessage());
-                setupExoPlayer(videoUrl, null);
-                fetchSimilarMovies();
+        // Focus the current episode
+        if (episodeAdapter != null && episodesList != null) {
+            for (int i = 0; i < episodesList.size(); i++) {
+                if (episodesList.get(i).getId().equals(episodeId)) {
+                    episodeAdapter.setSelectedPosition(i);
+                    // Also scroll the RecyclerView to show the selected episode
+                    RecyclerView rvEpisodes = findViewById(R.id.rvEpisodes);
+                    if (rvEpisodes != null) {
+                        rvEpisodes.scrollToPosition(i);
+                    }
+                    break;
+                }
             }
+        }
+        
+        com.example.pemomovie.dto.EpisodeDto currentEpisode = null;
+        if (mediaDetail.getSeasons() != null && !mediaDetail.getSeasons().isEmpty()) {
+            com.example.pemomovie.dto.SeasonDto firstSeason = mediaDetail.getSeasons().get(0);
+            if (firstSeason.getEpisodes() != null) {
+                for (com.example.pemomovie.dto.EpisodeDto ep : firstSeason.getEpisodes()) {
+                    if (ep.getId().equals(episodeId)) {
+                        currentEpisode = ep;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        List<SubtitleDto> subtitles = currentEpisode != null ? currentEpisode.getSubtitles() : null;
+
+        apiService.getPlayableEpisodeUrl(movieId, episodeId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String videoUrl = response.body().string().trim();
+                        if (videoUrl.startsWith("/")) {
+                            String baseUrl = com.example.pemomovie.BuildConfig.BASE_URL;
+                            if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                            videoUrl = baseUrl + videoUrl;
+                        }
+                        setupExoPlayer(videoUrl, subtitles);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {}
         });
     }
 
@@ -193,7 +261,7 @@ public class PlayActivity extends AppCompatActivity {
                         }
                     }
                     if (genreId != null) {
-                        apiService.filterMedia(null, genreId, null, null, null, null, null, 0, 10).enqueue(new Callback<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>>() {
+                        apiService.filterMedia(null, java.util.Collections.singletonList(genreId), null, null, null, null, null, null, null, 0, 10).enqueue(new Callback<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>>() {
                             @Override
                             public void onResponse(Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> call, Response<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> response) {
                                 if (response.isSuccessful() && response.body() != null) {
@@ -372,12 +440,34 @@ public class PlayActivity extends AppCompatActivity {
         if (rvEpisodes != null) {
             if ("TV_SHOW".equalsIgnoreCase(mediaDetail.getMediaType()) || "TV_SERIES".equalsIgnoreCase(mediaDetail.getMediaType())) {
                 rvEpisodes.setVisibility(View.VISIBLE);
-                java.util.List<String> episodes = new java.util.ArrayList<>();
-                for (int i = 1; i <= 20; i++) {
-                    episodes.add("Tập " + i);
+                episodesList.clear();
+                if (mediaDetail.getSeasons() != null && !mediaDetail.getSeasons().isEmpty()) {
+                    com.example.pemomovie.dto.SeasonDto firstSeason = mediaDetail.getSeasons().get(0);
+                    if (firstSeason.getEpisodes() != null) {
+                        for (com.example.pemomovie.dto.EpisodeDto ep : firstSeason.getEpisodes()) {
+                            boolean hasData = (ep.getVideoUrl() != null && !ep.getVideoUrl().trim().isEmpty()) || 
+                                              (ep.getSubtitles() != null && !ep.getSubtitles().isEmpty());
+                            if (!ep.isDeleted() && hasData) {
+                                episodesList.add(ep);
+                            }
+                        }
+                    }
                 }
-                com.example.pemomovie.adapter.EpisodeAdapter episodeAdapter = new com.example.pemomovie.adapter.EpisodeAdapter(this, episodes);
-                rvEpisodes.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                
+                episodeAdapter = new com.example.pemomovie.adapter.EpisodeAdapter(this, episodesList, (episode, position) -> {
+                    episodeId = episode.getId();
+                    playEpisode();
+                });
+                
+                // Find selected position
+                for (int i = 0; i < episodesList.size(); i++) {
+                    if (episodesList.get(i).getId().equals(episodeId)) {
+                        episodeAdapter.setSelectedPosition(i);
+                        break;
+                    }
+                }
+                
+                rvEpisodes.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 3));
                 rvEpisodes.setAdapter(episodeAdapter);
             } else {
                 rvEpisodes.setVisibility(View.GONE);
@@ -717,12 +807,8 @@ public class PlayActivity extends AppCompatActivity {
             commentAdapter = new com.example.pemomovie.adapter.CommentAdapter(this, reviewList, new com.example.pemomovie.adapter.CommentAdapter.OnCommentActionClickListener() {
                 @Override
                 public void onReplyClick(com.example.pemomovie.dto.ReviewResponseDto comment) {
-                    replyingToReviewId = comment.getId();
-                    etComment.setHint("Trả lời @" + (comment.getUser() != null ? comment.getUser().getUsername() : "User") + "...");
-                    if (btnCancelReply != null) btnCancelReply.setVisibility(View.VISIBLE);
-                    etComment.requestFocus();
-                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) imm.showSoftInput(etComment, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                    com.example.pemomovie.ui.main.ReplyBottomSheetFragment bottomSheet = new com.example.pemomovie.ui.main.ReplyBottomSheetFragment(comment, movieId);
+                    bottomSheet.show(getSupportFragmentManager(), "ReplyBottomSheet");
                 }
 
                 @Override
@@ -815,13 +901,9 @@ public class PlayActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void flattenReplies(java.util.List<com.example.pemomovie.dto.ReviewResponseDto> targetList, java.util.List<com.example.pemomovie.dto.ReviewResponseDto> replies) {
-        if (replies == null) return;
-        for (com.example.pemomovie.dto.ReviewResponseDto r : replies) {
-            targetList.add(r);
-            flattenReplies(targetList, r.getReplies());
-        }
-    }
+    private java.util.List<com.example.pemomovie.dto.ReviewResponseDto> allRootComments = new java.util.ArrayList<>();
+    private int currentCommentPage = 0;
+    private final int COMMENTS_PER_PAGE = 5;
 
     private void loadComments() {
         if (movieId == null || movieId == -1L || apiService == null) return;
@@ -829,22 +911,87 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onResponse(retrofit2.Call<java.util.List<com.example.pemomovie.dto.ReviewResponseDto>> call, retrofit2.Response<java.util.List<com.example.pemomovie.dto.ReviewResponseDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    reviewList.clear();
-                    for (com.example.pemomovie.dto.ReviewResponseDto root : response.body()) {
-                        reviewList.add(root);
-                        flattenReplies(reviewList, root.getReplies());
-                    }
-                    if (commentAdapter != null) commentAdapter.notifyDataSetChanged();
-
-                    // Update comment count
-                    TextView tvCommentTitle = findViewById(R.id.tvCommentTitle);
-                    if (tvCommentTitle != null) {
-                        tvCommentTitle.setText("Bình luận (" + reviewList.size() + ")");
-                    }
+                    allRootComments = response.body();
+                    currentCommentPage = 0;
+                    showCommentPage(0);
                 }
             }
             @Override
             public void onFailure(retrofit2.Call<java.util.List<com.example.pemomovie.dto.ReviewResponseDto>> call, Throwable t) {}
+        });
+    }
+
+    private void showCommentPage(int page) {
+        if (allRootComments == null || allRootComments.isEmpty()) {
+            LinearLayout layoutPagination = findViewById(R.id.layoutPagination);
+            if (layoutPagination != null) layoutPagination.setVisibility(View.GONE);
+            return;
+        }
+
+        currentCommentPage = page;
+        int totalPages = (int) Math.ceil((double) allRootComments.size() / COMMENTS_PER_PAGE);
+
+        int start = currentCommentPage * COMMENTS_PER_PAGE;
+        int end = Math.min(start + COMMENTS_PER_PAGE, allRootComments.size());
+
+        reviewList.clear();
+        for (int i = start; i < end; i++) {
+            com.example.pemomovie.dto.ReviewResponseDto root = allRootComments.get(i);
+            reviewList.add(root);
+        }
+
+        if (commentAdapter != null) {
+            commentAdapter.notifyDataSetChanged();
+        }
+
+        TextView tvCommentTitle = findViewById(R.id.tvCommentTitle);
+        if (tvCommentTitle != null) {
+            tvCommentTitle.setText("Bình luận (" + allRootComments.size() + ")");
+        }
+
+        setupPaginationUI(totalPages);
+    }
+
+    private com.example.pemomovie.adapter.PaginationAdapter paginationAdapter;
+
+    private void setupPaginationUI(int totalPages) {
+        LinearLayout layoutPagination = findViewById(R.id.layoutPagination);
+        if (layoutPagination == null) return;
+
+        if (totalPages <= 1) {
+            layoutPagination.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutPagination.setVisibility(View.VISIBLE);
+
+        androidx.recyclerview.widget.RecyclerView rvPagination = findViewById(R.id.rvPagination);
+        ImageButton btnPrevPage = findViewById(R.id.btnPrevPage);
+        ImageButton btnNextPage = findViewById(R.id.btnNextPage);
+
+        if (paginationAdapter == null) {
+            paginationAdapter = new com.example.pemomovie.adapter.PaginationAdapter(this, totalPages, page -> {
+                showCommentPage(page);
+            });
+            rvPagination.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false));
+            rvPagination.setAdapter(paginationAdapter);
+        } else {
+            paginationAdapter.setTotalPages(totalPages);
+        }
+        
+        paginationAdapter.setCurrentPage(currentCommentPage);
+        rvPagination.scrollToPosition(currentCommentPage);
+
+        btnPrevPage.setAlpha(currentCommentPage > 0 ? 1.0f : 0.3f);
+        btnPrevPage.setEnabled(currentCommentPage > 0);
+        btnPrevPage.setOnClickListener(v -> {
+            if (currentCommentPage > 0) showCommentPage(currentCommentPage - 1);
+        });
+
+        btnNextPage.setAlpha(currentCommentPage < totalPages - 1 ? 1.0f : 0.3f);
+        btnNextPage.setEnabled(currentCommentPage < totalPages - 1);
+        btnNextPage.setOnClickListener(v -> {
+            if (currentCommentPage < totalPages - 1) showCommentPage(currentCommentPage + 1);
         });
     }
 

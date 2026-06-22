@@ -38,4 +38,5 @@ public class MediaDetailResponse {
     private List<CreditDto> cast;
     private List<SubtitleDto> subtitles;
     private List<SeasonDto> seasons; // Danh sách các phần (dành cho phim bộ)
+    private Integer expectedEpisodes; // Số tập dự kiến
 }

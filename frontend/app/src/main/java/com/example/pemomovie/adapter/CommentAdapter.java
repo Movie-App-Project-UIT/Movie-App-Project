@@ -77,23 +77,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             holder.txtDate.setText("");
         }
 
-        // Handle Indentation for Replies
+        // CommentAdapter now only displays root comments, so no indentation needed.
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
-        if (review.getParentId() != null) {
-            params.setMarginStart(120); // indent 120 pixels for replies
-            if (review.getParentUsername() != null && !review.getParentUsername().isEmpty()) {
-                holder.txtReplyingTo.setVisibility(View.VISIBLE);
-                holder.txtReplyingTo.setText("Trả lời @" + review.getParentUsername());
-            } else {
-                holder.txtReplyingTo.setVisibility(View.GONE);
-            }
-        } else {
-            params.setMarginStart(0);
-            holder.txtReplyingTo.setVisibility(View.GONE);
-        }
+        params.setMarginStart(0);
+        holder.txtReplyingTo.setVisibility(View.GONE);
         holder.itemView.setLayoutParams(params);
 
         if (holder.txtReply != null) {
+            int replyCount = review.getReplies() != null ? review.getReplies().size() : 0;
+            if (replyCount > 0) {
+                holder.txtReply.setText("Trả lời (" + replyCount + ")");
+            } else {
+                holder.txtReply.setText("Trả lời");
+            }
             holder.txtReply.setOnClickListener(v -> {
                 if (actionListener != null) actionListener.onReplyClick(review);
             });

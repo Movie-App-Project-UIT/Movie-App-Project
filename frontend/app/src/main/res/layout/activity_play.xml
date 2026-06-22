@@ -150,16 +150,40 @@
                     android:nestedScrollingEnabled="false" />
 
                 <!-- Nút Tải thêm bình luận -->
-                <TextView
-                    android:id="@+id/btnLoadMoreComments"
+                <!-- Phân trang bình luận -->
+                <LinearLayout
+                    android:id="@+id/layoutPagination"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tải thêm bình luận"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp"
+                    android:orientation="horizontal"
                     android:gravity="center"
-                    android:paddingVertical="12dp"
-                    android:visibility="gone"/>
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone">
+
+                    <ImageButton
+                        android:id="@+id/btnPrevPage"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_back"
+                        app:tint="@android:color/white"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvPagination"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"/>
+
+                    <ImageButton
+                        android:id="@+id/btnNextPage"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_back"
+                        android:rotation="180"
+                        app:tint="@android:color/white"/>
+                </LinearLayout>
 
             </LinearLayout>
 

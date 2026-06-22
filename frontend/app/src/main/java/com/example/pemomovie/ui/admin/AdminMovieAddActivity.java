@@ -59,15 +59,18 @@ public class AdminMovieAddActivity extends AppCompatActivity {
                 return;
             }
 
-            fetchPreviewData(tmdbId, videoUrl);
+            android.widget.RadioButton rbTvSeries = findViewById(R.id.rbTvSeries);
+            String type = rbTvSeries.isChecked() ? "TV_SERIES" : "MOVIE";
+
+            fetchPreviewData(tmdbId, videoUrl, type);
         });
     }
 
-    private void fetchPreviewData(Integer tmdbId, String videoUrl) {
+    private void fetchPreviewData(Integer tmdbId, String videoUrl, String type) {
         progressBar.setVisibility(View.VISIBLE);
         btnFetchData.setEnabled(false);
 
-        apiService.previewTmdbMovie(tmdbId).enqueue(new Callback<MediaDetailResponse>() {
+        apiService.previewTmdbMovie(tmdbId, type).enqueue(new Callback<MediaDetailResponse>() {
             @Override
             public void onResponse(Call<MediaDetailResponse> call, Response<MediaDetailResponse> response) {
                 progressBar.setVisibility(View.GONE);

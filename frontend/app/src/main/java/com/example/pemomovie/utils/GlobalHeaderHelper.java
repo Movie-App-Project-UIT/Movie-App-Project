@@ -448,7 +448,7 @@ public class GlobalHeaderHelper {
         tvEmptySearch.setVisibility(View.GONE);
         rvSearchResults.setVisibility(View.GONE);
 
-        ApiClient.getApiService().filterMedia(query, null, null, null, null, null, null, 0, 10)
+        ApiClient.getApiService().filterMedia(query, null, null, null, null, null, null, null, null, 0, 10)
             .enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
                 @Override
                 public void onResponse(Call<PageResponseDto<MediaItemDto>> call, Response<PageResponseDto<MediaItemDto>> response) {

@@ -95,6 +95,16 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (movieId != -1L) {
+            // Reload comments when returning to DetailActivity to show new comments.
+            // Reset to page 0.
+            loadComments();
+        }
+    }
+
     private void loadMovieDetails(Long id) {
         apiService.getMediaDetail(id).enqueue(new Callback<MediaDetailResponse>() {
             @Override
@@ -146,9 +156,35 @@ public class DetailActivity extends AppCompatActivity {
         // Setup Buttons
         LinearLayout btnPlayDetailNew = findViewById(R.id.btnPlayDetailNew);
         btnPlayDetailNew.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
-            intent.putExtra("MOVIE_ID", detail.getId());
-            startActivity(intent);
+            apiService.getHistoryByMedia(detail.getId()).enqueue(new retrofit2.Callback<com.example.pemomovie.dto.WatchHistoryItemDto>() {
+                @Override
+                public void onResponse(retrofit2.Call<com.example.pemomovie.dto.WatchHistoryItemDto> call, retrofit2.Response<com.example.pemomovie.dto.WatchHistoryItemDto> response) {
+                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                    intent.putExtra("MOVIE_ID", detail.getId());
+                    if (response.isSuccessful() && response.body() != null) {
+                        com.example.pemomovie.dto.WatchHistoryItemDto history = response.body();
+                        if (history.getEpisode() != null) {
+                            intent.putExtra("EPISODE_ID", history.getEpisode().getId());
+                        } else {
+                            intent.putExtra("EPISODE_ID", -1L);
+                        }
+                        if (history.getProgressSeconds() != null) {
+                            intent.putExtra("START_POSITION", history.getProgressSeconds()); // Pass in seconds
+                        }
+                    } else {
+                        intent.putExtra("EPISODE_ID", -1L);
+                    }
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<com.example.pemomovie.dto.WatchHistoryItemDto> call, Throwable t) {
+                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                    intent.putExtra("MOVIE_ID", detail.getId());
+                    intent.putExtra("EPISODE_ID", -1L);
+                    startActivity(intent);
+                }
+            });
         });
 
         LinearLayout btnLikeDetail = findViewById(R.id.btnLikeDetail);
@@ -220,21 +256,35 @@ public class DetailActivity extends AppCompatActivity {
         isMovie = "MOVIE".equalsIgnoreCase(detail.getMediaType());
         LinearLayout layoutEpisodesContainer = findViewById(R.id.layoutEpisodesContainer);
         
-        // --- BẮT ĐẦU CODE TEST (LUÔN HIỂN THỊ 12 TẬP) ---
         // if (isMovie) {
         //     layoutEpisodesContainer.setVisibility(View.GONE);
         // } else {
             layoutEpisodesContainer.setVisibility(View.VISIBLE);
             RecyclerView rvEpisodes = findViewById(R.id.rvEpisodes);
-            List<String> episodes = new ArrayList<>();
-            for (int i = 1; i <= 12; i++) {
-                episodes.add("Tập " + i);
+            
+            java.util.List<com.example.pemomovie.dto.EpisodeDto> episodes = new java.util.ArrayList<>();
+            if (detail.getSeasons() != null && !detail.getSeasons().isEmpty()) {
+                com.example.pemomovie.dto.SeasonDto firstSeason = detail.getSeasons().get(0);
+                if (firstSeason.getEpisodes() != null) {
+                    for (com.example.pemomovie.dto.EpisodeDto ep : firstSeason.getEpisodes()) {
+                        boolean hasData = (ep.getVideoUrl() != null && !ep.getVideoUrl().trim().isEmpty()) || 
+                                          (ep.getSubtitles() != null && !ep.getSubtitles().isEmpty());
+                        if (!ep.isDeleted() && hasData) {
+                            episodes.add(ep);
+                        }
+                    }
+                }
             }
-            episodeAdapter = new EpisodeAdapter(this, episodes);
-            rvEpisodes.setLayoutManager(new GridLayoutManager(this, 3));
+            
+            episodeAdapter = new EpisodeAdapter(this, episodes, (episode, position) -> {
+                Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                intent.putExtra("MOVIE_ID", detail.getId());
+                intent.putExtra("EPISODE_ID", episode.getId());
+                startActivity(intent);
+            });
+            rvEpisodes.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 3));
             rvEpisodes.setAdapter(episodeAdapter);
         // }
-        // --- KẾT THÚC CODE TEST ---
 
         // Setup Comments UI elements
         RecyclerView rvComments = findViewById(R.id.rvComments);
@@ -260,11 +310,8 @@ public class DetailActivity extends AppCompatActivity {
         commentAdapter = new CommentAdapter(this, reviewList, new CommentAdapter.OnCommentActionClickListener() {
             @Override
             public void onReplyClick(ReviewResponseDto comment) {
-                replyingToReviewId = comment.getId();
-                edtComment.setHint("Trả lời @" + (comment.getUser() != null ? comment.getUser().getUsername() : "User") + "...");
-                edtComment.requestFocus();
-                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-                if (imm != null) imm.showSoftInput(edtComment, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                ReplyBottomSheetFragment bottomSheet = new ReplyBottomSheetFragment(comment, movieId);
+                bottomSheet.show(getSupportFragmentManager(), "ReplyBottomSheet");
             }
 
             @Override
@@ -320,22 +367,27 @@ public class DetailActivity extends AppCompatActivity {
                                 LinearLayout btnPlayDetailNew = findViewById(R.id.btnPlayDetailNew);
                                 if (btnPlayDetailNew != null) {
                                     btnPlayDetailNew.setOnClickListener(v -> {
-                                        new androidx.appcompat.app.AlertDialog.Builder(DetailActivity.this)
+                                        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(DetailActivity.this)
                                                 .setTitle("Tiếp tục xem phim")
                                                 .setMessage("Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?")
-                                                .setPositiveButton("Xem tiếp", (dialog, which) -> {
+                                                .setPositiveButton("Xem tiếp", (d, which) -> {
                                                     Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
                                                     intent.putExtra("MOVIE_ID", detail.getId());
-                                                    intent.putExtra("START_POSITION", progress);
+                                                    if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
+                                                    intent.putExtra("START_POSITION", (long) progress);
                                                     startActivity(intent);
                                                 })
-                                                .setNegativeButton("Từ đầu", (dialog, which) -> {
+                                                .setNegativeButton("Từ đầu", (d, which) -> {
                                                     Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
                                                     intent.putExtra("MOVIE_ID", detail.getId());
-                                                    intent.putExtra("START_POSITION", 0);
+                                                    if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
+                                                    intent.putExtra("START_POSITION", 0L);
                                                     startActivity(intent);
                                                 })
-                                                .show();
+                                                .create();
+                                            dialog.show();
+                                            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
+                                            dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
                                     });
                                 }
                             }
@@ -362,7 +414,7 @@ public class DetailActivity extends AppCompatActivity {
                         }
                     }
                     if (genreId != null) {
-                        apiService.filterMedia(null, genreId, null, null, null, null, null, 0, 10).enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
+                        apiService.filterMedia(null, java.util.Collections.singletonList(genreId), null, null, null, null, null, null, null, 0, 10).enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
                             @Override
                             public void onResponse(Call<PageResponseDto<MediaItemDto>> call, Response<PageResponseDto<MediaItemDto>> response) {
                                 if (response.isSuccessful() && response.body() != null) {
@@ -386,23 +438,19 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
+    private List<ReviewResponseDto> allRootComments = new ArrayList<>();
+    private int currentCommentPage = 0;
+    private final int COMMENTS_PER_PAGE = 5;
+
     private void loadComments() {
         if (movieId == null || movieId == -1L || apiService == null) return;
         apiService.getReviews(movieId).enqueue(new Callback<List<ReviewResponseDto>>() {
             @Override
             public void onResponse(Call<List<ReviewResponseDto>> call, Response<List<ReviewResponseDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    reviewList.clear();
-                    // Limiting to 20 for initial load
-                    List<ReviewResponseDto> allRoots = response.body();
-                    int count = 0;
-                    for (ReviewResponseDto root : allRoots) {
-                        if (count >= 20) break;
-                        reviewList.add(root);
-                        flattenReplies(reviewList, root.getReplies());
-                        count++;
-                    }
-                    if (commentAdapter != null) commentAdapter.notifyDataSetChanged();
+                    allRootComments = response.body();
+                    currentCommentPage = 0;
+                    showCommentPage(0);
                 }
             }
             @Override
@@ -410,12 +458,91 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
-    private void flattenReplies(List<ReviewResponseDto> targetList, List<ReviewResponseDto> replies) {
-        if (replies == null) return;
-        for (ReviewResponseDto r : replies) {
-            targetList.add(r);
-            flattenReplies(targetList, r.getReplies());
+    private void showCommentPage(int page) {
+        if (allRootComments == null || allRootComments.isEmpty()) {
+            LinearLayout layoutPagination = findViewById(R.id.layoutPagination);
+            if (layoutPagination != null) layoutPagination.setVisibility(View.GONE);
+            return;
         }
+
+        currentCommentPage = page;
+        int totalPages = (int) Math.ceil((double) allRootComments.size() / COMMENTS_PER_PAGE);
+
+        int start = currentCommentPage * COMMENTS_PER_PAGE;
+        int end = Math.min(start + COMMENTS_PER_PAGE, allRootComments.size());
+
+        reviewList.clear();
+        for (int i = start; i < end; i++) {
+            ReviewResponseDto root = allRootComments.get(i);
+            reviewList.add(root);
+        }
+
+        if (commentAdapter != null) {
+            commentAdapter.notifyDataSetChanged();
+        }
+
+        TextView tvCommentTitle = findViewById(R.id.tvCommentTitle);
+        if (tvCommentTitle != null) {
+            int totalComments = 0;
+            for (ReviewResponseDto r : allRootComments) {
+                totalComments += 1 + countReplies(r.getReplies());
+            }
+            tvCommentTitle.setText("Bình luận (" + totalComments + ")");
+        }
+
+        setupPaginationUI(totalPages);
+    }
+
+    private int countReplies(List<ReviewResponseDto> replies) {
+        if (replies == null || replies.isEmpty()) return 0;
+        int count = replies.size();
+        for (ReviewResponseDto r : replies) {
+            count += countReplies(r.getReplies());
+        }
+        return count;
+    }
+
+    private com.example.pemomovie.adapter.PaginationAdapter paginationAdapter;
+
+    private void setupPaginationUI(int totalPages) {
+        LinearLayout layoutPagination = findViewById(R.id.layoutPagination);
+        if (layoutPagination == null) return;
+
+        if (totalPages <= 1) {
+            layoutPagination.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutPagination.setVisibility(View.VISIBLE);
+
+        androidx.recyclerview.widget.RecyclerView rvPagination = findViewById(R.id.rvPagination);
+        ImageButton btnPrevPage = findViewById(R.id.btnPrevPage);
+        ImageButton btnNextPage = findViewById(R.id.btnNextPage);
+
+        if (paginationAdapter == null) {
+            paginationAdapter = new com.example.pemomovie.adapter.PaginationAdapter(this, totalPages, page -> {
+                showCommentPage(page);
+            });
+            rvPagination.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false));
+            rvPagination.setAdapter(paginationAdapter);
+        } else {
+            paginationAdapter.setTotalPages(totalPages);
+        }
+        
+        paginationAdapter.setCurrentPage(currentCommentPage);
+        rvPagination.scrollToPosition(currentCommentPage);
+
+        btnPrevPage.setAlpha(currentCommentPage > 0 ? 1.0f : 0.3f);
+        btnPrevPage.setEnabled(currentCommentPage > 0);
+        btnPrevPage.setOnClickListener(v -> {
+            if (currentCommentPage > 0) showCommentPage(currentCommentPage - 1);
+        });
+
+        btnNextPage.setAlpha(currentCommentPage < totalPages - 1 ? 1.0f : 0.3f);
+        btnNextPage.setEnabled(currentCommentPage < totalPages - 1);
+        btnNextPage.setOnClickListener(v -> {
+            if (currentCommentPage < totalPages - 1) showCommentPage(currentCommentPage + 1);
+        });
     }
 
     private void postComment(String content, EditText etComment) {
@@ -459,26 +586,7 @@ public class DetailActivity extends AppCompatActivity {
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(DetailActivity.this, "Báo cáo thành công", Toast.LENGTH_SHORT).show();
-                        Set<Long> idsToRemove = new HashSet<>();
-                        idsToRemove.add(reviewId);
-                        boolean added;
-                        do {
-                            added = false;
-                            for (ReviewResponseDto r : reviewList) {
-                                if (!idsToRemove.contains(r.getId()) && r.getParentId() != null && idsToRemove.contains(r.getParentId())) {
-                                    idsToRemove.add(r.getId());
-                                    added = true;
-                                }
-                            }
-                        } while (added);
-
-                        Iterator<ReviewResponseDto> iterator = reviewList.iterator();
-                        while (iterator.hasNext()) {
-                            if (idsToRemove.contains(iterator.next().getId())) {
-                                iterator.remove();
-                            }
-                        }
-                        if (commentAdapter != null) commentAdapter.notifyDataSetChanged();
+                        loadComments();
                     } else {
                         Toast.makeText(DetailActivity.this, "Bạn đã báo cáo hoặc có lỗi xảy ra", Toast.LENGTH_SHORT).show();
                     }

@@ -87,12 +87,17 @@ public class AdminMovieReviewAdapter extends RecyclerView.Adapter<AdminMovieRevi
 
         holder.btnDelete.setOnClickListener(v -> {
             android.app.Dialog dialog = new android.app.Dialog(v.getContext());
-            dialog.setContentView(R.layout.dialog_confirm_delete);
+            dialog.setContentView(R.layout.dialog_confirm);
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-            android.widget.Button btnCancelDelete = dialog.findViewById(R.id.btnCancelDelete);
-            android.widget.Button btnConfirmDelete = dialog.findViewById(R.id.btnConfirmDelete);
+            android.widget.TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+            android.widget.TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+            tvTitle.setText("Xác nhận xóa");
+            tvMessage.setText("Bạn có chắc chắn muốn xóa bình luận này không? Hành động này không thể hoàn tác.");
+
+            android.widget.Button btnCancelDelete = dialog.findViewById(R.id.btnDialogCancel);
+            android.widget.Button btnConfirmDelete = dialog.findViewById(R.id.btnDialogConfirm);
 
             btnCancelDelete.setOnClickListener(v1 -> dialog.dismiss());
             btnConfirmDelete.setOnClickListener(v1 -> {
