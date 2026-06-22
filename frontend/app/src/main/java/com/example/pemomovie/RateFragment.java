@@ -75,11 +75,10 @@ public class RateFragment extends Fragment {
 
             // hiển thị lại scroll view và ẩn fragment
             ScrollView svInfo = requireActivity().findViewById(R.id.svInfo);
-            FrameLayout detailContainer = requireActivity().findViewById(R.id.detailFragmentContainer);
 
-
-            svInfo.setVisibility(View.VISIBLE);
-            detailContainer.setVisibility(View.GONE);
+            if (svInfo != null) {
+                svInfo.setVisibility(View.VISIBLE);
+            }
         });
 
         btnSubmitRate.setOnClickListener(v -> {

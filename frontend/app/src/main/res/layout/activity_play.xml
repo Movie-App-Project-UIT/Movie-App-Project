@@ -101,38 +101,45 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="12dp">
+                    
+                    <ImageView
+                        android:id="@+id/ivCurrentUserAvatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_avatar"/>
+
+                    <EditText
+                        android:id="@+id/etComment"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_comment_frame"
+                        android:hint="Thêm bình luận..."
+                        android:textColorHint="#888888"
+                        android:textColor="@android:color/white"
+                        android:padding="12dp"
+                        android:textSize="14sp"/>
 
                     <ImageButton
                         android:id="@+id/btnCancelReply"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
+                        android:layout_marginStart="8dp"
                         android:src="@drawable/ic_close"
                         android:background="@android:color/transparent"
                         android:visibility="gone"
                         app:tint="#888888" />
 
-                    <EditText
-                        android:id="@+id/etComment"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Nêu cảm nhận của bạn"
-                        android:textSize="14sp"
-                        android:textColorHint="#888888"
-                        android:textColor="#FFFFFF"
-                        android:paddingHorizontal="16dp"
-                        android:inputType="text"
-                        android:layout_marginStart="8dp"/>
-
                     <ImageButton
                         android:id="@+id/btnSendComment"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
-                        android:background="@android:color/transparent"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_circle_gradient_pink"
                         android:src="@drawable/ic_send"
-                        app:tint="#FF1493"/>
+                        app:tint="@android:color/white"
+                        android:padding="10dp"/>
                 </LinearLayout>
 
                 <!-- Danh sách bình luận -->

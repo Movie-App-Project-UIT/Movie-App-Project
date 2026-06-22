@@ -691,6 +691,22 @@ public class PlayActivity extends AppCompatActivity {
         android.widget.EditText etComment = findViewById(R.id.etComment);
         ImageButton btnCancelReply = findViewById(R.id.btnCancelReply);
         ImageButton btnSendComment = findViewById(R.id.btnSendComment);
+        android.widget.ImageView ivCurrentUserAvatar = findViewById(R.id.ivCurrentUserAvatar);
+
+        if (ivCurrentUserAvatar != null) {
+            com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null && currentUser.getPhotoUrl() != null && !currentUser.getPhotoUrl().toString().trim().isEmpty()) {
+                String photoUrl = currentUser.getPhotoUrl().toString().trim();
+                if (photoUrl.startsWith("\"") && photoUrl.endsWith("\"")) {
+                    photoUrl = photoUrl.substring(1, photoUrl.length() - 1);
+                }
+                com.bumptech.glide.Glide.with(this)
+                        .load(photoUrl)
+                        .placeholder(R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(ivCurrentUserAvatar);
+            }
+        }
 
         if (rvComment != null && etComment != null) {
             commentAdapter = new com.example.pemomovie.adapter.CommentAdapter(this, reviewList, new com.example.pemomovie.adapter.CommentAdapter.OnCommentActionClickListener() {
