@@ -167,11 +167,31 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 }
                 break;
                 
-            default:
-                holder.ivIcon.setImageResource(R.drawable.ic_notification);
-                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_avatar_border);
+            case "REPLY":
+                holder.ivIcon.setImageResource(R.drawable.ic_chat_bubble_dots);
+                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_gradient_pink);
                 holder.ivIcon.setColorFilter(Color.WHITE);
                 holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#4C1D95")); // Subtle purple border
+                break;
+                
+            case "SYSTEM":
+                holder.ivIcon.setImageResource(R.drawable.ic_megaphone);
+                holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_gradient_blue);
+                holder.ivIcon.setColorFilter(Color.WHITE);
+                holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#1E3A8A")); // Subtle dark blue border
+                break;
+                
+            default:
+                holder.ivIcon.setImageResource(R.drawable.ic_notification);
+                android.graphics.drawable.GradientDrawable defaultIconBg = new android.graphics.drawable.GradientDrawable();
+                defaultIconBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+                defaultIconBg.setColor(Color.parseColor("#4B5563"));
+                holder.ivIcon.setBackground(defaultIconBg);
+                holder.ivIcon.setColorFilter(Color.parseColor("#E5E7EB"));
+                holder.ivArrow.setVisibility(View.VISIBLE);
+                borderDrawable.setStroke(dpToPx(1), Color.parseColor("#374151"));
                 break;
         }
 
