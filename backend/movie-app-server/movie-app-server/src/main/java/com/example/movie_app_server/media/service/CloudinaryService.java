@@ -27,8 +27,8 @@ public class CloudinaryService {
 
     // Hàm upload Video (Dành cho phim)
     public String uploadVideo(MultipartFile file) throws IOException {
-        // Cấu hình tuỳ chỉnh: Chỉ lấy bản gốc (giới hạn ở 720p) và bản 480p
-        String customHlsProfile = "c_limit,w_1280,h_720,vc_h264/c_limit,w_854,h_480,vc_h264/f_m3u8";
+        // Cấu hình tuỳ chỉnh siêu tiết kiệm: Chỉ lấy 720p (ép bitrate 1500k) và 480p (ép bitrate thấp 500k)
+        String customHlsProfile = "c_limit,w_1280,h_720,vc_h264,br_1500k/c_limit,w_854,h_480,vc_h264,br_500k/f_m3u8";
         
         Map uploadResult = cloudinary.uploader().uploadLarge(file.getInputStream(),
                 ObjectUtils.asMap(

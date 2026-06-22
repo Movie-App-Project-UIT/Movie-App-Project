@@ -363,6 +363,67 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    private void showQualityDialog() {
+        androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
+        java.util.Map<Integer, androidx.media3.common.TrackSelectionOverride> overrideMap = new java.util.HashMap<>();
+        
+        java.util.List<Integer> heights = new java.util.ArrayList<>();
+        
+        for (androidx.media3.common.Tracks.Group trackGroup : tracks.getGroups()) {
+            if (trackGroup.getType() == C.TRACK_TYPE_VIDEO) {
+                androidx.media3.common.TrackGroup group = trackGroup.getMediaTrackGroup();
+                for (int i = 0; i < group.length; i++) {
+                    androidx.media3.common.Format format = group.getFormat(i);
+                    int height = format.height;
+                    // Lọc trùng: nếu cloud sinh ra nhiều bitrate cho cùng 1 độ phân giải
+                    if (height > 0 && !heights.contains(height)) {
+                        heights.add(height);
+                        overrideMap.put(height, new androidx.media3.common.TrackSelectionOverride(group, i));
+                    }
+                }
+            }
+        }
+
+        // Sắp xếp độ phân giải từ cao xuống thấp
+        java.util.Collections.sort(heights, java.util.Collections.reverseOrder());
+
+        String[] options = new String[heights.size() + 1];
+        options[0] = "Tự động (Auto)";
+        for (int i = 0; i < heights.size(); i++) {
+            int h = heights.get(i);
+            options[i + 1] = h >= 720 ? h + "p (HD)" : h + "p";
+        }
+
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Chọn chất lượng")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Auto
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                                        .build()
+                        );
+                        Toast.makeText(this, "Chất lượng: Tự động", Toast.LENGTH_SHORT).show();
+                    } else {
+                        int height = heights.get(which - 1);
+                        androidx.media3.common.TrackSelectionOverride override = overrideMap.get(height);
+                        if (override != null) {
+                            exoPlayer.setTrackSelectionParameters(
+                                    exoPlayer.getTrackSelectionParameters()
+                                            .buildUpon()
+                                            .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                                            .addOverride(override)
+                                            .build()
+                            );
+                            Toast.makeText(this, "Chất lượng: " + height + "p", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
+
 
     private void populateMovieDetails() {
         if (mediaDetail == null) return;
@@ -646,16 +707,7 @@ public class PlayActivity extends AppCompatActivity {
             if (btnSettings != null) {
                 btnSettings.setOnClickListener(v -> {
                     if (exoPlayer != null) {
-                        androidx.media3.ui.TrackSelectionDialogBuilder dialogBuilder =
-                                new androidx.media3.ui.TrackSelectionDialogBuilder(
-                                        this,
-                                        "Chọn chất lượng",
-                                        exoPlayer,
-                                        C.TRACK_TYPE_VIDEO
-                                );
-                        dialogBuilder.setAllowAdaptiveSelections(true);
-                        dialogBuilder.setShowDisableOption(false);
-                        dialogBuilder.build().show();
+                        showQualityDialog();
                     }
                 });
             }
