@@ -1,5 +1,7 @@
 package com.example.pemomovie.ui.main;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -7,10 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.content.Intent;
-import android.net.Uri;
-import java.util.HashMap;
-import java.util.Map;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,9 +18,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pemomovie.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PaymentWebActivity extends AppCompatActivity {
 
     private WebView webView;
+    private String selectedPlanName;
+    private int selectedPlanDuration;
+    private String planPriceStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +39,17 @@ public class PaymentWebActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Lấy thông tin gói để truyền sang PaymentSuccessActivity
+        selectedPlanName = getIntent().getStringExtra("SELECTED_PLAN_NAME");
+        selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
+        planPriceStr = getIntent().getStringExtra("PLAN_PRICE");
+
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
         webView = findViewById(R.id.webView);
-        
-        // Cấu hình WebView hỗ trợ thanh toán VNPay/MoMo
+
+        // Cấu hình WebView hỗ trợ thanh toán VNPay
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -51,7 +61,29 @@ public class PaymentWebActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains("ngrok-free.dev") && !url.equals(lastInterceptedUrl)) {
+                // ✅ Bắt Deep Link từ Backend sau khi thanh toán VNPay xong
+                if (url != null && url.startsWith("pemomovie://payment")) {
+                    Uri uri = Uri.parse(url);
+                    String status = uri.getQueryParameter("status");
+                    if ("success".equals(status)) {
+                        // Thanh toán thành công → mở màn hình thành công
+                        Intent intent = new Intent(PaymentWebActivity.this, PaymentSuccessActivity.class);
+                        intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+                        intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
+                        intent.putExtra("PLAN_PRICE", planPriceStr);
+                        startActivity(intent);
+                    } else {
+                        // Thanh toán thất bại
+                        Toast.makeText(PaymentWebActivity.this,
+                                "Thanh toán thất bại hoặc đã bị hủy. Vui lòng thử lại!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    finish();
+                    return true;
+                }
+
+                // Thêm header bypass ngrok warning khi load các URL ngrok
+                if (url != null && url.contains("ngrok-free.dev") && !url.equals(lastInterceptedUrl)) {
                     lastInterceptedUrl = url;
                     view.post(() -> {
                         Map<String, String> extraHeaders = new HashMap<>();
@@ -59,9 +91,10 @@ public class PaymentWebActivity extends AppCompatActivity {
                         view.loadUrl(url, extraHeaders);
                     });
                     return true;
-                } else if (url.startsWith("http://") || url.startsWith("https://")) {
-                    return false;
+                } else if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    return false; // WebView tự xử lý
                 } else {
+                    // Mở ứng dụng ngoài (VNPay, ngân hàng,...)
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(intent);

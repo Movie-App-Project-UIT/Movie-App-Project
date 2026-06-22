@@ -165,13 +165,15 @@ public class QrPaymentActivity extends AppCompatActivity {
             });
         }
 
-        // Nút mở WebView trực tiếp trong app
         androidx.cardview.widget.CardView btnOpenWebView = findViewById(R.id.btnOpenWebView);
         if (btnOpenWebView != null) {
             btnOpenWebView.setOnClickListener(v -> {
                 if (currentPaymentUrl != null) {
                     Intent webIntent = new Intent(QrPaymentActivity.this, PaymentWebActivity.class);
                     webIntent.putExtra("PAYMENT_URL", currentPaymentUrl);
+                    webIntent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
+                    webIntent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
+                    webIntent.putExtra("PLAN_PRICE", planPriceStr);
                     startActivity(webIntent);
                 } else {
                     Toast.makeText(this, "Đang tải liên kết thanh toán, vui lòng đợi...", Toast.LENGTH_SHORT).show();
