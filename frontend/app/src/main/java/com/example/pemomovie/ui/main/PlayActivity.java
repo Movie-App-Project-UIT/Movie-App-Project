@@ -363,6 +363,82 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    private void showSpeedDialog() {
+        String[] options = {"0.5x", "0.75x", "1.0x (Chuẩn)", "1.25x", "1.5x", "2.0x"};
+        float[] speeds = {0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f};
+        
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Tốc độ phát")
+                .setItems(options, (dialog, which) -> {
+                    float speed = speeds[which];
+                    exoPlayer.setPlaybackParameters(new androidx.media3.common.PlaybackParameters(speed));
+                    Toast.makeText(this, "Tốc độ: " + options[which], Toast.LENGTH_SHORT).show();
+                })
+                .show();
+    }
+
+    private void showSubtitleDialog() {
+        androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
+        java.util.List<androidx.media3.common.TrackSelectionOverride> textOverrides = new java.util.ArrayList<>();
+        java.util.List<String> optionsList = new java.util.ArrayList<>();
+        
+        optionsList.add("Tắt phụ đề");
+        textOverrides.add(null); // Tương ứng với tắt
+        
+        for (androidx.media3.common.Tracks.Group trackGroup : tracks.getGroups()) {
+            if (trackGroup.getType() == C.TRACK_TYPE_TEXT) {
+                androidx.media3.common.TrackGroup group = trackGroup.getMediaTrackGroup();
+                for (int i = 0; i < group.length; i++) {
+                    androidx.media3.common.Format format = group.getFormat(i);
+                    String lang = format.language != null ? format.language : "Không rõ";
+                    String label = format.label != null ? format.label : lang;
+                    optionsList.add(label);
+                    textOverrides.add(new androidx.media3.common.TrackSelectionOverride(group, i));
+                }
+            }
+        }
+
+        String[] options = optionsList.toArray(new String[0]);
+        
+        new android.app.AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Chọn phụ đề")
+                .setItems(options, (dialog, which) -> {
+                    androidx.media3.common.TrackSelectionOverride override = textOverrides.get(which);
+                    if (override == null) {
+                        // Tắt phụ đề
+                        subtitleEnabled = false;
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                                        .build()
+                        );
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.GONE);
+                        }
+                        updateSubtitleButton();
+                        Toast.makeText(this, "Đã tắt phụ đề", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Bật phụ đề đã chọn
+                        subtitleEnabled = true;
+                        exoPlayer.setTrackSelectionParameters(
+                                exoPlayer.getTrackSelectionParameters()
+                                        .buildUpon()
+                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                        .addOverride(override)
+                                        .build()
+                        );
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.VISIBLE);
+                        }
+                        updateSubtitleButton();
+                        Toast.makeText(this, "Phụ đề: " + options[which], Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
     private void showQualityDialog() {
         androidx.media3.common.Tracks tracks = exoPlayer.getCurrentTracks();
         java.util.Map<Integer, androidx.media3.common.TrackSelectionOverride> overrideMap = new java.util.HashMap<>();
@@ -712,6 +788,16 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
+            // Tốc độ phát
+            View btnSpeed = playerView.findViewById(R.id.btnSpeed);
+            if (btnSpeed != null) {
+                btnSpeed.setOnClickListener(v -> {
+                    if (exoPlayer != null) {
+                        showSpeedDialog();
+                    }
+                });
+            }
+
             // Thanh trượt âm lượng
             ImageButton btnVolume = playerView.findViewById(R.id.btnVolume);
             SeekBar seekBarVolume = playerView.findViewById(R.id.seekBarVolume);
@@ -724,6 +810,8 @@ public class PlayActivity extends AppCompatActivity {
                     seekBarVolume.setProgress(currentVolume);
 
                     updateVolumeIcon(btnVolume, currentVolume);
+                    // Ẩn thanh trượt mặc định
+                    seekBarVolume.setVisibility(View.GONE);
 
                     seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
@@ -742,24 +830,26 @@ public class PlayActivity extends AppCompatActivity {
                     });
 
                     btnVolume.setOnClickListener(v -> {
-                        int progress = seekBarVolume.getProgress();
-                        if (progress > 0) {
-                            // Mute
-                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
-                            seekBarVolume.setProgress(0);
-                            btnVolume.setImageResource(R.drawable.ic_volume_off);
+                        // Toggle visibility
+                        if (seekBarVolume.getVisibility() == View.VISIBLE) {
+                            seekBarVolume.setVisibility(View.GONE);
                         } else {
-                            // Unmute to middle
-                            int midVol = maxVolume / 2;
-                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, midVol, 0);
-                            seekBarVolume.setProgress(midVol);
-                            btnVolume.setImageResource(R.drawable.ic_volume_up);
+                            seekBarVolume.setVisibility(View.VISIBLE);
                         }
                     });
                 }
             }
 
-            // Nút phụ đề đã được đổi thành @id/exo_subtitle nên ExoPlayer sẽ tự động quản lý!
+            // Phụ đề (Subtitle)
+            btnSubtitle = playerView.findViewById(R.id.btnSubtitle);
+            if (btnSubtitle != null) {
+                updateSubtitleButton(); // Cập nhật icon ban đầu
+                btnSubtitle.setOnClickListener(v -> {
+                    if (exoPlayer != null) {
+                        showSubtitleDialog();
+                    }
+                });
+            }
 
             // Sự kiện ẩn hiện các controll của video
             playerView.setControllerVisibilityListener(

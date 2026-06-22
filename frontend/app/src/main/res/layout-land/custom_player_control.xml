@@ -101,18 +101,64 @@
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
+            <!-- Volume -->
+            <ImageButton
+                android:id="@+id/btnVolume"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_volume_up"
+                app:tint="@android:color/white" />
+
+            <!-- Volume Slider -->
+            <SeekBar
+                android:id="@+id/seekBarVolume"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:maxHeight="4dp"
+                android:minHeight="4dp"
+                android:max="100"
+                android:progress="100"
+                android:progressDrawable="@drawable/custom_seekbar_progress"
+                android:thumbTint="@android:color/white"
+                android:progressTint="#D70466" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="5dp"
                 android:layout_weight="1" />
+
+            <!-- Tốc độ phát -->
+            <ImageButton
+                android:id="@+id/btnSpeed"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_time"
+                app:tint="@android:color/white" />
 
             <!-- Subtitle -->
             <ImageButton
                 android:id="@+id/btnSubtitle"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_subtitle"
+                app:tint="@android:color/white" />
+
+            <!-- Settings -->
+            <ImageButton
+                android:id="@id/exo_settings"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_settings"
                 app:tint="@android:color/white" />
 
             <!-- Fullscreen -->
