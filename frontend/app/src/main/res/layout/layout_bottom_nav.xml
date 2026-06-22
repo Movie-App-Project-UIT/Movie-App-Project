@@ -7,53 +7,85 @@
     android:background="@drawable/bg_bottom_nav"
     android:elevation="8dp">
 
-<LinearLayout
-android:id="@+id/bottomNav"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="horizontal"
-android:gravity="center"
-android:paddingTop="15dp">
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp">
 
-<ImageButton
-    android:id="@+id/btnHome"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:background="@android:color/transparent"
-    android:src="@drawable/ic_home"
-    app:tint="@color/btn_nav_selector"
-    android:elevation="8dp"/>
+        <!-- Home Tab -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_nav_bg_selector"
+                android:src="@drawable/ic_home"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/btn_nav_selector"
+                android:elevation="8dp"/>
+        </FrameLayout>
 
-<ImageButton
-    android:id="@+id/btnGenres"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:background="@android:color/transparent"
-    android:src="@drawable/ic_genres"
-    app:tint="@color/btn_nav_selector"
-    android:elevation="8dp"/>
+        <!-- Genres Tab -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/btnGenres"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_nav_bg_selector"
+                android:src="@drawable/ic_genres"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/btn_nav_selector"
+                android:elevation="8dp"/>
+        </FrameLayout>
 
-<ImageButton
-    android:id="@+id/btnFavorites"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:background="@android:color/transparent"
-    android:src="@drawable/ic_favorites"
-    app:tint="@color/btn_nav_selector"
-    android:elevation="8dp"/>
+        <!-- Favorites Tab -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/btnFavorites"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_nav_bg_selector"
+                android:src="@drawable/ic_favorites"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/btn_nav_selector"
+                android:elevation="8dp"/>
+        </FrameLayout>
 
-<ImageButton
-    android:id="@+id/btnWatching"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:background="@android:color/transparent"
-    android:src="@drawable/ic_watching"
-    app:tint="@color/btn_nav_selector"
-    android:elevation="8dp"/>
+        <!-- Watching Tab -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/btnWatching"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_nav_bg_selector"
+                android:src="@drawable/ic_watching"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/btn_nav_selector"
+                android:elevation="8dp"/>
+        </FrameLayout>
 
-</LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

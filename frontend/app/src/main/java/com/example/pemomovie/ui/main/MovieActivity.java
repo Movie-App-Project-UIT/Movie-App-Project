@@ -44,12 +44,8 @@ import retrofit2.Response;
 
 public class MovieActivity extends AppCompatActivity {
 
-    private EditText edtSearch;
     private LinearLayout btnSortOptions;
     private TextView txtCurrentSort;
-    
-    private Handler searchHandler = new Handler();
-    private Runnable searchRunnable;
 
     private TabLayout tabLayoutMediaType;
     private LinearLayout btnToggleFilter, layoutFiltersContainer;
@@ -88,7 +84,6 @@ public class MovieActivity extends AppCompatActivity {
         initViews();
         setupToggleFilter();
         setupTabLayout();
-        setupSearch();
         
         setupStaticFilters();
         loadDynamicFilters();
@@ -98,7 +93,8 @@ public class MovieActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        edtSearch = findViewById(R.id.edtSearch);
+        // Khởi tạo thanh tìm kiếm chung
+        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
 
         tabLayoutMediaType = findViewById(R.id.tabLayoutMediaType);
         btnToggleFilter = findViewById(R.id.btnToggleFilter);
@@ -145,29 +141,6 @@ public class MovieActivity extends AppCompatActivity {
             public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
-        });
-    }
-
-    private void setupSearch() {
-        edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (searchRunnable != null) {
-                    searchHandler.removeCallbacks(searchRunnable);
-                }
-                searchRunnable = () -> {
-                    currentKeyword = s.toString().trim();
-                    if (currentKeyword.isEmpty()) currentKeyword = null;
-                    loadMovies();
-                };
-                searchHandler.postDelayed(searchRunnable, 500); // 500ms debounce
-            }
         });
     }
 
