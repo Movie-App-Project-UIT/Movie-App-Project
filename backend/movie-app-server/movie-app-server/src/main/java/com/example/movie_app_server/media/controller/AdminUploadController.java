@@ -74,6 +74,16 @@ public class AdminUploadController {
         return ResponseEntity.ok(videoUrl);
     }
 
+    // API Up Subtitle từ Google Drive Link
+    @PostMapping("/drive-subtitle")
+    public ResponseEntity<String> uploadSubtitleFromDrive(@RequestParam("driveUrl") String driveUrl) throws Exception {
+        if (driveUrl == null || driveUrl.trim().isEmpty()) {
+            throw new com.example.movie_app_server.common.exception.AppException("Link Drive không được để trống", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        String subtitleUrl = cloudinaryService.uploadSubtitleFromDrive(driveUrl);
+        return ResponseEntity.ok(subtitleUrl);
+    }
+
     private boolean isImage(MultipartFile file) {
         String name = file.getOriginalFilename();
         if (name == null) return false;

@@ -107,6 +107,45 @@ public class CloudinaryService {
         return uploadResult.get("secure_url").toString();
     }
 
+    // Hàm upload file phụ đề trực tiếp từ Google Drive Link
+    public String uploadSubtitleFromDrive(String driveUrl) throws IOException {
+        String fileId = null;
+        if (driveUrl.contains("/d/")) {
+            String[] parts = driveUrl.split("/d/");
+            if (parts.length > 1) {
+                fileId = parts[1].split("/")[0];
+            }
+        } else if (driveUrl.contains("id=")) {
+            String[] parts = driveUrl.split("id=");
+            if (parts.length > 1) {
+                fileId = parts[1].split("&")[0];
+            }
+        }
+
+        if (fileId == null) {
+            throw new IllegalArgumentException("Không thể nhận diện ID từ Link Drive cung cấp.");
+        }
+
+        String downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
+
+        java.net.URL url = new java.net.URL(downloadUrl);
+        java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+        connection.setInstanceFollowRedirects(true);
+
+        try (java.io.InputStream inputStream = connection.getInputStream()) {
+            // Đọc InputStream thành chuỗi byte vì phụ đề rất nhẹ
+            byte[] bytes = inputStream.readAllBytes();
+            Map uploadResult = cloudinary.uploader().upload(bytes,
+                    ObjectUtils.asMap(
+                            "resource_type", "raw",
+                            "folder", subtitleFolder
+                    ));
+            return uploadResult.get("secure_url").toString();
+        } finally {
+            connection.disconnect();
+        }
+    }
+
     // Hàm xóa file raw
     public void deleteRawFile(String fileUrl) {
         try {
