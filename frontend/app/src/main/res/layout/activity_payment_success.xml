@@ -125,54 +125,63 @@
             android:gravity="center_horizontal"
             android:paddingHorizontal="20dp">
 
-            <!-- Crown Icon -->
-            <FrameLayout
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp">
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_circle_outline"
-                    android:padding="24dp"
-                    android:src="@drawable/ic_crown" 
-                    app:tint="#FBBF24"/>
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_check_circle_filled"
-                    app:tint="#8B5CF6"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginEnd="16dp"/>
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Congratulation Section -->
+            <LinearLayout
+                android:id="@+id/layoutCongrats"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chúc mừng!"
-                android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bạn đã trở thành"
-                android:textColor="#9CA3AF"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
+                <!-- Crown Icon -->
+                <FrameLayout
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_circle_outline"
+                        android:padding="24dp"
+                        android:src="@drawable/ic_crown" 
+                        app:tint="#FBBF24"/>
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_check_circle_filled"
+                        app:tint="#8B5CF6"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="16dp"/>
+                </FrameLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PREMIUM MEMBER"
-                android:textColor="#FBBF24"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="32dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chúc mừng!"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bạn đã trở thành"
+                    android:textColor="#9CA3AF"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PREMIUM MEMBER"
+                    android:textColor="#FBBF24"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="32dp"/>
+            </LinearLayout>
 
             <!-- Thông tin gói -->
             <LinearLayout
