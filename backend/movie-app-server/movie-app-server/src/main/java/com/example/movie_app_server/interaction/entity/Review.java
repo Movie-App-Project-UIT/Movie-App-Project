@@ -59,7 +59,7 @@ public class Review {
     @Builder.Default
     private boolean isHidden = false;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

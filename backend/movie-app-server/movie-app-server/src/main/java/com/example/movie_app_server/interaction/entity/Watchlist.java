@@ -30,7 +30,7 @@ public class Watchlist {
     @JoinColumn(name = "media_id", nullable = false)
     private Media media;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "added_at", nullable = false, updatable = false)
     private LocalDateTime addedAt;
 }

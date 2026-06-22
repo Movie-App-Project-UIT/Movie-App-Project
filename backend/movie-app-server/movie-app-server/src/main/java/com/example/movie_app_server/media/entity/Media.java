@@ -68,7 +68,7 @@ public class Media {
     @Column(name = "language", length = 50)
     private String language;
 
-    @CreationTimestamp
+    @CreationTimestamp(source = org.hibernate.annotations.SourceType.VM)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
