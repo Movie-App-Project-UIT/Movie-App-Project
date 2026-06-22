@@ -18,8 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pemomovie.R;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class PaymentWebActivity extends AppCompatActivity {
 
@@ -57,8 +56,6 @@ public class PaymentWebActivity extends AppCompatActivity {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         webView.setWebViewClient(new WebViewClient() {
-            private String lastInterceptedUrl = "";
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // ✅ Bắt Deep Link từ Backend sau khi thanh toán VNPay xong
@@ -66,12 +63,10 @@ public class PaymentWebActivity extends AppCompatActivity {
                     Uri uri = Uri.parse(url);
                     String status = uri.getQueryParameter("status");
                     if ("success".equals(status)) {
-                        // Thanh toán thành công → mở màn hình thành công
-                        Intent intent = new Intent(PaymentWebActivity.this, PaymentSuccessActivity.class);
-                        intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
-                        intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
-                        intent.putExtra("PLAN_PRICE", planPriceStr);
-                        startActivity(intent);
+                        // Không mở PaymentSuccessActivity ngay lập tức nữa.
+                        // Nhường lại cho QrPaymentActivity (đang chạy ngầm) xử lý,
+                        // nó sẽ tự mở PaymentProcessingActivity (Splash)
+                        Toast.makeText(PaymentWebActivity.this, "Đang xử lý giao dịch...", Toast.LENGTH_SHORT).show();
                     } else {
                         // Thanh toán thất bại
                         Toast.makeText(PaymentWebActivity.this,
@@ -82,17 +77,8 @@ public class PaymentWebActivity extends AppCompatActivity {
                     return true;
                 }
 
-                // Thêm header bypass ngrok warning khi load các URL ngrok
-                if (url != null && url.contains("ngrok-free.dev") && !url.equals(lastInterceptedUrl)) {
-                    lastInterceptedUrl = url;
-                    view.post(() -> {
-                        Map<String, String> extraHeaders = new HashMap<>();
-                        extraHeaders.put("ngrok-skip-browser-warning", "true");
-                        view.loadUrl(url, extraHeaders);
-                    });
-                    return true;
-                } else if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
-                    return false; // WebView tự xử lý
+                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    return false; // WebView tự xử lý (sẽ tự động hiện trang Visit Site của Ngrok)
                 } else {
                     // Mở ứng dụng ngoài (VNPay, ngân hàng,...)
                     try {
@@ -110,9 +96,7 @@ public class PaymentWebActivity extends AppCompatActivity {
 
         String paymentUrl = getIntent().getStringExtra("PAYMENT_URL");
         if (paymentUrl != null && !paymentUrl.isEmpty()) {
-            Map<String, String> extraHeaders = new HashMap<>();
-            extraHeaders.put("ngrok-skip-browser-warning", "true");
-            webView.loadUrl(paymentUrl, extraHeaders);
+            webView.loadUrl(paymentUrl);
         } else {
             Toast.makeText(this, "URL không hợp lệ", Toast.LENGTH_SHORT).show();
             finish();

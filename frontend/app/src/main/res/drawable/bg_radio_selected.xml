@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer circle outline -->
+    <item>
+        <shape android:shape="oval">
+            <stroke android:width="2dp" android:color="#8B5CF6" />
+            <solid android:color="@android:color/transparent" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+    <!-- Inner filled circle (dot) -->
+    <item android:top="6dp" android:bottom="6dp" android:left="6dp" android:right="6dp">
+        <shape android:shape="oval">
+            <solid android:color="#8B5CF6" />
+        </shape>
+    </item>
+</layer-list>

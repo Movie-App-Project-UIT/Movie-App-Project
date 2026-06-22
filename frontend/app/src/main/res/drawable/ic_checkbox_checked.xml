@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer border -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="4dp" />
+            <stroke android:width="2dp" android:color="#814EEB" />
+            <solid android:color="@android:color/transparent" />
+            <size android:width="20dp" android:height="20dp" />
+        </shape>
+    </item>
+    <!-- Inner checkmark -->
+    <item android:left="3dp" android:right="3dp" android:top="3dp" android:bottom="3dp">
+        <vector android:width="14dp" android:height="14dp"
+            android:viewportWidth="24" android:viewportHeight="24">
+            <path
+                android:fillColor="#814EEB"
+                android:pathData="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41-1.41z"/>
+        </vector>
+    </item>
+</layer-list>
