@@ -36,12 +36,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentUrl);
     }
 
-    // API Test: Giả lập thanh toán thành công
-    @PostMapping("/test-success")
-    public ResponseEntity<String> simulateSuccess(@RequestParam Long packageId) {
-        paymentService.simulateSuccess(packageId, getUid());
-        return ResponseEntity.ok("Thanh toán giả lập thành công!");
-    }
+
 
     // IPN Webhook: VNPay Server sẽ gọi trực tiếp vào đây để báo kết quả
     @GetMapping("/vnpay-ipn")
@@ -79,8 +74,6 @@ public class PaymentController {
 
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
-            // Since VNPay server cannot reach localhost IPN URL, we manually call IPN logic here for testing
-            paymentService.processIpnWebhook(originalParams);
             // Hiển thị giao diện hoặc redirect về App (DeepLink)
             return ResponseEntity.ok("Thanh toán thành công! Bạn có thể quay lại Ứng dụng.");
         } else {

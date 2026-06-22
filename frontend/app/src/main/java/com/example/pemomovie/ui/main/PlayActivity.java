@@ -53,7 +53,6 @@ import retrofit2.Response;
 
 import com.example.pemomovie.CommentFragment;
 import com.example.pemomovie.R;
-import com.example.pemomovie.RateFragment;
 
 @OptIn(markerClass = UnstableApi.class)
 public class PlayActivity extends AppCompatActivity {

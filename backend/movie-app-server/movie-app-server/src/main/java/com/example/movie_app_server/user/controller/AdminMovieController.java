@@ -63,6 +63,9 @@ public class AdminMovieController {
     @PostMapping
     @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<MediaDetailResponse> createMovie(@RequestBody AdminMovieSaveRequest request) {
+        if (request.getTmdbId() != null && mediaRepository.findByTmdbId(request.getTmdbId()).isPresent()) {
+            throw new com.example.movie_app_server.common.exception.AppException("Phim này đã tồn tại trong hệ thống!", org.springframework.http.HttpStatus.CONFLICT);
+        }
         Media media = tmdbSyncService.previewMovieFromTmdb(request.getTmdbId());
         media.setVideoUrl(request.getVideoUrl());
         media.setPremium(request.isPremium());

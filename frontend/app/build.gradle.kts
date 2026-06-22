@@ -16,7 +16,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+        //buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+        buildConfigField("String", "BASE_URL", "\"https://nutcase-poison-jeeringly.ngrok-free.dev\"")
     }
 
     buildFeatures {
@@ -33,7 +34,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.pemomovie.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+            buildConfigField("String", "BASE_URL", "\"https://nutcase-poison-jeeringly.ngrok-free.dev\"")
         }
     }
     compileOptions {

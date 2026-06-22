@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pemomovie.CommentFragment;
 import com.example.pemomovie.R;
-import com.example.pemomovie.RateFragment;
 import com.example.pemomovie.adapter.PosterAdapter;
 
 public class DetailActivity extends AppCompatActivity {

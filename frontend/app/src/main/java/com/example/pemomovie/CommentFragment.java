@@ -200,8 +200,29 @@ public class CommentFragment extends Fragment {
                             }
                         }
                         
-                        // Để đơn giản, reload lại toàn bộ bình luận để đúng thứ tự
-                        loadComments();
+                        // Chèn trực tiếp bình luận mới vào danh sách
+                        if (response.body().getParentId() == null) {
+                            reviewList.add(0, response.body());
+                            if (getView() != null) {
+                                RecyclerView rv = getView().findViewById(R.id.rvComment);
+                                if (rv != null) rv.scrollToPosition(0);
+                            }
+                        } else {
+                            int insertIdx = reviewList.size();
+                            for (int i = 0; i < reviewList.size(); i++) {
+                                if (reviewList.get(i).getId().equals(response.body().getParentId())) {
+                                    insertIdx = i + 1;
+                                    while (insertIdx < reviewList.size() && reviewList.get(insertIdx).getParentId() != null && reviewList.get(insertIdx).getParentId().equals(response.body().getParentId())) {
+                                        insertIdx++;
+                                    }
+                                    break;
+                                }
+                            }
+                            reviewList.add(insertIdx, response.body());
+                        }
+                        if (commentAdapter != null) {
+                            commentAdapter.notifyDataSetChanged();
+                        }
                         
                         android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
                         if (imm != null) {
