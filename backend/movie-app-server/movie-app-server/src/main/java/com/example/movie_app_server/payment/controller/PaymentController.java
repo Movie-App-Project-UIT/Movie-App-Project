@@ -52,24 +52,35 @@ public class PaymentController {
 
     // Return URL: Trình duyệt của user chuyển hướng về đây sau khi thanh toán xong
     @GetMapping("/vnpay-return")
-    public ResponseEntity<String> vnpayReturn(@RequestParam Map<String, String> params) {
-        Map<String, String> originalParams = new HashMap<>(params); // Save original for IPN
-
+    public org.springframework.http.ResponseEntity<Void> vnpayReturn(@RequestParam Map<String, String> params) {
         String secureHash = params.get("vnp_SecureHash");
-        params.remove("vnp_SecureHash");
-        params.remove("vnp_SecureHashType");
+        Map<String, String> verifyParams = new HashMap<>(params);
+        verifyParams.remove("vnp_SecureHash");
+        verifyParams.remove("vnp_SecureHashType");
 
-        String signValue = com.example.movie_app_server.payment.config.VNPayConfig.hashAllFields(params, paymentService.getVnPaySecretKey());
+        String signValue = com.example.movie_app_server.payment.config.VNPayConfig.hashAllFields(verifyParams, paymentService.getVnPaySecretKey());
+
+        String redirectUrl;
         if (!signValue.equals(secureHash)) {
-            return ResponseEntity.badRequest().body("Chữ ký không hợp lệ. Đã có lỗi xảy ra!");
+            // Chữ ký không hợp lệ → thất bại
+            redirectUrl = "pemomovie://payment?status=failed&reason=invalid_signature";
+        } else {
+            String responseCode = params.get("vnp_ResponseCode");
+            String txnRef = params.get("vnp_TxnRef");
+            if ("00".equals(responseCode)) {
+                // Thanh toán thành công → nâng cấp user
+                boolean upgraded = paymentService.processReturnUrl(txnRef);
+                redirectUrl = upgraded
+                        ? "pemomovie://payment?status=success"
+                        : "pemomovie://payment?status=success"; // Kể cả đã SUCCESS rồi (IPN xử lý trước) vẫn redirect success
+            } else {
+                redirectUrl = "pemomovie://payment?status=failed&reason=payment_failed";
+            }
         }
 
-        String responseCode = params.get("vnp_ResponseCode");
-        if ("00".equals(responseCode)) {
-            // Hiển thị giao diện hoặc redirect về App (DeepLink)
-            return ResponseEntity.ok("Thanh toán thành công! Bạn có thể quay lại Ứng dụng.");
-        } else {
-            return ResponseEntity.ok("Thanh toán thất bại hoặc đã bị hủy.");
-        }
+        return org.springframework.http.ResponseEntity
+                .status(org.springframework.http.HttpStatus.FOUND)
+                .header("Location", redirectUrl)
+                .build();
     }
 }

@@ -192,6 +192,35 @@ public class PaymentService {
         upgradeUserVip(mockTxn);
     }
 
+    /**
+     * Được gọi từ vnpay-return khi trình duyệt của user redirect về sau khi thanh toán.
+     * Tìm transaction theo txnRef và nâng cấp user nếu trạng thái còn là PENDING.
+     * Trả về true nếu xử lý thành công.
+     */
+    @Transactional
+    public boolean processReturnUrl(String txnRef) {
+        Transaction transaction = transactionRepository.findByTxnRef(txnRef).orElse(null);
+        if (transaction == null) {
+            log.warn("processReturnUrl: Không tìm thấy transaction với txnRef={}", txnRef);
+            return false;
+        }
+        // Tránh nâng cấp 2 lần nếu IPN đã xử lý trước
+        if ("SUCCESS".equals(transaction.getStatus())) {
+            log.info("processReturnUrl: Transaction {} đã SUCCESS rồi, bỏ qua.", txnRef);
+            return true;
+        }
+        if (!"PENDING".equals(transaction.getStatus())) {
+            log.warn("processReturnUrl: Transaction {} có status không hợp lệ: {}", txnRef, transaction.getStatus());
+            return false;
+        }
+        transaction.setStatus("SUCCESS");
+        transaction.setPayDate(LocalDateTime.now());
+        transactionRepository.save(transaction);
+        upgradeUserVip(transaction);
+        log.info("processReturnUrl: Nâng cấp thành công cho user {} qua txnRef={}", transaction.getUser().getFirebaseUid(), txnRef);
+        return true;
+    }
+
     @Transactional
     public String processIpnWebhook(Map<String, String> params) {
         String secureHash = params.get("vnp_SecureHash");
