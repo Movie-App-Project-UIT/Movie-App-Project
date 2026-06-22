@@ -21,69 +21,37 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/globalHeaderInclude">
 
-    <FrameLayout
-        android:id="@+id/ImagePoster"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@drawable/nen"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:elevation="8dp"
-        android:outlineProvider="background">
-
-        <ImageView
-            android:id="@+id/ivBackdrop"
+        <FrameLayout
+            android:id="@+id/ImagePoster"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="start|top"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/bg_circle_avatar_border"
-            android:backgroundTint="#80000000"
-            android:elevation="10dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_back"
-            app:tint="@android:color/white" />
-
-        <TextView
-            android:id="@+id/txt_VIP"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="32dp"
-            android:text="VIP"
-            android:textColor="#F5D020"
-            android:textStyle="bold"
-            android:textSize="12sp"
-            android:background="@drawable/bg_text"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"/>
-
-        <ImageButton
-            android:id="@+id/btnPlayDetail"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_play"
-            android:background="@drawable/bg_play_transparent"
+            android:layout_height="250dp"
+            android:background="@drawable/nen"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:elevation="8dp"
-            android:padding="16dp"/>
-    </FrameLayout>
-    </LinearLayout>
+            android:outlineProvider="background">
 
-    <!--Fragment cho bình luận và đánh giá-->
-    <FrameLayout
-        android:id="@+id/detailFragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/headerBanner"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+            <ImageView
+                android:id="@+id/ivBackdrop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/txt_VIP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:text="VIP"
+                android:textColor="#F5D020"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:background="@drawable/bg_text"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"/>
+        </FrameLayout>
+    </LinearLayout>
 
     <ScrollView
         android:id="@+id/svInfo"
@@ -97,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:paddingBottom="40dp">
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -105,281 +73,382 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="15dp"
-                android:text="Avengers 4: Hồi Kết"
+                android:text="Tiêu đề phim"
                 android:textColor="@android:color/white"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- Sub Information -->
+            <!-- Sub Information: Rating and Duration -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="8dp"
+                android:layout_marginStart="15dp"
                 android:gravity="center_vertical">
-
+                <ImageView
+                    android:src="@drawable/ic_star"
+                    app:tint="#F5D020"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"/>
                 <TextView
                     android:id="@+id/tvStartRanking"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4.5/5"
+                    android:text="4.5"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
                     android:textSize="14sp"
-                    android:layout_marginLeft="15dp"/>
-
-                <ImageView
-                    android:src="@drawable/start"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
                     android:layout_marginStart="4dp"/>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Thể loại:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/tvMediaType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="Học đường"
+                    android:text="  |  Thời lượng: "
                     android:textColor="#BCBFC4"
                     android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Quốc gia:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/tvCountry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="Nhật bản"
-                    android:textColor="#BCBFC4"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Ngôn ngữ:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/tvGenre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="Tiếng Việt"
-                    android:textColor="#BCBFC4"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Thời lượng:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
                 <TextView
                     android:id="@+id/tvDuration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="N/A"
+                    android:text="108 phút"
                     android:textColor="#BCBFC4"
                     android:textSize="14sp"/>
             </LinearLayout>
 
+            <!-- Action Buttons: Play and Like -->
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Đạo diễn:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/tvDirector"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="15dp">
+                
+                <LinearLayout
+                    android:id="@+id/btnPlayDetailNew"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:text="N/A"
-                    android:textColor="#BCBFC4"
-                    android:textSize="14sp"/>
+                    android:background="@drawable/bg_button_gradient"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_play_ui"
+                        app:tint="@color/white" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="CHIẾU PHÁT"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnLikeDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/bg_button_outline"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/ivLikeIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_heart"
+                        app:tint="@color/white" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Thích"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"/>
+                </LinearLayout>
             </LinearLayout>
 
+            <!-- Overview Section -->
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:text="Diễn viên:"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/tvCast"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:text="N/A"
-                    android:textColor="#BCBFC4"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="12dp"
-                android:text="Mô tả:"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"/>
+                android:gravity="center_vertical">
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/bg_button_gradient"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="NỘI DUNG"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvDesc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:text="Mitsuha, một nữ sinh sống ở vùng quê yên bình, và Taki, một nam sinh ở Tokyo, bất ngờ hoán đổi cơ thể cho nhau một cách bí ẩn. Khi dần quen với cuộc sống của đối phương, cả hai bắt đầu hình thành một mối liên kết đặc biệt vượt qua khoảng cách không gian và thời gian. Hành trình tìm kiếm nhau hé lộ những bí mật cảm động về định mệnh, ký ức và tình yêu."
-                android:textColor="#BABABA"/>
+                android:textColor="#BABABA"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@drawable/bg_gradient_save_button"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="2dp"
-                android:layout_marginHorizontal="15dp"/>
-
-            <!--Tab yêu thích + bình luận + đánh giá-->
-            <include
-                layout="@layout/layout_detail_action"
+            <!-- Director Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="15dp"
+                android:text="ĐẠO DIỄN"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDirectors"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="8dp"
+                android:paddingStart="7dp"
+                android:clipToPadding="false"/>
 
-            <!--2 tab hiển thị mặc định là "Gợi ý tương tự" nếu là phim bộ thì hiển thị "Tập phim" còn không thì bỏ qua-->
+            <!-- Cast Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="15dp"
+                android:text="DIỄN VIÊN"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="7dp"
+                android:clipToPadding="false"/>
+
+            <!-- Genres Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="15dp"
+                android:text="THỂ LOẠI"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvGenreTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="15dp"
+                android:clipToPadding="false"/>
+
+            <!-- Additional Info Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="15dp"
+                android:text="THÔNG TIN THÊM"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="15dp">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Quốc gia:"
+                    android:textColor="#BCBFC4"/>
+                <TextView
+                    android:id="@+id/tvCountry"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="15dp">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Năm:"
+                    android:textColor="#BCBFC4"/>
+                <TextView
+                    android:id="@+id/tvYear"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="15dp">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Ngôn ngữ:"
+                    android:textColor="#BCBFC4"/>
+                <TextView
+                    android:id="@+id/tvLanguage"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <!-- Episodes Section -->
+            <LinearLayout
+                android:id="@+id/layoutEpisodesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="CHỌN TẬP"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvEpisodes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingStart="7dp"
+                    android:clipToPadding="false"/>
+            </LinearLayout>
+
+            <!-- Comments Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp">
-
-                        <!-- Tabs -->
-                        <LinearLayout
-                            android:id="@+id/tabContainer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center">
-
-                            <TextView
-                                android:id="@+id/tabSuggestion"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingHorizontal="20dp"
-                                android:paddingVertical="8dp"
-                                android:text="Gợi ý tương tự"
-                                android:textColor="@color/white"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/tabEpisode"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tập phim"
-                                android:textColor="@color/white"
-                                android:textSize="16sp"
-                                android:paddingHorizontal="20dp"
-                                android:paddingVertical="8dp"/>
-                        </LinearLayout>
-
-                        <!-- Thanh trượt dưới tab -->
-                        <View
-                            android:id="@+id/tabIndicator"
-                            android:layout_width="100dp"
-                            android:layout_height="2dp"
-                            android:layout_marginTop="4dp"
-                            android:background="@drawable/bg_gradient_save_button"
-                            android:layout_gravity="start"/>
-
-                <!-- Nội dung thay đổi -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvContent"
+                android:layout_marginTop="32dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="BÌNH LUẬN"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_button_gradient"/>
+                
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:nestedScrollingEnabled="false"/>
+                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical">
+                    
+                    <ImageView
+                        android:id="@+id/ivCurrentUserAvatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_avatar"/>
+                    
+                    <EditText
+                        android:id="@+id/edtComment"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_comment_frame"
+                        android:hint="Thêm bình luận..."
+                        android:textColorHint="#888888"
+                        android:textColor="@android:color/white"
+                        android:padding="12dp"
+                        android:textSize="14sp"/>
+                    
+                    <ImageButton
+                        android:id="@+id/btnSendComment"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_circle_gradient_pink"
+                        android:src="@drawable/ic_send"
+                        app:tint="@android:color/white"
+                        android:padding="10dp"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvComments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="15dp"/>
             </LinearLayout>
 
+            <!-- Similar Movies Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="32dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="Gợi ý tương tự"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_button_gradient"/>
+                
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvSuggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
