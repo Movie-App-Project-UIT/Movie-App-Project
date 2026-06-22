@@ -106,7 +106,7 @@
 
             <!-- Subtitle -->
             <ImageButton
-                android:id="@+id/btnSubtitle"
+                android:id="@id/exo_subtitle"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="@android:color/transparent"
