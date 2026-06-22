@@ -91,6 +91,22 @@ public class FavoriteManager {
         }
 
         saveFavorites(context, favorites);
+        
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            ApiClient.getApiService().toggleWatchlist(movie.getId()).enqueue(new Callback<okhttp3.ResponseBody>() {
+                @Override
+                public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                    if (!response.isSuccessful()) {
+                        Log.e("FavoriteManager", "Lỗi đồng bộ Favorite lên backend: " + response.code());
+                    }
+                }
+                @Override
+                public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                    Log.e("FavoriteManager", "Lỗi kết nối khi đồng bộ Favorite lên backend");
+                }
+            });
+        }
+
         return isAdded;
     }
 
