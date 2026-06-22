@@ -45,7 +45,7 @@ public class QrPaymentActivity extends AppCompatActivity {
     private String planPriceStr = "249.000đ";
     private double selectedPlanPriceRaw = 249000.0;
     private int selectedPlanDuration = 180;
-    private String paymentMethod = "MOMO";
+    private String paymentMethod = "VNPAY";
     private CountDownTimer countDownTimer;
     private TextView txtTimer;
     private boolean isCheckingPayment = false;
@@ -70,7 +70,7 @@ public class QrPaymentActivity extends AppCompatActivity {
         selectedPlanPriceRaw = getIntent().getDoubleExtra("SELECTED_PLAN_PRICE_RAW", 249000.0);
         selectedPlanDuration = getIntent().getIntExtra("SELECTED_PLAN_DURATION", 180);
         paymentMethod = getIntent().getStringExtra("PAYMENT_METHOD");
-        if (paymentMethod == null) paymentMethod = "MOMO";
+        if (paymentMethod == null) paymentMethod = "VNPAY";
 
         // Cập nhật UI theo phương thức thanh toán
         TextView txtAppInstruction = findViewById(R.id.txtAppInstruction);
@@ -78,11 +78,7 @@ public class QrPaymentActivity extends AppCompatActivity {
         ImageView imgQrCenterLogo = findViewById(R.id.imgQrCenterLogo);
         ImageView imgQrCode = findViewById(R.id.imgQrCode);
         
-        if ("MOMO".equals(paymentMethod)) {
-            txtAppInstruction.setText("Sử dụng ứng dụng MoMo để quét mã");
-            txtSecurityInfo.setText("Giao dịch được bảo mật bởi MoMo");
-            if (imgQrCenterLogo != null) imgQrCenterLogo.setImageResource(R.drawable.logo_momo);
-        } else if ("VNPAY".equals(paymentMethod)) {
+        if ("VNPAY".equals(paymentMethod)) {
             txtAppInstruction.setText("Sử dụng ứng dụng ngân hàng hoặc VNPay để quét mã");
             txtSecurityInfo.setText("Giao dịch được bảo mật bởi VNPay");
             if (imgQrCenterLogo != null) imgQrCenterLogo.setImageResource(R.drawable.logo_vnpay);
@@ -110,7 +106,7 @@ public class QrPaymentActivity extends AppCompatActivity {
             }
         }
 
-        // Gọi API thực tế từ Backend để lấy URL thanh toán (Sandbox MoMo / VNPay)
+        // Gọi API thực tế từ Backend để lấy URL thanh toán (VNPay)
         Toast.makeText(this, "Đang lấy mã " + paymentMethod + " từ Server...", Toast.LENGTH_SHORT).show();
         ApiClient.getApiService().createPaymentUrl(selectedPlanId, paymentMethod, finalAmount) // Truyền ID gói và giá tiền động
             .enqueue(new Callback<ResponseBody>() {

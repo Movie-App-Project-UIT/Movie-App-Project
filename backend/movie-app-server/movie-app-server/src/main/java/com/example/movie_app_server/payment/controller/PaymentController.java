@@ -50,14 +50,6 @@ public class PaymentController {
         return ResponseEntity.ok(result);
     }
 
-    // IPN Webhook: MoMo Server sẽ gọi POST JSON vào đây
-    @PostMapping("/momo-ipn")
-    public ResponseEntity<String> momoIpn(@RequestBody Map<String, Object> payload) {
-        paymentService.processMoMoIpnWebhook(payload);
-        // Trả về HTTP 204 No Content theo chuẩn MoMo (hoặc 200 OK rỗng)
-        return ResponseEntity.noContent().build();
-    }
-
     // Return URL: Trình duyệt của user chuyển hướng về đây sau khi thanh toán xong
     @GetMapping("/vnpay-return")
     public ResponseEntity<String> vnpayReturn(@RequestParam Map<String, String> params) {
