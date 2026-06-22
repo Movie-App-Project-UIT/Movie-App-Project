@@ -129,11 +129,22 @@
                 android:layout_height="5dp"
                 android:layout_weight="1" />
 
-            <!-- Subtitle -->
+            <!-- Tốc độ phát -->
             <ImageButton
-                android:id="@id/exo_subtitle"
+                android:id="@+id/btnSpeed"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_time"
+                app:tint="@android:color/white" />
+
+            <!-- Subtitle -->
+            <ImageButton
+                android:id="@+id/btnSubtitle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_subtitle"
                 app:tint="@android:color/white" />
