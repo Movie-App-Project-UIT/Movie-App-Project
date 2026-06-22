@@ -10,6 +10,7 @@ import com.example.movie_app_server.interaction.repository.SubscriptionPlanRepos
 import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/plans")
+    @Cacheable("activePlans")
     public ResponseEntity<java.util.List<SubscriptionPlan>> getActivePlans() {
         // Lấy danh sách các gói premium đang bán (isActive = true)
         return ResponseEntity.ok(subscriptionPlanRepository.findAll().stream()

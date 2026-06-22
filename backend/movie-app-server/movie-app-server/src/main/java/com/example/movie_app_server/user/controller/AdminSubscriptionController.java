@@ -12,6 +12,7 @@ import com.example.movie_app_server.user.entity.User;
 import com.example.movie_app_server.user.repository.UserRepository;
 import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class AdminSubscriptionController {
     }
 
     @PostMapping
+    @CacheEvict(value = "activePlans", allEntries = true)
     public ResponseEntity<SubscriptionPlan> createSubscription(@RequestBody SubscriptionPlan plan) {
         plan.setIsActive(true);
         SubscriptionPlan saved = subscriptionPlanRepository.save(plan);
@@ -43,6 +45,7 @@ public class AdminSubscriptionController {
     }
 
     @PutMapping("/{id}")
+    @CacheEvict(value = "activePlans", allEntries = true)
     public ResponseEntity<SubscriptionPlan> updateSubscription(@PathVariable Long id, @RequestBody SubscriptionPlan planDetails) {
         return subscriptionPlanRepository.findById(id).map(plan -> {
             plan.setName(planDetails.getName());
@@ -56,6 +59,7 @@ public class AdminSubscriptionController {
     }
 
     @PutMapping("/{id}/toggle-status")
+    @CacheEvict(value = "activePlans", allEntries = true)
     public ResponseEntity<Void> toggleSubscriptionStatus(@PathVariable Long id) {
         return subscriptionPlanRepository.findById(id).map(plan -> {
             boolean newStatus = plan.getIsActive() == null || !plan.getIsActive();
