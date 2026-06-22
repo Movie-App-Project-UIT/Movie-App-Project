@@ -3,6 +3,8 @@ package com.example.movie_app_server.media.controller;
 import com.example.movie_app_server.media.service.CloudinaryService;
 import com.example.movie_app_server.media.service.ImageKitService;
 import com.example.movie_app_server.media.service.LocalFileService;
+import com.example.movie_app_server.media.repository.MediaRepository;
+import com.example.movie_app_server.media.entity.Media;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ public class AdminUploadController {
     private final CloudinaryService cloudinaryService;
     private final ImageKitService imageKitService;
     private final LocalFileService localFileService;
+    private final MediaRepository mediaRepository;
 
     // API Up Ảnh -> Nhận file và trả về link ImageKit
     @PostMapping("/image")
@@ -30,6 +33,26 @@ public class AdminUploadController {
     public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) throws Exception {
         if (!isVideo(file)) throw new com.example.movie_app_server.common.exception.AppException("Định dạng video không hợp lệ", org.springframework.http.HttpStatus.BAD_REQUEST);
         String videoUrl = localFileService.storeFile(file);
+        return ResponseEntity.ok(videoUrl);
+    }
+
+    // API Up Video lên Cloudinary và ghi đè video_url của phim (nếu có mediaId)
+    @PostMapping("/video/cloudinary")
+    public ResponseEntity<String> uploadVideoCloudinary(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "mediaId", required = false) Long mediaId) throws Exception {
+        
+        if (!isVideo(file)) throw new com.example.movie_app_server.common.exception.AppException("Định dạng video không hợp lệ", org.springframework.http.HttpStatus.BAD_REQUEST);
+        
+        String videoUrl = cloudinaryService.uploadVideo(file);
+        
+        if (mediaId != null) {
+            Media media = mediaRepository.findById(mediaId)
+                    .orElseThrow(() -> new com.example.movie_app_server.common.exception.AppException("Không tìm thấy phim", org.springframework.http.HttpStatus.NOT_FOUND));
+            media.setVideoUrl(videoUrl);
+            mediaRepository.save(media);
+        }
+        
         return ResponseEntity.ok(videoUrl);
     }
 
