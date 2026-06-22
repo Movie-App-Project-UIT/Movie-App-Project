@@ -343,8 +343,14 @@ public class GlobalHeaderHelper {
                             @Override
                             public void onNotificationClick(NotificationDto notification) {
                                 popupWindow.dismiss();
-                                Intent intent = new Intent(activity, NotificationActivity.class);
-                                activity.startActivity(intent);
+                                if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
+                                    Intent intent = new Intent(activity, com.example.pemomovie.ui.main.PaymentSuccessActivity.class);
+                                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
+                                    activity.startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(activity, NotificationActivity.class);
+                                    activity.startActivity(intent);
+                                }
                             }
 
                             @Override
@@ -353,7 +359,8 @@ public class GlobalHeaderHelper {
                                 if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
                                     showExpiringPremiumBottomSheet(notification.getMessage() != null ? notification.getMessage() : "Gói Premium của bạn sắp hết hạn.");
                                 } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
-                                    Intent intent = new Intent(activity, ProfileActivity.class);
+                                    Intent intent = new Intent(activity, com.example.pemomovie.ui.main.PaymentSuccessActivity.class);
+                                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
                                     activity.startActivity(intent);
                                 } else {
                                     Intent intent = new Intent(activity, NotificationActivity.class);

@@ -120,7 +120,8 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:checked="true"
-                android:buttonTint="#814EEB"/>
+                android:button="@drawable/selector_checkbox"
+                android:paddingStart="8dp"/>
 
             <!-- Một View trống đẩy 2 chữ ra 2 mép -->
             <View
