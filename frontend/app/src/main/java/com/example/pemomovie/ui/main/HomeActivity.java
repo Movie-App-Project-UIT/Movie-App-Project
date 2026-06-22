@@ -275,16 +275,25 @@ public class HomeActivity extends AppCompatActivity {
         View layoutEmptyNotification = popupView.findViewById(R.id.layoutEmptyNotification);
         RecyclerView rvDropdownNotifications = popupView.findViewById(R.id.rvDropdownNotifications);
 
-        if (dbNotifications != null && !dbNotifications.isEmpty()) {
+        List<com.example.pemomovie.dto.NotificationDto> unreadList = new java.util.ArrayList<>();
+        if (dbNotifications != null) {
+            for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
+                if (notif.getRead() == null || !notif.getRead()) {
+                    unreadList.add(notif);
+                }
+            }
+        }
+
+        if (!unreadList.isEmpty()) {
             if (layoutEmptyNotification != null) layoutEmptyNotification.setVisibility(View.GONE);
             if (rvDropdownNotifications != null) {
                 rvDropdownNotifications.setVisibility(View.VISIBLE);
                 rvDropdownNotifications.setLayoutManager(new LinearLayoutManager(this));
                 
                 // Show up to 5 latest notifications in dropdown
-                List<com.example.pemomovie.dto.NotificationDto> displayList = dbNotifications.size() > 5 
-                        ? dbNotifications.subList(0, 5) 
-                        : dbNotifications;
+                List<com.example.pemomovie.dto.NotificationDto> displayList = unreadList.size() > 5 
+                        ? unreadList.subList(0, 5) 
+                        : unreadList;
                         
                 com.example.pemomovie.adapter.NotificationAdapter adapter = new com.example.pemomovie.adapter.NotificationAdapter(
                         this,
@@ -303,7 +312,8 @@ public class HomeActivity extends AppCompatActivity {
                                 if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
                                     showExpiringPremiumBottomSheet(notification.getMessage() != null ? notification.getMessage() : "Gói Premium của bạn sắp hết hạn.");
                                 } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
-                                    Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                                    Intent intent = new Intent(HomeActivity.this, PaymentSuccessActivity.class);
+                                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
                                     startActivity(intent);
                                 } else {
                                     Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
@@ -325,13 +335,23 @@ public class HomeActivity extends AppCompatActivity {
                 for (com.example.pemomovie.dto.NotificationDto notif : dbNotifications) {
                     if (notif.getRead() == null || !notif.getRead()) {
                         markNotificationAsReadOnBackend(notif.getId());
+                        notif.setRead(true);
                     }
                 }
                 hasExpiringNotif = false;
                 hasAdminGift = false;
                 hasPremiumNotif = false;
                 updateNotificationBadge(0);
-                popupWindow.dismiss();
+                
+                dbNotifications.clear();
+                if (rvDropdownNotifications != null && rvDropdownNotifications.getAdapter() != null) {
+                    rvDropdownNotifications.getAdapter().notifyDataSetChanged();
+                    rvDropdownNotifications.setVisibility(View.GONE);
+                }
+                if (layoutEmptyNotification != null) {
+                    layoutEmptyNotification.setVisibility(View.VISIBLE);
+                }
+                
                 Toast.makeText(HomeActivity.this, "Đã đánh dấu đọc tất cả", Toast.LENGTH_SHORT).show();
             });
         }
