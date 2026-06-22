@@ -13,4 +13,8 @@ public class UserProfileDto {
     private String avatarUrl;
     private Tier tier;
     private com.example.movie_app_server.user.entity.enums.Role role;
+    
+    private int watchedMoviesCount;
+    private int watchedHours;
+    private int streakDays;
 }

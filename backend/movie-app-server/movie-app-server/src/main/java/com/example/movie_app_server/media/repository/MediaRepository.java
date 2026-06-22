@@ -37,6 +37,9 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     // --- Homepage API Queries ---
     // Phim được đánh giá cao nhất (Top Rated) > 8.0
     List<Media> findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(Float voteAverage);
+    
+    // Lấy Top 10 phim đánh giá cao (không bắt buộc >= 8.0)
+    List<Media> findTop10ByIsDeletedFalseOrderByVoteAverageDesc();
 
     // Phim mới cập nhật (Recently Added)
     List<Media> findTop10ByIsDeletedFalseOrderByIdDesc();

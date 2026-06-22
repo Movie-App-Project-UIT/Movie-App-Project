@@ -103,6 +103,9 @@ public class DetailActivity extends AppCompatActivity {
 
         com.example.pemomovie.utils.NavigationHelper.setupBottomNavigation(this);
         
+        // Khởi tạo thanh tìm kiếm chung
+        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
+        
         Long movieId = getIntent().getLongExtra("MOVIE_ID", -1);
         if (movieId != -1) {
             loadMovieDetails(movieId);
@@ -307,14 +310,75 @@ public class DetailActivity extends AppCompatActivity {
             });
         }
 
-        ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+        android.widget.ImageButton btnPlay = findViewById(R.id.btnPlayDetail);
+
         if (btnPlay != null) {
             btnPlay.setOnClickListener(v -> {
                 Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
                 intent.putExtra("MOVIE_ID", detail.getId());
+                intent.putExtra("START_POSITION", 0);
                 startActivity(intent);
             });
         }
+
+        // Kiểm tra lịch sử xem phim
+        com.example.pemomovie.api.ApiClient.getApiService().getUserHistory().enqueue(new retrofit2.Callback<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>>() {
+            @Override
+            public void onResponse(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, retrofit2.Response<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (com.example.pemomovie.dto.WatchHistoryItemDto history : response.body()) {
+                        Long mId = null;
+                        int totalDuration = 0;
+                        if (history.getMedia() != null) {
+                            mId = history.getMedia().getId();
+                            if (history.getEpisode() != null) {
+                                if (history.getEpisode().getDuration() != null) totalDuration = history.getEpisode().getDuration();
+                            } else {
+                                if (history.getMedia().getDuration() != null) totalDuration = history.getMedia().getDuration();
+                            }
+                        }
+
+                        if (mId != null && mId.equals(detail.getId())) {
+                            int progress = history.getProgressSeconds() != null ? history.getProgressSeconds() : 0;
+                            int totalDurationSec = 0;
+                            if (history.getTotalDurationSeconds() != null && history.getTotalDurationSeconds() > 0) {
+                                totalDurationSec = history.getTotalDurationSeconds();
+                            } else if (totalDuration > 0) {
+                                totalDurationSec = totalDuration * 60;
+                            }
+                            float percent = totalDurationSec > 0 ? (float) progress / totalDurationSec : 0;
+                            
+                            // Nếu chưa xem xong hẳn (< 95%)
+                            if (percent < 0.95f && progress > 0) {
+                                if (btnPlay != null) {
+                                    btnPlay.setOnClickListener(v -> {
+                                        new androidx.appcompat.app.AlertDialog.Builder(DetailActivity.this)
+                                                .setTitle("Tiếp tục xem phim")
+                                                .setMessage("Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?")
+                                                .setPositiveButton("Xem tiếp", (dialog, which) -> {
+                                                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                                                    intent.putExtra("MOVIE_ID", detail.getId());
+                                                    intent.putExtra("START_POSITION", progress);
+                                                    startActivity(intent);
+                                                })
+                                                .setNegativeButton("Từ đầu", (dialog, which) -> {
+                                                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                                                    intent.putExtra("MOVIE_ID", detail.getId());
+                                                    intent.putExtra("START_POSITION", 0);
+                                                    startActivity(intent);
+                                                })
+                                                .show();
+                                    });
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, Throwable t) {}
+        });
         
         // Cập nhật tab gợi ý tương tự dựa trên genre đầu tiên
         if (detail.getGenres() != null && !detail.getGenres().isEmpty()) {

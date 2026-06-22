@@ -6,12 +6,20 @@
     android:layout_height="match_parent"
     android:background="#050814">
 
+    <!-- Global Header -->
+    <include
+        android:id="@+id/globalHeaderInclude"
+        layout="@layout/layout_global_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/headerBanner"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/globalHeaderInclude">
 
     <FrameLayout
         android:id="@+id/ImagePoster"

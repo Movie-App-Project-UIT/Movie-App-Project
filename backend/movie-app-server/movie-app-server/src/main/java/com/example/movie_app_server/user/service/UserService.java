@@ -23,6 +23,7 @@ public class UserService {
     private final com.example.movie_app_server.interaction.service.NotificationService notificationService;
     private final com.example.movie_app_server.interaction.repository.UserSubscriptionRepository userSubscriptionRepository;
     private final com.example.movie_app_server.interaction.repository.SubscriptionPlanRepository subscriptionPlanRepository;
+    private final com.example.movie_app_server.interaction.repository.WatchHistoryRepository watchHistoryRepository;
  
     /**
      * Hàm đồng bộ thông tin User từ Firebase xuống MySQL.
@@ -96,7 +97,51 @@ public class UserService {
             throw new org.springframework.security.access.AccessDeniedException("Tài khoản của bạn đã bị khóa.");
         }
         
-        return convertToProfileDto(user);
+        UserProfileDto dto = convertToProfileDto(user);
+        
+        java.util.List<com.example.movie_app_server.interaction.entity.WatchHistory> historyList = 
+                watchHistoryRepository.findByUserIdOrderByLastWatchedAtDesc(user.getId());
+                
+        java.util.Set<Long> uniqueMediaIds = new java.util.HashSet<>();
+        long totalSeconds = 0;
+        java.util.Set<java.time.LocalDate> watchedDates = new java.util.TreeSet<>(java.util.Collections.reverseOrder());
+        
+        for (com.example.movie_app_server.interaction.entity.WatchHistory h : historyList) {
+            if (h.getMedia() != null) {
+                uniqueMediaIds.add(h.getMedia().getId());
+            }
+            if (h.getProgressSeconds() != null) {
+                totalSeconds += h.getProgressSeconds();
+            }
+            if (h.getLastWatchedAt() != null) {
+                watchedDates.add(h.getLastWatchedAt().toLocalDate());
+            }
+        }
+        
+        dto.setWatchedMoviesCount(uniqueMediaIds.size());
+        dto.setWatchedHours((int) (totalSeconds / 3600));
+        
+        int streak = 0;
+        java.time.LocalDate currentDate = java.time.LocalDate.now();
+        java.time.LocalDate yesterday = currentDate.minusDays(1);
+        
+        java.util.List<java.time.LocalDate> dateList = new java.util.ArrayList<>(watchedDates);
+        
+        // Tính streak: Bắt đầu từ hnay hoặc hôm qua
+        if (!dateList.isEmpty() && (dateList.get(0).equals(currentDate) || dateList.get(0).equals(yesterday))) {
+            java.time.LocalDate expectedDate = dateList.get(0);
+            for (java.time.LocalDate date : dateList) {
+                if (date.equals(expectedDate)) {
+                    streak++;
+                    expectedDate = expectedDate.minusDays(1);
+                } else {
+                    break;
+                }
+            }
+        }
+        dto.setStreakDays(streak);
+        
+        return dto;
     }
 
     @Transactional

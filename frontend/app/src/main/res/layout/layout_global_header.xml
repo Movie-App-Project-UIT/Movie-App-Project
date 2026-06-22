@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/globalHeader"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="12dp"
+    android:background="#050814"
+    android:elevation="12dp">
+
+    <!-- Menu / Logo -->
+    <ImageView
+        android:id="@+id/ivHeaderLogo"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:src="@drawable/logo_name_pemo"
+        android:scaleType="fitCenter"/>
+
+    <!-- Search Bar -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_input_field"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_search"
+            app:tint="#AAAAAA"/>
+
+        <EditText
+            android:id="@+id/edtGlobalSearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:hint="Tìm kiếm phim..."
+            android:textColorHint="#AAAAAA"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:paddingStart="8dp"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"/>
+    </LinearLayout>
+
+    <!-- Notification -->
+    <FrameLayout
+        android:id="@+id/layoutGlobalNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp">
+
+        <ImageButton
+            android:id="@+id/btnGlobalNotification"
+            android:src="@drawable/ic_notification"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:scaleType="fitCenter"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/tvGlobalNotificationBadge"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/bg_notification_badge"
+            android:gravity="center"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Utility / Profile Button -->
+    <ImageView
+        android:id="@+id/btnProfile"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_avatar"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>

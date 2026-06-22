@@ -46,6 +46,7 @@ public class MediaService {
                 .language(media.getLanguage() != null ? media.getLanguage() : "N/A")
                 .country(media.getCountry() != null ? media.getCountry().getName() : "N/A")
                 .hiddenByGenreId(media.getHiddenByGenreId())
+                .duration(media.getDuration())
                 // TODO: XÓA ĐOẠN FAKE DATA NÀY KHI CÓ HỆ THỐNG ĐẾM LƯỢT XEM THỰC TẾ
                 .viewCount(media.getId() != null ? (int) (media.getId() * 1234 % 50000) : 0) // Tạo lượt xem giả ngẫu nhiên nhưng cố định theo ID phim
                 .build();
@@ -77,6 +78,7 @@ public class MediaService {
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
+        // Lấy 10 phim được đánh giá cao nhất (bắt buộc >= 8.0)
         List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(8.0f).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
