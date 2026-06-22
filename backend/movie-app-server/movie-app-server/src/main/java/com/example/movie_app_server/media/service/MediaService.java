@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@org.springframework.transaction.annotation.Transactional
 public class MediaService {
 
     private final MediaRepository mediaRepository;

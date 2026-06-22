@@ -25,6 +25,7 @@ public class AdminMovieController {
     private final AdminHistoryService adminHistoryService;
 
     @GetMapping
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<List<MediaItemDto>> getAllMovies() {
         List<MediaItemDto> movies = mediaRepository.findAll().stream()
                 .map(mediaService::convertToItemDto)
