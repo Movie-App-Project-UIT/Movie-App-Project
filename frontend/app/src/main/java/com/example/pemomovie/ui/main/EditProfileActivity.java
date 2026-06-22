@@ -221,8 +221,7 @@ public class EditProfileActivity extends AppCompatActivity {
         BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
         View view = getLayoutInflater().inflate(R.layout.layout_bottom_sheet_edit_name, null);
         dialog.setContentView(view);
-
-        // Khắc phục lỗi lọt màu nền chính ở đáy (thanh điều hướng)
+        
         if (dialog.getWindow() != null) {
             dialog.getWindow().setNavigationBarColor(Color.parseColor("#0F1221"));
         }
@@ -232,8 +231,8 @@ public class EditProfileActivity extends AppCompatActivity {
             edtDisplayName.setText(txtDisplayName.getText().toString());
         }
 
-        findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
-        findViewById(R.id.btnSubmitName).setOnClickListener(v -> {
+        view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        view.findViewById(R.id.btnSubmitName).setOnClickListener(v -> {
             String newName = edtDisplayName.getText().toString().trim();
             if (!newName.isEmpty()) {
                 if (txtDisplayName != null) {

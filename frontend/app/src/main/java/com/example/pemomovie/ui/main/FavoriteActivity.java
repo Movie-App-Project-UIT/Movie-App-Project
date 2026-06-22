@@ -51,12 +51,28 @@ public class FavoriteActivity extends AppCompatActivity {
         RecyclerView rvFavorites = findViewById(R.id.rvFav);
         rvFavorites.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
 
+
         // Lấy danh sách yêu thích và cập nhật adapter
+
+        
+        // Cập nhật giao diện từ bộ nhớ tạm (Cache) trước để giao diện hiện lên lập tức
+        updateUI();
+
+        // Âm thầm đồng bộ với Database để lấy dữ liệu mới nhất
+        FavoriteManager.syncFavoritesWithBackend(this, () -> {
+            runOnUiThread(() -> {
+                updateUI();
+            });
+        });
+    }
+
+    private void updateUI() {
+        RecyclerView rvFavorites = findViewById(R.id.rvFav);
+
         List<MediaItemDto> favList = FavoriteManager.getFavorites(this);
         FavoriteAdapter adapter = new FavoriteAdapter(favList);
         rvFavorites.setAdapter(adapter);
 
-        // Cập nhật số lượng phim
         TextView tvCountMovieFav = findViewById(R.id.tvCountMovieFav);
         if (tvCountMovieFav != null) {
             tvCountMovieFav.setText(favList.size() + " phim");

@@ -13,6 +13,7 @@ public class MediaDetailResponse {
     private Integer releaseYear;
     private Integer duration;
     private Integer viewCount;
+    private Integer favoriteCount;
     @com.google.gson.annotations.SerializedName("isPremium")
     private boolean isPremium;
     @com.google.gson.annotations.SerializedName("isDeleted")
@@ -36,6 +37,8 @@ public class MediaDetailResponse {
     public Integer getReleaseYear() { return releaseYear; }
     public Integer getDuration() { return duration; }
     public Integer getViewCount() { return viewCount; }
+    public Integer getFavoriteCount() { return favoriteCount; }
+    public void setFavoriteCount(Integer favoriteCount) { this.favoriteCount = favoriteCount; }
     public boolean isPremium() { return isPremium; }
     public boolean isDeleted() { return isDeleted; }
     public String getMediaType() { return mediaType; }

@@ -2,29 +2,46 @@ package com.example.pemomovie.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.api.ApiService;
+import com.example.pemomovie.dto.MediaItemDto;
+import com.example.pemomovie.dto.WatchlistItemDto;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.example.pemomovie.dto.MediaItemDto;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class FavoriteManager {
     private static final String PREF_NAME = "favorite_prefs";
-    private static final String KEY_FAVORITES = "favorite_movies";
+
+    // Lấy Key lưu trữ riêng biệt cho từng User (Dựa vào Firebase UID)
+    private static String getUserSpecificKey() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return "favorite_movies_" + user.getUid();
+        }
+        return "favorite_movies_guest";
+    }
 
     // Hàm lấy danh sách phim yêu thích
     public static List<MediaItemDto> getFavorites(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        String json = prefs.getString(KEY_FAVORITES, null);
+        String json = prefs.getString(getUserSpecificKey(), null);
         
         if (json == null) {
             return new ArrayList<>();
         }
         
-        // Gson biến đổi chuỗi JSON lấy từ bộ nhớ thành List Object
         Gson gson = new Gson();
         Type type = new TypeToken<List<MediaItemDto>>() {}.getType();
         return gson.fromJson(json, type);
@@ -35,11 +52,10 @@ public class FavoriteManager {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         
-        // Gson biến đổi List Object thành chuỗi JSON để lưu vào máy
         Gson gson = new Gson();
         String json = gson.toJson(favorites);
         
-        editor.putString(KEY_FAVORITES, json);
+        editor.putString(getUserSpecificKey(), json);
         editor.apply();
     }
 
@@ -54,12 +70,11 @@ public class FavoriteManager {
         return false;
     }
 
-    // Hàm Thêm hoặc Xóa phim (Hàm này dùng cho nút bấm thả Tym)
+    // Hàm Thêm hoặc Xóa phim cục bộ (Hàm này dùng cho nút bấm thả Tym)
     public static boolean toggleFavorite(Context context, MediaItemDto movie) {
         List<MediaItemDto> favorites = getFavorites(context);
         boolean isAdded = false;
 
-        // Tìm kiếm phim hiện tại
         MediaItemDto existingMovie = null;
         for (MediaItemDto item : favorites) {
             if (item.getId() != null && item.getId().equals(movie.getId())) {
@@ -68,7 +83,6 @@ public class FavoriteManager {
             }
         }
 
-        // Logic toggle (nếu có rồi thì xóa đi, chưa có thì thêm vào)
         if (existingMovie != null) {
             favorites.remove(existingMovie);
         } else {
@@ -76,8 +90,39 @@ public class FavoriteManager {
             isAdded = true;
         }
 
-        // Cập nhật lại bộ nhớ
         saveFavorites(context, favorites);
-        return isAdded; // Trả về true nếu vừa thả tym, false nếu vừa gỡ tym
+        return isAdded;
+    }
+
+    // Hàm đồng bộ danh sách yêu thích từ Backend Database về máy
+    public static void syncFavoritesWithBackend(Context context, Runnable onComplete) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            if (onComplete != null) onComplete.run();
+            return;
+        }
+
+        ApiService apiService = ApiClient.getApiService();
+        apiService.getMyWatchlist().enqueue(new Callback<List<WatchlistItemDto>>() {
+            @Override
+            public void onResponse(Call<List<WatchlistItemDto>> call, Response<List<WatchlistItemDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<MediaItemDto> syncedList = new ArrayList<>();
+                    for (WatchlistItemDto dto : response.body()) {
+                        if (dto.getMedia() != null) {
+                            syncedList.add(dto.getMedia());
+                        }
+                    }
+                    saveFavorites(context, syncedList);
+                    Log.d("FavoriteManager", "Đồng bộ Watchlist thành công: " + syncedList.size() + " phim");
+                }
+                if (onComplete != null) onComplete.run();
+            }
+
+            @Override
+            public void onFailure(Call<List<WatchlistItemDto>> call, Throwable t) {
+                Log.e("FavoriteManager", "Lỗi mạng khi đồng bộ Watchlist: " + t.getMessage());
+                if (onComplete != null) onComplete.run();
+            }
+        });
     }
 }

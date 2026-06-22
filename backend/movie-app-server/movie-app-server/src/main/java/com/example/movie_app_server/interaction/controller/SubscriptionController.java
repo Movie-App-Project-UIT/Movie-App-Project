@@ -27,6 +27,30 @@ public class SubscriptionController {
     private final UserRepository userRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
 
+    @GetMapping("/active")
+    public ResponseEntity<?> getActiveSubscription() {
+        String firebaseUid = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userRepository.findByFirebaseUid(firebaseUid).orElse(null);
+        if (currentUser == null) return ResponseEntity.status(401).body(java.util.Map.of("message", "User not found"));
+
+        UserSubscription activeSub = userSubscriptionRepository
+                .findFirstByUserAndStatusOrderByEndDateDesc(currentUser, SubscriptionStatus.ACTIVE).orElse(null);
+                
+        if (activeSub != null && activeSub.getEndDate().isAfter(LocalDateTime.now())) {
+            UserSubscription firstSub = userSubscriptionRepository
+                    .findFirstByUserOrderByStartDateAsc(currentUser).orElse(activeSub);
+
+            java.util.Map<String, Object> data = new java.util.HashMap<>();
+            data.put("planName", activeSub.getPlan().getName());
+            data.put("startDate", activeSub.getStartDate().toString());
+            data.put("firstStartDate", firstSub.getStartDate().toString());
+            data.put("endDate", activeSub.getEndDate().toString());
+            return ResponseEntity.ok(data);
+        }
+        
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/plans")
     public ResponseEntity<java.util.List<SubscriptionPlan>> getActivePlans() {
         // Lấy danh sách các gói premium đang bán (isActive = true)

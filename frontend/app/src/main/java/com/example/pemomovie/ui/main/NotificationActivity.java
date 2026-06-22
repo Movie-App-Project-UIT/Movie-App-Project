@@ -52,7 +52,11 @@ public class NotificationActivity extends AppCompatActivity {
         adapter = new NotificationAdapter(this, notificationList, new NotificationAdapter.OnNotificationClickListener() {
             @Override
             public void onNotificationClick(NotificationDto notification) {
-                // Do something when item clicked
+                if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
+                    Intent intent = new Intent(NotificationActivity.this, PaymentSuccessActivity.class);
+                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
+                    startActivity(intent);
+                }
             }
 
             @Override
@@ -63,7 +67,8 @@ public class NotificationActivity extends AppCompatActivity {
                 } else if ("SUBSCRIPTION_EXPIRING".equals(notification.getType())) {
                     showExpiringPremiumBottomSheet(notification);
                 } else if ("SUBSCRIPTION_NEW_PLAN".equals(notification.getType())) {
-                    Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+                    Intent intent = new Intent(NotificationActivity.this, PaymentSuccessActivity.class);
+                    intent.putExtra("IS_VIEW_PRIVILEGE", true);
                     startActivity(intent);
                 }
             }

@@ -46,6 +46,15 @@ public interface ApiService {
     @GET("/api/v1/media/{id}")
     Call<MediaDetailResponse> getMediaDetail(@Path("id") Long id);
 
+    @POST("/api/v1/media/{id}/view")
+    Call<Void> incrementViewCount(@Path("id") Long id);
+
+    @POST("/api/v1/watchlist/{mediaId}")
+    Call<okhttp3.ResponseBody> toggleWatchlist(@Path("mediaId") Long mediaId);
+
+    @GET("/api/v1/watchlist")
+    Call<List<com.example.pemomovie.dto.WatchlistItemDto>> getMyWatchlist();
+
     // --- ADMIN API ---
     @GET("/api/v1/admin/movies")
     Call<List<MediaItemDto>> getAllMoviesAdmin();
@@ -143,6 +152,9 @@ public interface ApiService {
 
     @GET("/api/v1/lookups/genres")
     Call<List<com.example.pemomovie.dto.GenreDto>> getGenres();
+
+    @GET("/api/v1/subscriptions/active")
+    Call<java.util.Map<String, Object>> getActiveSubscription();
 
     @GET("/api/v1/lookups/countries")
     Call<List<com.example.pemomovie.dto.CountryDto>> getCountries();

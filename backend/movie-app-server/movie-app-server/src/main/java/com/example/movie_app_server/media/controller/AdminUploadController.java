@@ -2,6 +2,7 @@ package com.example.movie_app_server.media.controller;
 
 import com.example.movie_app_server.media.service.CloudinaryService;
 import com.example.movie_app_server.media.service.ImageKitService;
+import com.example.movie_app_server.media.service.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ public class AdminUploadController {
 
     private final CloudinaryService cloudinaryService;
     private final ImageKitService imageKitService;
+    private final LocalFileService localFileService;
 
     // API Up Ảnh -> Nhận file và trả về link ImageKit
     @PostMapping("/image")
@@ -23,11 +25,11 @@ public class AdminUploadController {
         return ResponseEntity.ok(imageUrl);
     }
 
-    // API Up Video -> Nhận file và trả về link Cloudinary
+    // API Up Video -> Nhận file và lưu cục bộ, trả về link stream
     @PostMapping("/video")
     public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) throws Exception {
         if (!isVideo(file)) throw new com.example.movie_app_server.common.exception.AppException("Định dạng video không hợp lệ", org.springframework.http.HttpStatus.BAD_REQUEST);
-        String videoUrl = cloudinaryService.uploadVideo(file);
+        String videoUrl = localFileService.storeFile(file);
         return ResponseEntity.ok(videoUrl);
     }
 

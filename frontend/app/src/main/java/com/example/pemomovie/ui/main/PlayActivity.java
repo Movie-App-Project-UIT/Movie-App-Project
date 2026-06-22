@@ -68,6 +68,7 @@ public class PlayActivity extends AppCompatActivity {
     private Long movieId;
     private MediaDetailResponse mediaDetail; // Lưu trữ thông tin phim để khôi phục dữ liệu khi xoay màn hình
     private LinearLayout topInfo;
+    private boolean viewCountIncremented = false;
 
     // Play/Pause button references (custom controller)
     private View btnPlayCustom;
@@ -107,6 +108,13 @@ public class PlayActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String videoUrl = response.body().string().trim();
+                        if (videoUrl.startsWith("/")) {
+                            String baseUrl = com.example.pemomovie.BuildConfig.BASE_URL;
+                            if (baseUrl.endsWith("/")) {
+                                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                            }
+                            videoUrl = baseUrl + videoUrl;
+                        }
                         fetchSubtitlesAndSetupPlayer(videoUrl);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -238,6 +246,7 @@ public class PlayActivity extends AppCompatActivity {
                             Uri.parse(subUrl))
                             .setMimeType(mimeType)
                             .setLanguage(sub.getLanguage() != null ? sub.getLanguage() : "vi")
+                            .setLabel(sub.getLanguage() != null ? sub.getLanguage() : "Tiếng Việt")
                             .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                             .build();
                     subtitleConfigs.add(config);
@@ -249,6 +258,23 @@ public class PlayActivity extends AppCompatActivity {
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
         exoPlayer.play();
+
+        // Ghi nhận lượt xem thực tế khi ấn Play (hoặc tự động Play) lần đầu tiên
+        if (!viewCountIncremented && movieId != null) {
+            apiService.incrementViewCount(movieId).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        viewCountIncremented = true;
+                        Log.d("PlayActivity", "Tăng lượt xem thành công!");
+                    }
+                }
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("PlayActivity", "Lỗi tăng lượt xem: " + t.getMessage());
+                }
+            });
+        }
 
         toggleSubtitle(); // Cập nhật trạng thái bật/tắt phụ đề hiện tại
 
@@ -314,11 +340,21 @@ public class PlayActivity extends AppCompatActivity {
         }
         TextView tvViews = findViewById(R.id.tvViews);
         if (tvViews != null) {
-            tvViews.setText(mediaDetail.getViewCount() + " lượt xem");
+            String views = mediaDetail.getViewCount() != null ? String.valueOf(mediaDetail.getViewCount()) : "0";
+            tvViews.setText(views + " lượt xem");
         }
         TextView tvTime = findViewById(R.id.tvTime);
         if (tvTime != null) {
-            tvTime.setText(String.valueOf(mediaDetail.getReleaseYear()));
+            String year = mediaDetail.getReleaseYear() != null ? String.valueOf(mediaDetail.getReleaseYear()) : "N/A";
+            
+            // Xử lý đồng bộ dữ liệu: Nếu Backend chưa kịp cập nhật hoặc trả về 0/null, nhưng bộ nhớ thiết bị đã lưu là "Yêu thích"
+            int favCount = mediaDetail.getFavoriteCount() != null ? mediaDetail.getFavoriteCount() : 0;
+            if ((mediaDetail.getFavoriteCount() == null || mediaDetail.getFavoriteCount() == 0) && FavoriteManager.isFavorite(this, mediaDetail.getId())) {
+                favCount = 1;
+                mediaDetail.setFavoriteCount(1); // Cập nhật lại vào đối tượng để lần ấn tim tiếp theo tính toán đúng
+            }
+            
+            tvTime.setText(year + "  •  " + favCount + " lượt yêu thích");
         }
 
         // Thiết lập thông tin phim cho Landscape layout
@@ -350,15 +386,35 @@ public class PlayActivity extends AppCompatActivity {
         // Gán sự kiện click
         btnFavorite.setOnClickListener(v -> {
             boolean isAdded = FavoriteManager.toggleFavorite(this, currentMovie);
+            int currentCount = mediaDetail.getFavoriteCount() != null ? mediaDetail.getFavoriteCount() : 0;
             if (isAdded) {
                 btnFavorite.setImageResource(R.drawable.ic_heart);
                 btnFavorite.setColorFilter(Color.parseColor("#FF1493"));
+                mediaDetail.setFavoriteCount(currentCount + 1);
                 Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
             } else {
                 btnFavorite.setImageResource(R.drawable.ic_favorites);
                 btnFavorite.setColorFilter(null);
+                mediaDetail.setFavoriteCount(Math.max(0, currentCount - 1));
                 Toast.makeText(this, "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show();
             }
+            populateMovieDetails();
+            
+            // Gửi API về Backend để đồng bộ Watchlist vào Database
+            apiService.toggleWatchlist(mediaDetail.getId()).enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+                @Override
+                public void onResponse(retrofit2.Call<okhttp3.ResponseBody> call, retrofit2.Response<okhttp3.ResponseBody> response) {
+                    if (!response.isSuccessful()) {
+                        android.util.Log.e("PlayActivity", "Lỗi đồng bộ Watchlist với DB: " + response.code());
+                    } else {
+                        android.util.Log.d("PlayActivity", "Đồng bộ Watchlist thành công!");
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<okhttp3.ResponseBody> call, Throwable t) {
+                    android.util.Log.e("PlayActivity", "Lỗi mạng khi đồng bộ Watchlist: " + t.getMessage());
+                }
+            });
         });
     }
 
@@ -534,9 +590,17 @@ public class PlayActivity extends AppCompatActivity {
             if (btnSubtitle != null) {
                 updateSubtitleButton();
                 btnSubtitle.setOnClickListener(v -> {
-                    subtitleEnabled = !subtitleEnabled;
-                    toggleSubtitle();
-                    updateSubtitleButton();
+                    if (exoPlayer != null) {
+                        androidx.media3.ui.TrackSelectionDialogBuilder builder = 
+                            new androidx.media3.ui.TrackSelectionDialogBuilder(
+                                PlayActivity.this,
+                                "Chọn phụ đề",
+                                exoPlayer,
+                                androidx.media3.common.C.TRACK_TYPE_TEXT
+                            );
+                        builder.setTheme(androidx.appcompat.R.style.Theme_AppCompat_Dialog);
+                        builder.build().show();
+                    }
                 });
             }
 

@@ -59,6 +59,10 @@ public class Media {
     @Column(name = "duration")
     private Integer duration;
 
+    @Column(name = "view_count", nullable = false)
+    @Builder.Default
+    private Integer viewCount = 0;
+
     @Column(name = "language", length = 50)
     private String language;
 

@@ -86,4 +86,10 @@ public class MediaController {
         String videoUrl = mediaService.getPlayableVideoUrl(id, getUid());
         return ResponseEntity.ok(videoUrl);
     }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<Void> incrementViewCount(@PathVariable Long id) {
+        mediaService.incrementViewCount(id);
+        return ResponseEntity.ok().build();
+    }
 }

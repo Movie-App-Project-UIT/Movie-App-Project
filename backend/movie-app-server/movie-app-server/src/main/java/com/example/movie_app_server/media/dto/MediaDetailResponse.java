@@ -26,6 +26,9 @@ public class MediaDetailResponse {
 
     // --- Các trường bổ sung cho màn hình chi tiết ---
     private LocalDate releaseDate;
+    private Integer releaseYear;    // Năm sản xuất (trích xuất từ releaseDate)
+    private Integer viewCount;      // Lượt xem thực tế
+    private Integer favoriteCount;  // Lượt yêu thích
     private String trailerUrl;      // Link trailer YouTube (embed)
     private String countryName;     // Tên quốc gia sản xuất
     private String ageRating;       // Cảnh báo độ tuổi
