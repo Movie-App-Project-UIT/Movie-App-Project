@@ -25,11 +25,11 @@ public class AdminUploadController {
         return ResponseEntity.ok(imageUrl);
     }
 
-    // API Up Video -> Nhận file và lưu cục bộ, trả về link stream
+    // API Up Video -> Nhận file và tải lên Cloudinary, trả về link stream HLS (.m3u8)
     @PostMapping("/video")
     public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) throws Exception {
         if (!isVideo(file)) throw new com.example.movie_app_server.common.exception.AppException("Định dạng video không hợp lệ", org.springframework.http.HttpStatus.BAD_REQUEST);
-        String videoUrl = localFileService.storeFile(file);
+        String videoUrl = cloudinaryService.uploadVideo(file);
         return ResponseEntity.ok(videoUrl);
     }
 
