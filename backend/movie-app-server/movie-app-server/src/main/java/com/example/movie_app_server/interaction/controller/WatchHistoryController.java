@@ -44,6 +44,11 @@ public class WatchHistoryController {
         return ResponseEntity.ok(watchHistoryService.getUserHistory(getUid()));
     }
 
+    @GetMapping("/media/{mediaId}")
+    public ResponseEntity<com.example.movie_app_server.interaction.dto.WatchHistoryItemDto> getHistoryByMediaId(@PathVariable Long mediaId) {
+        return ResponseEntity.ok(watchHistoryService.getHistoryByMediaId(getUid(), mediaId));
+    }
+
     @Data
     public static class UpdateHistoryRequest {
         private Long mediaId;

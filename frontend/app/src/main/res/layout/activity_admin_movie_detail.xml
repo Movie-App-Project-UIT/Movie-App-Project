@@ -60,6 +60,37 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Loại Phim"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <RadioGroup
+                android:id="@+id/rgMediaType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <RadioButton
+                    android:id="@+id/rbMovie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phim lẻ (MOVIE)"
+                    android:textColor="@color/white"
+                    android:checked="true"
+                    android:buttonTint="#3B82F6" />
+                <RadioButton
+                    android:id="@+id/rbTvSeries"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phim bộ (TV SERIES)"
+                    android:textColor="@color/white"
+                    android:layout_marginStart="16dp"
+                    android:buttonTint="#3B82F6" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="TMDB ID"
                 android:textColor="@color/white"
                 android:textStyle="bold"
@@ -82,15 +113,52 @@
                     android:hint="Nhập TMDB ID"
                     android:textColorHint="#9CA3AF"/>
                     
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnLoadTmdb"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
                     android:layout_marginStart="8dp"
-                    android:backgroundTint="#3B82F6"
+                    android:background="@drawable/bg_tab_active_gradient"
                     android:text="Tải lại"
                     android:textColor="@color/white"
-                    app:cornerRadius="8dp"/>
+                    android:textAllCaps="false"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvExpectedEpisodesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số tập dự kiến (Để 1 nếu là phim lẻ)"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                
+                <EditText
+                    android:id="@+id/etExpectedEpisodes"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_field"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="16dp"
+                    android:inputType="number"
+                    android:enabled="false"
+                    android:text="1"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnEditExpectedEpisodes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Sửa"
+                    android:background="@drawable/bg_tab_active_gradient"
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"/>
             </LinearLayout>
 
             <TextView
@@ -212,11 +280,19 @@
                 android:layout_marginBottom="8dp"/>
 
             <LinearLayout
+                android:id="@+id/layoutEpisodes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp"
+                android:background="#1E293B"
+                android:padding="12dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn tập để chỉnh sửa"
                 <Button
                     android:id="@+id/btnUploadVideo"
                     android:layout_width="0dp"
@@ -236,43 +312,65 @@
                     android:backgroundTint="#8B5CF6"
                     android:text="Dán Link Drive"
                     android:textColor="@color/white"
-                    app:cornerRadius="8dp"/>
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvEpisodesAdmin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp"/>
+                    
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quản lý Phụ đề"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
-
+                
             <LinearLayout
+                android:id="@+id/layoutEpisodeDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/etSubtitleLanguage"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="50dp"
-                    android:hint="Ngôn ngữ (VD: vi, en)"
-                    android:textColorHint="#9CA3AF"
-                    android:background="@drawable/bg_input_field"
-                    android:textColor="@color/white"
-                    android:paddingHorizontal="16dp"/>
-
-                <Button
-                    android:id="@+id/btnUploadSubtitle"
+                <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="#3B82F6"
-                    android:text="Thêm file SRT"
+                    android:layout_height="wrap_content"
+                    android:text="Video URL"
                     android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/etVideoUrl"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_input_field"
+                        android:textColor="@color/white"
+                        android:paddingHorizontal="16dp"/>
+
+                    <Button
+                        android:id="@+id/btnUploadVideo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#10B981"
+                        android:text="Upload MP4"
+                        android:textColor="@color/white"
+                        app:cornerRadius="8dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quản lý Phụ đề"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
                     app:cornerRadius="8dp"/>
 
                 <Button
@@ -286,31 +384,59 @@
                     app:cornerRadius="8dp"/>
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvSubtitles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
+                    <EditText
+                        android:id="@+id/etSubtitleLanguage"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="50dp"
+                        android:hint="Ngôn ngữ (VD: vi, en)"
+                        android:textColorHint="#9CA3AF"
+                        android:background="@drawable/bg_input_field"
+                        android:textColor="@color/white"
+                        android:paddingHorizontal="16dp"/>
 
+                    <Button
+                        android:id="@+id/btnUploadSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#3B82F6"
+                        android:text="Thêm file SRT"
+                        android:textColor="@color/white"
+                        app:cornerRadius="8dp"/>
+                </LinearLayout>
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swPremium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phim Premium (VIP mới được xem)"
-                android:textColor="@color/white"
-                android:theme="@style/Widget.AppCompat.CompoundButton.Switch"
-                android:layout_marginBottom="16dp"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvSubtitles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"/>
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swDeleted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Khóa phim (Ẩn khỏi hệ thống)"
-                android:textColor="@color/white"
-                android:theme="@style/Widget.AppCompat.CompoundButton.Switch"
-                android:layout_marginBottom="16dp"/>
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swPremium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Phim Premium (VIP mới được xem)"
+                    android:textColor="@color/white"
+                    android:theme="@style/Widget.AppCompat.CompoundButton.Switch"
+                    android:layout_marginBottom="16dp"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swDeleted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Khóa phim (Ẩn khỏi hệ thống)"
+                    android:textColor="@color/white"
+                    android:theme="@style/Widget.AppCompat.CompoundButton.Switch"
+                    android:layout_marginBottom="16dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
@@ -319,33 +445,37 @@
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:background="@color/bg_dark"
         android:padding="16dp"
+        android:weightSum="2"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnViewReviews"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="56dp"
-            android:backgroundTint="#3B82F6"
+            android:background="@drawable/bg_button_outline"
             android:text="Xem Bình Luận"
-            android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textColor="#D946EF"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            app:cornerRadius="12dp"/>
+            android:layout_marginEnd="8dp"
+            android:textAllCaps="false"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSave"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="56dp"
-            android:backgroundTint="#D946EF"
+            android:background="@drawable/bg_tab_active_gradient"
             android:text="Xác nhận tạo phim"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:cornerRadius="12dp"/>
+            android:layout_marginStart="8dp"
+            android:textAllCaps="false"/>
     </LinearLayout>
     
     <ProgressBar

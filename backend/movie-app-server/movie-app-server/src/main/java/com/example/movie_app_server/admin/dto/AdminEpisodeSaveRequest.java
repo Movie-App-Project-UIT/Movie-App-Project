@@ -3,8 +3,7 @@ package com.example.movie_app_server.admin.dto;
 import lombok.Data;
 
 @Data
-public class AdminMovieSaveRequest {
-    private Integer tmdbId;
+public class AdminEpisodeSaveRequest {
     private String videoUrl;
     @com.fasterxml.jackson.annotation.JsonProperty("isPremium")
     private boolean isPremium;
@@ -12,14 +11,5 @@ public class AdminMovieSaveRequest {
     private boolean isDeleted;
     private String title;
     private String overview;
-    private String language;
-    private Integer expectedEpisodes;
-    private String mediaType;
-    private java.util.List<AdminSubtitleRequest> subtitles;
-
-    @Data
-    public static class AdminSubtitleRequest {
-        private String language;
-        private String fileUrl;
-    }
+    private java.util.List<AdminMovieSaveRequest.AdminSubtitleRequest> subtitles;
 }

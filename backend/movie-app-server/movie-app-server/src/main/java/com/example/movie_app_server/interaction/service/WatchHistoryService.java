@@ -72,6 +72,15 @@ public class WatchHistoryService {
                 .stream().map(this::convertToDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    public com.example.movie_app_server.interaction.dto.WatchHistoryItemDto getHistoryByMediaId(String firebaseUid, Long mediaId) {
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return watchHistoryRepository.findFirstByUserIdAndMediaIdOrderByLastWatchedAtDesc(user.getId(), mediaId)
+                .map(this::convertToDto)
+                .orElse(null);
+    }
+
     private com.example.movie_app_server.interaction.dto.WatchHistoryItemDto convertToDto(WatchHistory h) {
         return com.example.movie_app_server.interaction.dto.WatchHistoryItemDto.builder()
                 .id(h.getId())

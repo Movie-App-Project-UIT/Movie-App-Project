@@ -48,6 +48,19 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
              .placeholder(R.drawable.yn) // fallback placeholder
              .into(holder.imgPoster);
 
+        if (movie.getVoteAverage() != null && movie.getVoteAverage() > 0) {
+            holder.txt_IMDb.setVisibility(View.VISIBLE);
+            holder.txt_IMDb.setText(String.format("IMDb %.1f", movie.getVoteAverage()));
+        } else {
+            holder.txt_IMDb.setVisibility(View.GONE);
+        }
+
+        if (movie.isPremium()) {
+            holder.txt_VIP.setVisibility(View.VISIBLE);
+        } else {
+            holder.txt_VIP.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetailActivity.class);
             // Pass movie id to DetailActivity
@@ -63,10 +76,14 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
     public static class PosterViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPoster;
+        android.widget.TextView txt_IMDb;
+        android.widget.TextView txt_VIP;
 
         public PosterViewHolder(@NonNull View itemView) {
             super(itemView);
             imgPoster = itemView.findViewById(R.id.imgPoster);
+            txt_IMDb = itemView.findViewById(R.id.txt_IMDb);
+            txt_VIP = itemView.findViewById(R.id.txt_VIP);
         }
     }
 }

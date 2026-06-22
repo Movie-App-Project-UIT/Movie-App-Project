@@ -13,5 +13,10 @@ public class EpisodeDto {
     private String stillUrl;
     private Integer duration;
     private boolean isPlayable;
+    @com.fasterxml.jackson.annotation.JsonProperty("isPremium")
+    private boolean isPremium;
+    @com.fasterxml.jackson.annotation.JsonProperty("isDeleted")
+    private boolean isDeleted;
+    private String videoUrl;
     private java.util.List<SubtitleDto> subtitles;
 }

@@ -42,6 +42,7 @@ public class MediaDetailResponse {
     public boolean isPremium() { return isPremium; }
     public boolean isDeleted() { return isDeleted; }
     public String getMediaType() { return mediaType; }
+    public void setMediaType(String mediaType) { this.mediaType = mediaType; }
     public java.util.List<String> getGenres() { return genres; }
     public String getCountryName() { return countryName; }
     public String getLanguage() { return language; }
@@ -49,4 +50,10 @@ public class MediaDetailResponse {
     public List<CreditDto> getCast() { return cast; }
     public List<SubtitleDto> getSubtitles() { return subtitles; }
     public String getTrailerUrl() { return trailerUrl; }
+
+    private Integer expectedEpisodes;
+    private List<SeasonDto> seasons;
+    
+    public Integer getExpectedEpisodes() { return expectedEpisodes; }
+    public List<SeasonDto> getSeasons() { return seasons; }
 }

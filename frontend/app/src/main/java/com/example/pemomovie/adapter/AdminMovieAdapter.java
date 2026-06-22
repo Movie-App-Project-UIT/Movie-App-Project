@@ -90,6 +90,18 @@ public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.Vi
         } else {
             holder.tvViews.setText("0 lượt xem");
         }
+
+        if (movie.isPremium()) {
+            holder.txt_VIP.setVisibility(View.VISIBLE);
+            if (holder.tvPremiumInfo != null) {
+                holder.tvPremiumInfo.setVisibility(View.VISIBLE);
+            }
+        } else {
+            holder.txt_VIP.setVisibility(View.GONE);
+            if (holder.tvPremiumInfo != null) {
+                holder.tvPremiumInfo.setVisibility(View.GONE);
+            }
+        }
         
         if (isInactiveTab) {
             holder.btnDelete.setImageResource(R.drawable.ic_save); // Restore icon
@@ -169,7 +181,7 @@ public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPoster, btnDelete, btnEdit;
-        TextView tvTitle, tvType, tvRating, tvGenres, tvViews;
+        TextView tvTitle, tvType, tvRating, tvGenres, tvViews, txt_VIP, tvPremiumInfo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -181,6 +193,8 @@ public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.Vi
             tvRating = itemView.findViewById(R.id.tvRating);
             tvGenres = itemView.findViewById(R.id.tvGenres);
             tvViews = itemView.findViewById(R.id.tvViews);
+            txt_VIP = itemView.findViewById(R.id.txt_VIP);
+            tvPremiumInfo = itemView.findViewById(R.id.tvPremiumInfo);
         }
     }
 }

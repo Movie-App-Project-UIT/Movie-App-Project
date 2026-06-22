@@ -56,6 +56,9 @@ public interface ApiService {
     Call<List<com.example.pemomovie.dto.WatchlistItemDto>> getMyWatchlist();
 
     // --- ADMIN API ---
+    @GET("/api/v1/admin/dashboard/stats")
+    Call<com.example.pemomovie.dto.AdminDashboardStatsDto> getDashboardStats();
+
     @GET("/api/v1/admin/movies")
     Call<List<MediaItemDto>> getAllMoviesAdmin();
 
@@ -66,13 +69,19 @@ public interface ApiService {
     Call<Void> softDeleteMovie(@retrofit2.http.Path("id") Long id);
 
     @GET("/api/v1/admin/movies/preview-tmdb")
-    Call<com.example.pemomovie.dto.MediaDetailResponse> previewTmdbMovie(@retrofit2.http.Query("tmdbId") Integer tmdbId);
+    Call<com.example.pemomovie.dto.MediaDetailResponse> previewTmdbMovie(@retrofit2.http.Query("tmdbId") Integer tmdbId, @retrofit2.http.Query("type") String type);
 
     @POST("/api/v1/admin/movies")
     Call<com.example.pemomovie.dto.MediaDetailResponse> createMovie(@Body com.example.pemomovie.dto.AdminMovieSaveRequest request);
 
     @retrofit2.http.PUT("/api/v1/admin/movies/{id}")
     Call<com.example.pemomovie.dto.MediaDetailResponse> updateMovie(@retrofit2.http.Path("id") Long id, @Body com.example.pemomovie.dto.AdminMovieSaveRequest request);
+
+    @POST("/api/v1/admin/movies/{id}/episodes")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> createEpisodeAdmin(@retrofit2.http.Path("id") Long id, @Body com.example.pemomovie.dto.AdminEpisodeSaveRequest request);
+
+    @retrofit2.http.PUT("/api/v1/admin/movies/{id}/episodes/{episodeId}")
+    Call<com.example.pemomovie.dto.MediaDetailResponse> updateEpisodeAdmin(@retrofit2.http.Path("id") Long id, @retrofit2.http.Path("episodeId") Long episodeId, @Body com.example.pemomovie.dto.AdminEpisodeSaveRequest request);
 
     @GET("/api/v1/admin/categories")
     Call<List<com.example.pemomovie.dto.AdminGenreDto>> getAllCategoriesAdmin();
@@ -150,6 +159,9 @@ public interface ApiService {
     @GET("/api/v1/media/{id}/play")
     Call<ResponseBody> getPlayableVideoUrl(@retrofit2.http.Path("id") Long id);
 
+    @GET("/api/v1/media/{id}/episodes/{episodeId}/play")
+    Call<ResponseBody> getPlayableEpisodeUrl(@retrofit2.http.Path("id") Long id, @retrofit2.http.Path("episodeId") Long episodeId);
+
     @GET("/api/v1/lookups/genres")
     Call<List<com.example.pemomovie.dto.GenreDto>> getGenres();
 
@@ -162,15 +174,17 @@ public interface ApiService {
     @GET("/api/v1/lookups/age-ratings")
     Call<List<com.example.pemomovie.dto.AgeRatingDto>> getAgeRatings();
 
-    @GET("/api/v1/media/filter")
-    Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> filterMedia(
+    @retrofit2.http.GET("/api/v1/media/filter")
+    retrofit2.Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.MediaItemDto>> filterMedia(
             @retrofit2.http.Query("keyword") String keyword,
-            @retrofit2.http.Query("genreId") Long genreId,
-            @retrofit2.http.Query("countryId") Long countryId,
+            @retrofit2.http.Query("genreIds") java.util.List<Long> genreIds,
+            @retrofit2.http.Query("countryIds") java.util.List<Long> countryIds,
+            @retrofit2.http.Query("languages") java.util.List<String> languages,
             @retrofit2.http.Query("ageRatingId") Long ageRatingId,
             @retrofit2.http.Query("releaseYear") Integer releaseYear,
             @retrofit2.http.Query("mediaType") String mediaType,
             @retrofit2.http.Query("sortBy") String sortBy,
+            @retrofit2.http.Query("isPremium") Boolean isPremium,
             @retrofit2.http.Query("page") int page,
             @retrofit2.http.Query("size") int size
     );
@@ -229,4 +243,7 @@ public interface ApiService {
 
     @GET("/api/v1/history/me")
     Call<List<com.example.pemomovie.dto.WatchHistoryItemDto>> getUserHistory();
+
+    @GET("/api/v1/history/media/{mediaId}")
+    Call<com.example.pemomovie.dto.WatchHistoryItemDto> getHistoryByMedia(@retrofit2.http.Path("mediaId") Long mediaId);
 }

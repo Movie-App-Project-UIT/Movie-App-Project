@@ -53,7 +53,8 @@ public class MovieActivity extends AppCompatActivity {
     
     private RecyclerView rvCountries, rvGenres, rvYears, rvMovies;
     
-    private FilterChipAdapter countryAdapter, genreAdapter, yearAdapter;
+    private com.example.pemomovie.adapter.MultiSelectFilterChipAdapter countryAdapter, genreAdapterMulti, languageAdapter;
+    private FilterChipAdapter yearAdapter;
     private PosterAdapter movieAdapter;
 
     private ApiService apiService;
@@ -61,10 +62,12 @@ public class MovieActivity extends AppCompatActivity {
     // Filter State
     private String currentKeyword = null;
     private String currentMediaType = null; // null = Tất cả
-    private Long currentGenreId = null;
-    private Long currentCountryId = null;
+    private java.util.List<Long> currentGenreIds = new java.util.ArrayList<>();
+    private java.util.List<Long> currentCountryIds = new java.util.ArrayList<>();
+    private java.util.List<String> currentLanguages = new java.util.ArrayList<>();
     private Long currentAgeRatingId = null;
     private Integer currentReleaseYear = null;
+    private Boolean currentIsPremium = null;
     private String currentSortBy = "Mới nhất"; // "Mới nhất", "Cũ nhất", "Điểm TMDB"
 
     @Override
@@ -104,7 +107,9 @@ public class MovieActivity extends AppCompatActivity {
         rvCountries = findViewById(R.id.rvCountries);
         rvGenres = findViewById(R.id.rvGenres);
         rvYears = findViewById(R.id.rvYears);
+        androidx.recyclerview.widget.RecyclerView rvLanguages = findViewById(R.id.rvLanguages);
         rvMovies = findViewById(R.id.rvMovies);
+        androidx.recyclerview.widget.RecyclerView rvPremium = findViewById(R.id.rvPremium);
         
         btnSortOptions = findViewById(R.id.btnSortOptions);
         txtCurrentSort = findViewById(R.id.txtCurrentSort);
@@ -209,10 +214,22 @@ public class MovieActivity extends AppCompatActivity {
                     List<FilterOption> options = new ArrayList<>();
                     options.add(new FilterOption((Long)null, "Tất cả"));
                     for (GenreDto g : response.body()) options.add(new FilterOption(g.getId(), g.getName()));
-                    genreAdapter = new FilterChipAdapter(options, opt -> {
-                        currentGenreId = opt.getId(); loadMovies();
+                    genreAdapterMulti = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(options, opts -> {
+                        currentGenreIds.clear();
+                        for (FilterOption opt : opts) {
+                            if (opt.getId() != null) {
+                                currentGenreIds.add(opt.getId());
+                            }
+                        }
                     });
-                    rvGenres.setAdapter(genreAdapter);
+                    rvGenres.setAdapter(genreAdapterMulti);
+                    
+                    String genreName = getIntent().getStringExtra("GENRE_NAME");
+                    if (genreName != null && !genreName.isEmpty()) {
+                        genreAdapterMulti.selectByName(genreName);
+                        // We also trigger loadMovies because it's passed directly via intent
+                        loadMovies();
+                    }
                 }
             }
             @Override
@@ -227,8 +244,13 @@ public class MovieActivity extends AppCompatActivity {
                     List<FilterOption> options = new ArrayList<>();
                     options.add(new FilterOption((Long)null, "Tất cả"));
                     for (CountryDto c : response.body()) options.add(new FilterOption(c.getId(), c.getName()));
-                    countryAdapter = new FilterChipAdapter(options, opt -> {
-                        currentCountryId = opt.getId(); loadMovies();
+                    countryAdapter = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(options, opts -> {
+                        currentCountryIds.clear();
+                        for (FilterOption opt : opts) {
+                            if (opt.getId() != null) {
+                                currentCountryIds.add(opt.getId());
+                            }
+                        }
                     });
                     rvCountries.setAdapter(countryAdapter);
                 }
@@ -238,12 +260,69 @@ public class MovieActivity extends AppCompatActivity {
         });
 
         // Age Ratings đã bị ẩn
+        // Premium
+        List<FilterOption> premiumOptions = new ArrayList<>();
+        premiumOptions.add(new FilterOption(0L, "Tất cả"));
+        premiumOptions.add(new FilterOption(1L, "Premium"));
+        premiumOptions.add(new FilterOption(2L, "Miễn phí"));
+        FilterChipAdapter premiumAdapter = new FilterChipAdapter(premiumOptions, opt -> {
+            if (opt.getName().equals("Premium")) currentIsPremium = true;
+            else if (opt.getName().equals("Miễn phí")) currentIsPremium = false;
+            else currentIsPremium = null;
+        });
+        androidx.recyclerview.widget.RecyclerView rvPremium = findViewById(R.id.rvPremium);
+        rvPremium.setAdapter(premiumAdapter);
+        
+        // Languages
+        List<FilterOption> langOptions = new ArrayList<>();
+        langOptions.add(new FilterOption((Long)null, "Tất cả"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Việt"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Anh"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Hàn"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Trung"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Nhật"));
+        langOptions.add(new FilterOption((Long)null, "Tiếng Thái"));
+
+        languageAdapter = new com.example.pemomovie.adapter.MultiSelectFilterChipAdapter(langOptions, opts -> {
+            currentLanguages.clear();
+            for (FilterOption opt : opts) {
+                if (opt.getName() != null && !opt.getName().equals("Tất cả")) {
+                    currentLanguages.add(opt.getName());
+                }
+            }
+        });
+        androidx.recyclerview.widget.RecyclerView rvLanguages = findViewById(R.id.rvLanguages);
+        rvLanguages.setAdapter(languageAdapter);
+        
+        // Setup Clear and Apply Buttons
+        TextView btnClearFilters = findViewById(R.id.btnClearFilters);
+        androidx.appcompat.widget.AppCompatButton btnApplyFilters = findViewById(R.id.btnApplyFilters);
+        
+        btnClearFilters.setOnClickListener(v -> {
+            if (genreAdapterMulti != null) genreAdapterMulti.clearSelection();
+            if (countryAdapter != null) countryAdapter.clearSelection();
+            if (languageAdapter != null) languageAdapter.clearSelection();
+            currentReleaseYear = null;
+            currentIsPremium = null;
+            // Also reset UI for static filters here if needed
+            loadMovies();
+        });
+        
+        btnApplyFilters.setOnClickListener(v -> {
+            layoutFiltersContainer.setVisibility(View.GONE);
+            txtToggleFilter.setText("Mở rộng bộ lọc");
+            loadMovies();
+        });
     }
 
     private void loadMovies() {
         apiService.filterMedia(
-                currentKeyword, currentGenreId, currentCountryId, currentAgeRatingId,
-                currentReleaseYear, currentMediaType, currentSortBy, 0, 50
+                currentKeyword, 
+                currentGenreIds.isEmpty() ? null : currentGenreIds, 
+                currentCountryIds.isEmpty() ? null : currentCountryIds, 
+                currentLanguages.isEmpty() ? null : currentLanguages, 
+                currentAgeRatingId,
+                currentReleaseYear, currentMediaType, currentSortBy, currentIsPremium, 0, 50
         ).enqueue(new Callback<PageResponseDto<MediaItemDto>>() {
             @Override
             public void onResponse(Call<PageResponseDto<MediaItemDto>> call, Response<PageResponseDto<MediaItemDto>> response) {

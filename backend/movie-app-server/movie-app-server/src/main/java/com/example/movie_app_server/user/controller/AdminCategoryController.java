@@ -30,10 +30,9 @@ public class AdminCategoryController {
     private AdminGenreDto convertToDto(Genre genre) {
         List<Media> mediaList = mediaRepository.findByGenres_Id(genre.getId());
         
-        // Tạo viewCount giả định
-        int fakeViewCount = 0;
+        int realViewCount = 0;
         for (Media m : mediaList) {
-            fakeViewCount += (m.getId() != null ? (int) (m.getId() * 1234 % 50000) : 0);
+            realViewCount += (m.getViewCount() != null ? m.getViewCount() : 0);
         }
 
         // Tùy chọn color (mock cho giống design cũ)
@@ -44,7 +43,7 @@ public class AdminCategoryController {
                 .id(genre.getId())
                 .name(genre.getName())
                 .colorCode(color)
-                .viewCount(fakeViewCount)
+                .viewCount(realViewCount)
                 .mediaCount(mediaList.size())
                 .isDeleted(genre.isDeleted())
                 .build();

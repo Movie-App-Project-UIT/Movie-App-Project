@@ -34,6 +34,26 @@ public class MediaService {
 
     // --- HÀM TIỆN ÍCH DÙNG CHUNG ---
     public MediaItemDto convertToItemDto(Media media) {
+        int availableEpisodes = 0;
+        int hiddenEpisodesCount = 0;
+        if (media.getMediaType() == com.example.movie_app_server.media.entity.enums.MediaType.TV_SERIES && media.getSeasons() != null) {
+            for (Season s : media.getSeasons()) {
+                if (s.getEpisodes() != null) {
+                    for (Episode e : s.getEpisodes()) {
+                        if (e.isDeleted()) hiddenEpisodesCount++;
+                        
+                        boolean hasData = (e.getVideoUrl() != null && !e.getVideoUrl().trim().isEmpty()) || 
+                                          (e.getSubtitles() != null && !e.getSubtitles().isEmpty());
+                        if (hasData && !e.isDeleted()) {
+                            if (e.getEpisodeNumber() > availableEpisodes) {
+                                availableEpisodes = e.getEpisodeNumber();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return MediaItemDto.builder()
                 .id(media.getId())
                 .title(media.getTitle())
@@ -50,6 +70,9 @@ public class MediaService {
                 .hiddenByGenreId(media.getHiddenByGenreId())
                 .duration(media.getDuration())
                 .viewCount(media.getViewCount() != null ? media.getViewCount() : 0)
+                .expectedEpisodes(media.getExpectedEpisodes())
+                .availableEpisodes(availableEpisodes)
+                .hiddenEpisodesCount(hiddenEpisodesCount)
                 .build();
     }
 
@@ -61,8 +84,8 @@ public class MediaService {
     }
 
     // --- LOGIC LỌC PHIM ---
-    public Page<MediaItemDto> filterMedia(String keyword, Long genreId, Long countryId, Long ageRatingId,
-                                          Integer releaseYear, Boolean isPlayable, String mediaType, Pageable pageable) {
+    public Page<MediaItemDto> filterMedia(String keyword, List<Long> genreIds, List<Long> countryIds, List<String> languages, Long ageRatingId,
+                                          Integer releaseYear, Boolean isPlayable, String mediaType, Boolean isPremium, Pageable pageable) {
         
         java.time.LocalDate startDate = null;
         java.time.LocalDate endDate = null;
@@ -72,7 +95,7 @@ public class MediaService {
         }
 
         Page<Media> mediaPage = mediaRepository.filterMediaDynamically(
-                keyword, genreId, countryId, ageRatingId, startDate, endDate, isPlayable, mediaType, pageable);
+                keyword, genreIds, countryIds, languages, ageRatingId, startDate, endDate, isPlayable, mediaType, isPremium, pageable);
 
         return mediaPage.map(this::convertToItemDto);
     }
@@ -204,6 +227,7 @@ public class MediaService {
                 .cast(cast)
                 .subtitles(subtitles)
                 .seasons(seasonDtos)
+                .expectedEpisodes(media.getExpectedEpisodes())
                 .build();
     }
 
@@ -227,6 +251,34 @@ public class MediaService {
         }
 
         return media.getVideoUrl();
+    }
+
+    public String getPlayableEpisodeUrl(Long mediaId, Long episodeId, String firebaseUid) {
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
+
+        if (media.isDeleted()) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
+
+        Episode episode = episodeRepository.findById(episodeId)
+                .orElseThrow(() -> new AppException("Không tìm thấy tập phim", HttpStatus.NOT_FOUND));
+
+        if (episode.isDeleted()) {
+            throw new AppException("Tập phim này đã bị ẩn", HttpStatus.NOT_FOUND);
+        }
+
+        if (episode.isPremium() || media.isPremium()) {
+            if (!userService.hasPremiumAccess(firebaseUid)) {
+                throw new AppException("YÊU CẦU_NÂNG_CẤP: Bạn cần gói Premium để xem tập phim này", HttpStatus.PAYMENT_REQUIRED);
+            }
+        }
+
+        if (episode.getVideoUrl() == null || episode.getVideoUrl().trim().isEmpty()) {
+            throw new AppException("Tập phim hiện chưa có link xem", HttpStatus.NO_CONTENT);
+        }
+
+        return episode.getVideoUrl();
     }
 
     // --- LOGIC LẤY DANH SÁCH SEASONS ---
@@ -295,6 +347,9 @@ public class MediaService {
                 .stillUrl(episode.getStillPath() != null ? "https://image.tmdb.org/t/p/w300" + episode.getStillPath() : null)
                 .duration(episode.getDuration())
                 .isPlayable(episode.getVideoUrl() != null && !episode.getVideoUrl().trim().isEmpty())
+                .isPremium(episode.isPremium())
+                .isDeleted(episode.isDeleted())
+                .videoUrl(episode.getVideoUrl())
                 .subtitles(subtitleDtos)
                 .build();
     }

@@ -117,4 +117,17 @@ public class MediaItemDto implements Serializable {
     private Integer duration;
     public Integer getDuration() { return duration; }
     public void setDuration(Integer duration) { this.duration = duration; }
+
+    private Integer expectedEpisodes;
+    private Integer availableEpisodes;
+    private Integer hiddenEpisodesCount;
+
+    public Integer getExpectedEpisodes() { return expectedEpisodes; }
+    public void setExpectedEpisodes(Integer expectedEpisodes) { this.expectedEpisodes = expectedEpisodes; }
+
+    public Integer getAvailableEpisodes() { return availableEpisodes; }
+    public void setAvailableEpisodes(Integer availableEpisodes) { this.availableEpisodes = availableEpisodes; }
+
+    public Integer getHiddenEpisodesCount() { return hiddenEpisodesCount; }
+    public void setHiddenEpisodesCount(Integer hiddenEpisodesCount) { this.hiddenEpisodesCount = hiddenEpisodesCount; }
 }

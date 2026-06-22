@@ -12,6 +12,12 @@ public class EpisodeDto {
     private boolean isPlayable;
     private List<SubtitleDto> subtitles;
 
+    @com.google.gson.annotations.SerializedName("isPremium")
+    private boolean isPremium;
+    @com.google.gson.annotations.SerializedName(value = "isDeleted", alternate = {"deleted"})
+    private boolean isDeleted;
+    private String videoUrl;
+
     public Long getId() { return id; }
     public Integer getEpisodeNumber() { return episodeNumber; }
     public String getTitle() { return title; }
@@ -20,4 +26,16 @@ public class EpisodeDto {
     public Integer getDuration() { return duration; }
     public boolean isPlayable() { return isPlayable; }
     public List<SubtitleDto> getSubtitles() { return subtitles; }
+    public boolean isPremium() { return isPremium; }
+    public boolean isDeleted() { return isDeleted; }
+    public String getVideoUrl() { return videoUrl; }
+    
+    public void setId(Long id) { this.id = id; }
+    public void setEpisodeNumber(Integer episodeNumber) { this.episodeNumber = episodeNumber; }
+    public void setTitle(String title) { this.title = title; }
+    public void setOverview(String overview) { this.overview = overview; }
+    public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
+    public void setPremium(boolean premium) { isPremium = premium; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+    public void setSubtitles(List<SubtitleDto> subtitles) { this.subtitles = subtitles; }
 }

@@ -48,12 +48,14 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             "LEFT JOIN m.genres g " +
             "WHERE m.isDeleted = false " +
             "AND (:keyword IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:genreId IS NULL OR g.id = :genreId) " +
-            "AND (:countryId IS NULL OR m.country.id = :countryId) " +
+            "AND (:#{#genreIds == null || #genreIds.isEmpty()} = true OR g.id IN :genreIds) " +
+            "AND (:#{#countryIds == null || #countryIds.isEmpty()} = true OR m.country.id IN :countryIds) " +
+            "AND (:#{#languages == null || #languages.isEmpty()} = true OR m.language IN :languages) " +
             "AND (:ageRatingId IS NULL OR m.ageRating.id = :ageRatingId) " +
             "AND (CAST(:startDate AS date) IS NULL OR m.releaseDate >= :startDate) " +
             "AND (CAST(:endDate AS date) IS NULL OR m.releaseDate <= :endDate) " +
-            "AND (:mediaType IS NULL OR CAST(m.mediaType AS string) = :mediaType) " + // ĐÃ THÊM DÒNG NÀY
+            "AND (:mediaType IS NULL OR CAST(m.mediaType AS string) = :mediaType) " +
+            "AND (:isPremium IS NULL OR m.isPremium = :isPremium) " +
             "AND (:isPlayable IS NULL OR " +
             "  (:isPlayable = true AND (" +
             "    (m.mediaType = 'MOVIE' AND m.videoUrl IS NOT NULL AND TRIM(m.videoUrl) <> '') OR " +
@@ -66,13 +68,15 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             ")")
     Page<Media> filterMediaDynamically(
             @Param("keyword") String keyword,
-            @Param("genreId") Long genreId,
-            @Param("countryId") Long countryId,
+            @Param("genreIds") java.util.List<Long> genreIds,
+            @Param("countryIds") java.util.List<Long> countryIds,
+            @Param("languages") java.util.List<String> languages,
             @Param("ageRatingId") Long ageRatingId,
             @Param("startDate") java.time.LocalDate startDate,
             @Param("endDate") java.time.LocalDate endDate,
             @Param("isPlayable") Boolean isPlayable,
-            @Param("mediaType") String mediaType, // ĐÃ THÊM THAM SỐ NÀY
+            @Param("mediaType") String mediaType,
+            @Param("isPremium") Boolean isPremium,
             Pageable pageable
     );
 

@@ -10,8 +10,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.example.pemomovie.R;
+import com.example.pemomovie.adapter.AdminTopMovieAdapter;
+import com.example.pemomovie.api.ApiClient;
+import com.example.pemomovie.api.ApiService;
+import com.example.pemomovie.dto.AdminDashboardStatsDto;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import java.util.ArrayList;
 
 public class AdminDashboardActivity extends AppCompatActivity {
+    
+    private RecyclerView rvTopTrending;
+    private RecyclerView rvTopLiked;
+    private AdminTopMovieAdapter trendingAdapter;
+    private AdminTopMovieAdapter likedAdapter;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +86,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             });
         }
 
-        android.view.View btnViewAllMovies = findViewById(R.id.btnViewAllMovies);
-        if (btnViewAllMovies != null) {
-            btnViewAllMovies.setOnClickListener(v -> {
-                Intent intent = new Intent(this, com.example.pemomovie.ui.admin.AdminMovieActivity.class);
-                startActivity(intent);
-            });
-        }
 
         // Setup bottom navigation
         com.example.pemomovie.utils.AdminNavigationHelper.setupBottomNavigation(this);
@@ -88,12 +94,45 @@ public class AdminDashboardActivity extends AppCompatActivity {
         if (btnProfileUtility != null) {
             btnProfileUtility.setOnClickListener(v -> showProfileDropdown(v));
         }
+
+        apiService = ApiClient.getClient().create(ApiService.class);
+        rvTopTrending = findViewById(R.id.rvTopTrending);
+        rvTopLiked = findViewById(R.id.rvTopLiked);
+
+        rvTopTrending.setLayoutManager(new LinearLayoutManager(this));
+        rvTopLiked.setLayoutManager(new LinearLayoutManager(this));
+
+        trendingAdapter = new AdminTopMovieAdapter(this, new ArrayList<>(), true);
+        likedAdapter = new AdminTopMovieAdapter(this, new ArrayList<>(), false);
+
+        rvTopTrending.setAdapter(trendingAdapter);
+        rvTopLiked.setAdapter(likedAdapter);
     }
     
     @Override
     protected void onResume() {
         super.onResume();
         loadHomeProfileAvatar();
+        loadDashboardStats();
+    }
+
+    private void loadDashboardStats() {
+        apiService.getDashboardStats().enqueue(new retrofit2.Callback<AdminDashboardStatsDto>() {
+            @Override
+            public void onResponse(retrofit2.Call<AdminDashboardStatsDto> call, retrofit2.Response<AdminDashboardStatsDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    trendingAdapter.updateData(response.body().getTopTrendingMovies());
+                    likedAdapter.updateData(response.body().getTopLikedMovies());
+                } else {
+                    Toast.makeText(AdminDashboardActivity.this, "Không thể tải dữ liệu thống kê", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<AdminDashboardStatsDto> call, Throwable t) {
+                Toast.makeText(AdminDashboardActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadHomeProfileAvatar() {

@@ -5,38 +5,41 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pemomovie.R;
-
 import com.example.pemomovie.dto.EpisodeDto;
+
 import java.util.List;
 
-public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeViewHolder> {
+public class AdminEpisodeAdapter extends RecyclerView.Adapter<AdminEpisodeAdapter.EpisodeViewHolder> {
 
     private final Context context;
     private final List<EpisodeDto> episodeList;
-    private int selectedPosition = -1; // Default selected is -1 (No focus)
-    private OnEpisodeClickListener listener;
+    private int selectedPosition = -1;
+    private final OnItemClickListener listener;
 
-    public interface OnEpisodeClickListener {
-        void onEpisodeClick(EpisodeDto episode, int position);
+    public interface OnItemClickListener {
+        void onItemClick(EpisodeDto episode, int position);
     }
 
-    public EpisodeAdapter(Context context, List<EpisodeDto> episodeList, OnEpisodeClickListener listener) {
+    public AdminEpisodeAdapter(Context context, List<EpisodeDto> episodeList, OnItemClickListener listener) {
         this.context = context;
         this.episodeList = episodeList;
         this.listener = listener;
     }
 
     public void setSelectedPosition(int position) {
-        int previous = this.selectedPosition;
-        this.selectedPosition = position;
+        int previous = selectedPosition;
+        selectedPosition = position;
         notifyItemChanged(previous);
         notifyItemChanged(selectedPosition);
+    }
+
+    public int getSelectedPosition() {
+        return selectedPosition;
     }
 
     @NonNull
@@ -49,25 +52,29 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     @Override
     public void onBindViewHolder(@NonNull EpisodeViewHolder holder, int position) {
         EpisodeDto episode = episodeList.get(position);
-        holder.btnEpisode.setText("Tập " + episode.getEpisodeNumber());
+        
+        String text = episode.getEpisodeNumber() != null ? "Tập " + episode.getEpisodeNumber() : "Tập mới";
+        holder.btnEpisode.setText(text);
 
         if (position == selectedPosition) {
             holder.btnEpisode.setBackgroundResource(R.drawable.bg_gradient_save_button);
             holder.btnEpisode.setTextColor(Color.WHITE);
         } else {
             holder.btnEpisode.setBackgroundResource(R.drawable.bg_episode_unselected);
-            holder.btnEpisode.setTextColor(Color.WHITE);
+            if (episode.isDeleted()) {
+                holder.btnEpisode.setTextColor(Color.parseColor("#EF4444")); // Red if deleted
+            } else if (episode.isPremium()) {
+                holder.btnEpisode.setTextColor(Color.parseColor("#EAB308")); // Yellow if premium
+            } else {
+                holder.btnEpisode.setTextColor(Color.WHITE);
+            }
         }
 
         holder.btnEpisode.setOnClickListener(v -> {
-            int previousSelected = selectedPosition;
-            selectedPosition = holder.getAdapterPosition();
-            notifyItemChanged(previousSelected);
-            notifyItemChanged(selectedPosition);
-            
             if (listener != null) {
-                listener.onEpisodeClick(episode, selectedPosition);
+                listener.onItemClick(episode, holder.getAdapterPosition());
             }
+            setSelectedPosition(holder.getAdapterPosition());
         });
     }
 
