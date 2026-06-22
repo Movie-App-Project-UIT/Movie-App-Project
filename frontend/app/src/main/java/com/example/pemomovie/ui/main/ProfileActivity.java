@@ -90,6 +90,17 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+        // Xử lý nút Gói premium của tôi
+        View btnMyPremium = findViewById(R.id.btnMyPremium);
+        if (btnMyPremium != null) {
+            btnMyPremium.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, PaymentSuccessActivity.class);
+                intent.putExtra("IS_VIEW_PRIVILEGE", true);
+                intent.putExtra("IS_FROM_MY_PREMIUM", true);
+                startActivity(intent);
+            });
+        }
+
         // Xử lý nút Nâng cấp Premium
         View btnUpgradePremium = findViewById(R.id.btnUpgradePremium);
         if (btnUpgradePremium != null) {
@@ -233,15 +244,34 @@ public class ProfileActivity extends AppCompatActivity {
                     // Logic hiển thị bảng Premium
                     LinearLayout layoutPremium = findViewById(R.id.layoutPremium);
                     LinearLayout layoutUpgradePremium = findViewById(R.id.layoutUpgradePremium);
+                    View btnMyPremium = findViewById(R.id.btnMyPremium);
                     
                     if (profile.isPremium()) {
                         // Đã là premium thì hiện dòng "Thành viên Premium" dưới tên và ẩn bảng Nâng cấp
                         if (layoutPremium != null) layoutPremium.setVisibility(View.VISIBLE);
                         if (layoutUpgradePremium != null) layoutUpgradePremium.setVisibility(View.GONE);
+                        if (btnMyPremium != null) btnMyPremium.setVisibility(View.VISIBLE);
                     } else {
                         // Chưa mua Premium thì ẩn dòng "Thành viên" và hiện bảng "Nâng cấp" to chà bá
                         if (layoutPremium != null) layoutPremium.setVisibility(View.GONE);
                         if (layoutUpgradePremium != null) layoutUpgradePremium.setVisibility(View.VISIBLE);
+                        if (btnMyPremium != null) btnMyPremium.setVisibility(View.GONE);
+                    }
+                    
+                    // Cập nhật thống kê: Phim đã xem, Giờ xem, Ngày liên tiếp
+                    TextView txtWatchedCount = findViewById(R.id.txtWatchedCount);
+                    if (txtWatchedCount != null) {
+                        txtWatchedCount.setText(String.valueOf(profile.getWatchedMoviesCount()));
+                    }
+                    
+                    TextView txtWatchedHours = findViewById(R.id.txtWatchedHours);
+                    if (txtWatchedHours != null) {
+                        txtWatchedHours.setText(profile.getWatchedHours() + "h");
+                    }
+                    
+                    TextView txtStreakDays = findViewById(R.id.txtStreakDays);
+                    if (txtStreakDays != null) {
+                        txtStreakDays.setText(String.valueOf(profile.getStreakDays()));
                     }
                 }
             }

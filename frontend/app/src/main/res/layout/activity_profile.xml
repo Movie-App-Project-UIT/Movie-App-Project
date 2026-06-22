@@ -334,9 +334,10 @@
                             app:tint="#8B5CF6"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtWatchedCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="0"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
@@ -377,9 +378,10 @@
                             app:tint="#3B82F6"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtWatchedHours"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="50h"
+                            android:text="0h"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
@@ -420,9 +422,10 @@
                             app:tint="#EF4444"
                             android:layout_marginEnd="6dp"/>
                         <TextView
+                            android:id="@+id/txtStreakDays"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12"
+                            android:text="0"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"/>
@@ -603,6 +606,41 @@
                         android:textSize="14sp"
                         android:layout_marginStart="8dp"
                         app:layout_constraintStart_toEndOf="@id/txtFavTitle"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Premium Package Card -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/btnMyPremium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_profile_card"
+                    android:padding="16dp"
+                    android:layout_marginTop="10dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgCrownProfile"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_crown"
+                        app:tint="#FBBF24"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/txtPremiumTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gói Premium của tôi"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="12dp"
+                        app:layout_constraintStart_toEndOf="@id/imgCrownProfile"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 

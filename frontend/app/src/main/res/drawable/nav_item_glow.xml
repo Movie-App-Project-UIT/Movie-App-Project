@@ -4,7 +4,7 @@
     <!-- Tạo hiệu ứng tỏa tròn từ màu đỏ thương hiệu (#D70466) mờ dần ra trong suốt -->
     <gradient
         android:type="radial"
-        android:gradientRadius="35dp"
-        android:startColor="#25D70466"
+        android:gradientRadius="30dp"
+        android:startColor="#55D70466"
         android:endColor="#00000000" />
 </shape>

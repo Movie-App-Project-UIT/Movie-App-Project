@@ -77,6 +77,7 @@ public class MediaService {
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
+        // Lấy 10 phim được đánh giá cao nhất (bắt buộc >= 8.0)
         List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(8.0f).stream()
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());

@@ -273,6 +273,7 @@ public class PlayActivity extends AppCompatActivity {
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
         exoPlayer.play();
+        startSavingHistory(); // Bắt đầu đếm giờ và lưu lịch sử xem
 
         // Ghi nhận lượt xem thực tế khi ấn Play (hoặc tự động Play) lần đầu tiên
         if (!viewCountIncremented && movieId != null) {
@@ -866,9 +867,49 @@ public class PlayActivity extends AppCompatActivity {
         initViews(newConfig.orientation);
     }
 
+    private android.os.Handler historyHandler = new android.os.Handler();
+    private Runnable historyRunnable;
+
+    private void startSavingHistory() {
+        if (historyRunnable == null) {
+            historyRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (exoPlayer != null && exoPlayer.isPlaying() && movieId != null) {
+                        saveWatchHistory();
+                    }
+                    historyHandler.postDelayed(this, 10000); // Lưu mỗi 10 giây
+                }
+            };
+        }
+        historyHandler.postDelayed(historyRunnable, 10000);
+    }
+
+    private void stopSavingHistory() {
+        if (historyRunnable != null) {
+            historyHandler.removeCallbacks(historyRunnable);
+        }
+    }
+
+    private void saveWatchHistory() {
+        if (exoPlayer != null && movieId != null) {
+            int progressSeconds = (int) (exoPlayer.getCurrentPosition() / 1000);
+            // Hiện tại chỉ hỗ trợ phim lẻ, nếu là phim bộ thì truyền thêm episodeId
+            apiService.updateHistory(new com.example.pemomovie.dto.UpdateHistoryRequest(movieId, null, progressSeconds))
+                    .enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {}
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                    });
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopSavingHistory();
+        saveWatchHistory(); // Lưu lần cuối trước khi thoát
         if (exoPlayer != null) {
             exoPlayer.release();
             exoPlayer = null;
