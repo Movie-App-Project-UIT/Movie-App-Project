@@ -9,6 +9,7 @@ import com.example.movie_app_server.media.service.MediaService;
 import com.example.movie_app_server.media.service.TmdbSyncService;
 import com.example.movie_app_server.admin.service.AdminHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,7 @@ public class AdminMovieController {
     }
 
     @PutMapping("/{id}/soft-delete")
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<Void> softDeleteMovie(@PathVariable Long id) {
         return mediaRepository.findById(id).map(media -> {
             boolean isNowDeleted = !media.isDeleted();
@@ -63,6 +65,7 @@ public class AdminMovieController {
 
     @PostMapping
     @org.springframework.transaction.annotation.Transactional
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<MediaDetailResponse> createMovie(@RequestBody AdminMovieSaveRequest request) {
         if (request.getTmdbId() != null && mediaRepository.findByTmdbId(request.getTmdbId()).isPresent()) {
             throw new com.example.movie_app_server.common.exception.AppException("Phim này đã tồn tại trong hệ thống!", org.springframework.http.HttpStatus.CONFLICT);
@@ -97,6 +100,7 @@ public class AdminMovieController {
 
     @PutMapping("/{id}")
     @org.springframework.transaction.annotation.Transactional
+    @CacheEvict(value = "homepageData", allEntries = true)
     public ResponseEntity<MediaDetailResponse> updateMovie(@PathVariable Long id, @RequestBody AdminMovieSaveRequest request) {
         Media media = mediaRepository.findById(id).orElse(null);
         if (media == null) {

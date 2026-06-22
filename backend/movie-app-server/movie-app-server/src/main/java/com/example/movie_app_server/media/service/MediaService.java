@@ -10,6 +10,7 @@ import com.example.movie_app_server.media.repository.MediaRepository;
 import com.example.movie_app_server.media.repository.SeasonRepository;
 import com.example.movie_app_server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,7 @@ public class MediaService {
     }
 
     // --- LOGIC LẤY DỮ LIỆU TRANG CHỦ ---
+    @Cacheable("homepageData")
     public java.util.Map<String, List<MediaItemDto>> getHomepageData() {
         // Lấy 10 phim được đánh giá cao nhất (bắt buộc >= 8.0)
         List<MediaItemDto> topRated = mediaRepository.findTop10ByIsDeletedFalseAndVoteAverageGreaterThanEqualOrderByVoteAverageDesc(8.0f).stream()
