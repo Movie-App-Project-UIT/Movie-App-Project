@@ -7,7 +7,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
-
+import android.content.Intent;
+import android.net.Uri;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -46,7 +47,19 @@ public class PaymentWebActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Mở tất cả link bên trong WebView
+                // Nếu là Deeplink của MoMo, mở App MoMo
+                if (url != null && url.startsWith("momo://")) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        Toast.makeText(PaymentWebActivity.this, "Bạn chưa cài đặt ứng dụng MoMo", Toast.LENGTH_SHORT).show();
+                        return true; // Vẫn chặn link này lại để WebView không bị lỗi "Webpage not available"
+                    }
+                }
+                
+                // Các link khác (VNPay, ...) mở bình thường trong WebView
                 view.loadUrl(url);
                 return true;
             }
