@@ -214,7 +214,7 @@ public interface ApiService {
     Call<List<com.example.pemomovie.dto.ReviewResponseDto>> getReviewsByMediaForAdmin(@retrofit2.http.Path("mediaId") Long mediaId);
 
     @Multipart
-    @POST("/api/v1/admin/upload/video")
+    @POST("/api/v1/admin/upload/video/cloudinary")
     Call<ResponseBody> uploadVideoAdmin(@Part MultipartBody.Part file);
 
     @Multipart
