@@ -22,6 +22,8 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ScrollView;
+import android.media.AudioManager;
+import android.widget.SeekBar;
 
 import android.net.Uri;
 import android.util.Log;
@@ -351,6 +353,16 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    private void updateVolumeIcon(ImageButton btnVolume, int volume) {
+        if (btnVolume != null) {
+            if (volume == 0) {
+                btnVolume.setImageResource(R.drawable.ic_volume_off);
+            } else {
+                btnVolume.setImageResource(R.drawable.ic_volume_up);
+            }
+        }
+    }
+
 
     private void populateMovieDetails() {
         if (mediaDetail == null) return;
@@ -629,6 +641,72 @@ public class PlayActivity extends AppCompatActivity {
                 });
             }
 
+            // Cài đặt chọn chất lượng video (Settings)
+            View btnSettings = playerView.findViewById(androidx.media3.ui.R.id.exo_settings);
+            if (btnSettings != null) {
+                btnSettings.setOnClickListener(v -> {
+                    if (exoPlayer != null) {
+                        androidx.media3.ui.TrackSelectionDialogBuilder dialogBuilder =
+                                new androidx.media3.ui.TrackSelectionDialogBuilder(
+                                        this,
+                                        "Chọn chất lượng",
+                                        exoPlayer,
+                                        C.TRACK_TYPE_VIDEO
+                                );
+                        dialogBuilder.setAllowAdaptiveSelections(true);
+                        dialogBuilder.setShowDisableOption(false);
+                        dialogBuilder.build().show();
+                    }
+                });
+            }
+
+            // Thanh trượt âm lượng
+            ImageButton btnVolume = playerView.findViewById(R.id.btnVolume);
+            SeekBar seekBarVolume = playerView.findViewById(R.id.seekBarVolume);
+            if (btnVolume != null && seekBarVolume != null) {
+                AudioManager audioManager = (AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                if (audioManager != null) {
+                    int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    seekBarVolume.setMax(maxVolume);
+                    seekBarVolume.setProgress(currentVolume);
+
+                    updateVolumeIcon(btnVolume, currentVolume);
+
+                    seekBarVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if (fromUser) {
+                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                            }
+                            updateVolumeIcon(btnVolume, progress);
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                    });
+
+                    btnVolume.setOnClickListener(v -> {
+                        int progress = seekBarVolume.getProgress();
+                        if (progress > 0) {
+                            // Mute
+                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+                            seekBarVolume.setProgress(0);
+                            btnVolume.setImageResource(R.drawable.ic_volume_off);
+                        } else {
+                            // Unmute to middle
+                            int midVol = maxVolume / 2;
+                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, midVol, 0);
+                            seekBarVolume.setProgress(midVol);
+                            btnVolume.setImageResource(R.drawable.ic_volume_up);
+                        }
+                    });
+                }
+            }
+
             // Nút phụ đề đã được đổi thành @id/exo_subtitle nên ExoPlayer sẽ tự động quản lý!
 
             // Sự kiện ẩn hiện các controll của video
@@ -645,6 +723,18 @@ public class PlayActivity extends AppCompatActivity {
                                 topInfo.setVisibility(
                                         visible ? View.VISIBLE : View.GONE
                                 );
+                            }
+                            
+                            // Cập nhật lại thanh âm lượng nếu hệ thống thay đổi bằng phím cứng khi ẩn controller
+                            if (visible && playerView != null) {
+                                SeekBar seekBarVolume = playerView.findViewById(R.id.seekBarVolume);
+                                ImageButton btnVolume = playerView.findViewById(R.id.btnVolume);
+                                AudioManager audioManager = (AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+                                if (audioManager != null && seekBarVolume != null && btnVolume != null) {
+                                    int currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                                    seekBarVolume.setProgress(currentVol);
+                                    updateVolumeIcon(btnVolume, currentVol);
+                                }
                             }
                         }
                     }
