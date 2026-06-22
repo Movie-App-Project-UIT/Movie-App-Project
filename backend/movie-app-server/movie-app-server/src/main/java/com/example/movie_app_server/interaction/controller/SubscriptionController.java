@@ -37,9 +37,13 @@ public class SubscriptionController {
                 .findFirstByUserAndStatusOrderByEndDateDesc(currentUser, SubscriptionStatus.ACTIVE).orElse(null);
                 
         if (activeSub != null && activeSub.getEndDate().isAfter(LocalDateTime.now())) {
+            UserSubscription firstSub = userSubscriptionRepository
+                    .findFirstByUserOrderByStartDateAsc(currentUser).orElse(activeSub);
+
             java.util.Map<String, Object> data = new java.util.HashMap<>();
             data.put("planName", activeSub.getPlan().getName());
             data.put("startDate", activeSub.getStartDate().toString());
+            data.put("firstStartDate", firstSub.getStartDate().toString());
             data.put("endDate", activeSub.getEndDate().toString());
             return ResponseEntity.ok(data);
         }
