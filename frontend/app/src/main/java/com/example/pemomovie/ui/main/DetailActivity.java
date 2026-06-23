@@ -335,69 +335,63 @@ public class DetailActivity extends AppCompatActivity {
         rvSuggestion.setLayoutManager(new GridLayoutManager(this, 3));
         rvSuggestion.setAdapter(similarAdapter);
 
-        // Kiểm tra lịch sử xem phim
-        com.example.pemomovie.api.ApiClient.getApiService().getUserHistory().enqueue(new retrofit2.Callback<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>>() {
+        // Kiểm tra lịch sử xem phim (sử dụng API lấy theo mediaId thay vì tải toàn bộ lịch sử)
+        com.example.pemomovie.api.ApiClient.getApiService().getHistoryByMedia(detail.getId()).enqueue(new retrofit2.Callback<com.example.pemomovie.dto.WatchHistoryItemDto>() {
             @Override
-            public void onResponse(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, retrofit2.Response<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> response) {
+            public void onResponse(retrofit2.Call<com.example.pemomovie.dto.WatchHistoryItemDto> call, retrofit2.Response<com.example.pemomovie.dto.WatchHistoryItemDto> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    for (com.example.pemomovie.dto.WatchHistoryItemDto history : response.body()) {
-                        Long mId = null;
-                        int totalDuration = 0;
-                        if (history.getMedia() != null) {
-                            mId = history.getMedia().getId();
-                            if (history.getEpisode() != null) {
-                                if (history.getEpisode().getDuration() != null) totalDuration = history.getEpisode().getDuration();
-                            } else {
-                                if (history.getMedia().getDuration() != null) totalDuration = history.getMedia().getDuration();
-                            }
+                    com.example.pemomovie.dto.WatchHistoryItemDto history = response.body();
+                    int totalDuration = 0;
+                    if (history.getMedia() != null) {
+                        if (history.getEpisode() != null) {
+                            if (history.getEpisode().getDuration() != null) totalDuration = history.getEpisode().getDuration();
+                        } else {
+                            if (history.getMedia().getDuration() != null) totalDuration = history.getMedia().getDuration();
                         }
+                    }
 
-                        if (mId != null && mId.equals(detail.getId())) {
-                            int progress = history.getProgressSeconds() != null ? history.getProgressSeconds() : 0;
-                            int totalDurationSec = 0;
-                            if (history.getTotalDurationSeconds() != null && history.getTotalDurationSeconds() > 0) {
-                                totalDurationSec = history.getTotalDurationSeconds();
-                            } else if (totalDuration > 0) {
-                                totalDurationSec = totalDuration * 60;
-                            }
-                            float percent = totalDurationSec > 0 ? (float) progress / totalDurationSec : 0;
-                            
-                            // Nếu chưa xem xong hẳn (< 95%)
-                            if (percent < 0.95f && progress > 0) {
-                                LinearLayout btnPlayDetailNew = findViewById(R.id.btnPlayDetailNew);
-                                if (btnPlayDetailNew != null) {
-                                    btnPlayDetailNew.setOnClickListener(v -> {
-                                        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(DetailActivity.this)
-                                                .setTitle("Tiếp tục xem phim")
-                                                .setMessage("Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?")
-                                                .setPositiveButton("Xem tiếp", (d, which) -> {
-                                                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
-                                                    intent.putExtra("MOVIE_ID", detail.getId());
-                                                    if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
-                                                    intent.putExtra("START_POSITION", (long) progress);
-                                                    startActivity(intent);
-                                                })
-                                                .setNegativeButton("Từ đầu", (d, which) -> {
-                                                    Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
-                                                    intent.putExtra("MOVIE_ID", detail.getId());
-                                                    if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
-                                                    intent.putExtra("START_POSITION", 0L);
-                                                    startActivity(intent);
-                                                })
-                                                .create();
-                                            dialog.show();
-                                            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
-                                            dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
-                                    });
-                                }
-                            }
-                            break;
+                    int progress = history.getProgressSeconds() != null ? history.getProgressSeconds() : 0;
+                    int totalDurationSec = 0;
+                    if (history.getTotalDurationSeconds() != null && history.getTotalDurationSeconds() > 0) {
+                        totalDurationSec = history.getTotalDurationSeconds();
+                    } else if (totalDuration > 0) {
+                        totalDurationSec = totalDuration * 60;
+                    }
+                    float percent = totalDurationSec > 0 ? (float) progress / totalDurationSec : 0;
+
+                    // Nếu chưa xem xong hẳn (< 95%)
+                    if (percent < 0.95f && progress > 0) {
+                        LinearLayout btnPlayDetailNew2 = findViewById(R.id.btnPlayDetailNew);
+                        if (btnPlayDetailNew2 != null) {
+                            btnPlayDetailNew2.setOnClickListener(v -> {
+                                android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(DetailActivity.this)
+                                        .setTitle("Tiếp tục xem phim")
+                                        .setMessage("Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?")
+                                        .setPositiveButton("Xem tiếp", (d, which) -> {
+                                            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                                            intent.putExtra("MOVIE_ID", detail.getId());
+                                            if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
+                                            intent.putExtra("START_POSITION", (long) progress);
+                                            startActivity(intent);
+                                        })
+                                        .setNegativeButton("Từ đầu", (d, which) -> {
+                                            Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
+                                            intent.putExtra("MOVIE_ID", detail.getId());
+                                            if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
+                                            intent.putExtra("START_POSITION", 0L);
+                                            startActivity(intent);
+                                        })
+                                        .create();
+                                    dialog.show();
+                                    dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
+                                    dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
+                            });
                         }
                     }
                 }
             }
             @Override
-            public void onFailure(retrofit2.Call<java.util.List<com.example.pemomovie.dto.WatchHistoryItemDto>> call, Throwable t) {}
+            public void onFailure(retrofit2.Call<com.example.pemomovie.dto.WatchHistoryItemDto> call, Throwable t) {}
         });
     }
 

@@ -392,24 +392,12 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     }
 
     private void showDriveLinkDialog() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Upload qua Google Drive (< 100MB)");
-        
-        final EditText input = new EditText(this);
-        input.setHint("Dán link Google Drive vào đây");
-        input.setPadding(40, 40, 40, 40);
-        builder.setView(input);
-
-        builder.setPositiveButton("Tải lên", (dialog, which) -> {
-            String link = input.getText().toString().trim();
-            if (!link.isEmpty()) {
-                uploadDriveLink(link);
-            } else {
-                Toast.makeText(this, "Vui lòng dán link", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-        builder.show();
+        AdminDriveUploadBottomSheet bottomSheet = new AdminDriveUploadBottomSheet(
+                "Upload Phim qua Google Drive",
+                "Dán link Google Drive chia sẻ công khai vào bên dưới. Dung lượng file nên < 100MB để đảm bảo tốc độ tải lên ổn định.",
+                link -> uploadDriveLink(link)
+        );
+        bottomSheet.show(getSupportFragmentManager(), "AdminDriveUploadBottomSheet");
     }
 
     private void uploadDriveLink(String link) {
@@ -457,24 +445,12 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     }
 
     private void showDriveSubtitleDialog() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Thêm Phụ đề qua Google Drive");
-        
-        final EditText input = new EditText(this);
-        input.setHint("Dán link Drive chứa file .srt/.vtt");
-        input.setPadding(40, 40, 40, 40);
-        builder.setView(input);
-
-        builder.setPositiveButton("Tải lên", (dialog, which) -> {
-            String link = input.getText().toString().trim();
-            if (!link.isEmpty()) {
-                uploadDriveSubtitle(link);
-            } else {
-                Toast.makeText(this, "Vui lòng dán link", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-        builder.show();
+        AdminDriveUploadBottomSheet bottomSheet = new AdminDriveUploadBottomSheet(
+                "Thêm Phụ đề qua Google Drive",
+                "Dán link Google Drive chứa file .srt hoặc .vtt. Vui lòng đảm bảo link đã được bật chia sẻ công khai.",
+                link -> uploadDriveSubtitle(link)
+        );
+        bottomSheet.show(getSupportFragmentManager(), "AdminDriveUploadBottomSheet");
     }
 
     private void uploadDriveSubtitle(String link) {

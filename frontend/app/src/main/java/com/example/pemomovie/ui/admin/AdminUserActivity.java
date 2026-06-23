@@ -36,9 +36,18 @@ public class AdminUserActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_user);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutHeader), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+            
+            View header = findViewById(R.id.layoutHeader);
+            if (header != null) {
+                header.setPadding(header.getPaddingLeft(), systemBars.top, header.getPaddingRight(), header.getPaddingBottom());
+            }
+            
+            View bottomNav = findViewById(R.id.adminBottomNavInclude);
+            if (bottomNav != null) {
+                bottomNav.setPadding(0, 0, 0, systemBars.bottom);
+            }
             return insets;
         });
 
@@ -98,16 +107,16 @@ public class AdminUserActivity extends AppCompatActivity {
 
     private void loadUsers() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        apiService.getUsers(isPremiumFilter, currentSearch).enqueue(new Callback<List<AdminUserDto>>() {
+        apiService.getUsers(isPremiumFilter, currentSearch, 0, 1000).enqueue(new Callback<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>>() {
             @Override
-            public void onResponse(Call<List<AdminUserDto>> call, Response<List<AdminUserDto>> response) {
+            public void onResponse(Call<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> call, Response<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter.setUsers(response.body());
+                    adapter.setUsers(response.body().getContent());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<AdminUserDto>> call, Throwable t) {
+            public void onFailure(Call<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> call, Throwable t) {
                 // ignore
             }
         });

@@ -65,13 +65,25 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, 0, systemBars.right, 0);
+            
+            View header = findViewById(R.id.globalHeaderInclude);
+            if (header != null) {
+                header.setPadding(0, systemBars.top, 0, 0);
+            }
+            
+            View bottomNav = findViewById(R.id.bottomNavInclude);
+            if (bottomNav != null) {
+                bottomNav.setPadding(0, 0, 0, systemBars.bottom);
+            }
             return insets;
         });
 
         bannerViewPager = findViewById(R.id.bannerViewPager);
         sectionListHome = findViewById(R.id.sectionListHome);
         sectionListHome.setLayoutManager(new LinearLayoutManager(this));
+        sectionListHome.setHasFixedSize(true);
+        sectionListHome.setItemViewCacheSize(4);
 
         handler = new Handler(Looper.getMainLooper());
 
@@ -101,6 +113,7 @@ public class HomeActivity extends AppCompatActivity {
         apiService.getHomepageData().enqueue(new Callback<Map<String, List<MediaItemDto>>>() {
             @Override
             public void onResponse(Call<Map<String, List<MediaItemDto>>> call, Response<Map<String, List<MediaItemDto>>> response) {
+                if (isDestroyed()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     Map<String, List<MediaItemDto>> data = response.body();
                     List<Section> sections = new ArrayList<>();

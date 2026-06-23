@@ -118,6 +118,7 @@ public class PlayActivity extends AppCompatActivity {
         apiService.getMediaDetail(movieId).enqueue(new Callback<MediaDetailResponse>() {
             @Override
             public void onResponse(Call<MediaDetailResponse> call, Response<MediaDetailResponse> response) {
+                if (isDestroyed()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     mediaDetail = response.body();
                     populateMovieDetails();
@@ -145,6 +146,7 @@ public class PlayActivity extends AppCompatActivity {
         apiService.getPlayableVideoUrl(movieId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (isDestroyed()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String videoUrl = response.body().string().trim();
@@ -1292,6 +1294,21 @@ public class PlayActivity extends AppCompatActivity {
                         });
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (exoPlayer != null && exoPlayer.isPlaying()) {
+            exoPlayer.pause();
+        }
+        stopSavingHistory();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startSavingHistory();
     }
 
     @Override

@@ -22,7 +22,7 @@ import retrofit2.Response;
 
 public class AdminMovieAddActivity extends AppCompatActivity {
 
-    private EditText etTmdbId, etVideoUrl;
+    private EditText etTmdbId;
     private Button btnFetchData;
     private ProgressBar progressBar;
     private ApiService apiService;
@@ -35,7 +35,7 @@ public class AdminMovieAddActivity extends AppCompatActivity {
         apiService = ApiClient.getApiService();
 
         etTmdbId = findViewById(R.id.etTmdbId);
-        etVideoUrl = findViewById(R.id.etVideoUrl);
+
         btnFetchData = findViewById(R.id.btnFetchData);
         progressBar = findViewById(R.id.progressBar);
 
@@ -44,7 +44,7 @@ public class AdminMovieAddActivity extends AppCompatActivity {
 
         btnFetchData.setOnClickListener(v -> {
             String tmdbIdStr = etTmdbId.getText().toString().trim();
-            String videoUrl = etVideoUrl.getText().toString().trim();
+            String videoUrl = "";
 
             if (tmdbIdStr.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập TMDB ID", Toast.LENGTH_SHORT).show();

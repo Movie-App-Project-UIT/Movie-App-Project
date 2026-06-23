@@ -4,6 +4,7 @@ import com.example.movie_app_server.media.entity.Media;
 import com.example.movie_app_server.media.entity.enums.MediaType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -13,6 +14,13 @@ import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface MediaRepository extends JpaRepository<Media, Long> {
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"genres", "country", "ageRating"})
+    Page<Media> findAll(Pageable pageable);
+
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"genres", "country", "ageRating"})
+    List<Media> findAll();
     // Phân loại phim: lấy danh sách toàn bộ phim lẻ hoặc toàn bộ phim bộ
     List<Media> findByMediaType(MediaType mediaType);
 
@@ -86,4 +94,11 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             "GROUP BY wh.media " +
             "ORDER BY COUNT(wh) DESC")
     List<Media> findTrendingMedia(@Param("since") java.time.LocalDateTime since, Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Media m SET m.viewCount = COALESCE(m.viewCount, 0) + 1 WHERE m.id = :id")
+    void incrementViewCount(@Param("id") Long id);
+
+    // Fallback cho Trending: lấy top 10 phim có lượt xem cao nhất
+    List<Media> findTop10ByIsDeletedFalseOrderByViewCountDesc();
 }

@@ -94,25 +94,7 @@
             android:inputType="number"
             android:layout_marginBottom="24dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nguồn phim (Video URL / MP4)"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
 
-        <EditText
-            android:id="@+id/etVideoUrl"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Nhập link video hoặc file mp4"
-            android:textColorHint="#9CA3AF"
-            android:textColor="@color/white"
-            android:paddingHorizontal="16dp"
-            android:inputType="textUri"
-            android:layout_marginBottom="32dp"/>
 
         <Button
             android:id="@+id/btnFetchData"
