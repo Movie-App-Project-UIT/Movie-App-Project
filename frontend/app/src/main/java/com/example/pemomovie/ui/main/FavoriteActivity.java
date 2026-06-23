@@ -21,6 +21,7 @@ import com.example.pemomovie.utils.NavigationHelper;
 import java.util.List;
 
 public class FavoriteActivity extends AppCompatActivity {
+    private com.example.pemomovie.utils.GlobalHeaderHelper globalHeaderHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,8 @@ public class FavoriteActivity extends AppCompatActivity {
 
         // Cài đặt thanh bottom navigation
         NavigationHelper.setupBottomNavigation(this);
-        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
+        globalHeaderHelper = new com.example.pemomovie.utils.GlobalHeaderHelper(this);
+        globalHeaderHelper.setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
     }
 
     @Override
@@ -52,11 +54,6 @@ public class FavoriteActivity extends AppCompatActivity {
         RecyclerView rvFavorites = findViewById(R.id.rvFav);
         rvFavorites.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
 
-
-        // Lấy danh sách yêu thích và cập nhật adapter
-
-        
-        // Cập nhật giao diện từ bộ nhớ tạm (Cache) trước để giao diện hiện lên lập tức
         updateUI();
 
         // Âm thầm đồng bộ với Database để lấy dữ liệu mới nhất
@@ -65,6 +62,10 @@ public class FavoriteActivity extends AppCompatActivity {
                 updateUI();
             });
         });
+
+        if (globalHeaderHelper != null) {
+            globalHeaderHelper.fetchNotifications();
+        }
     }
 
     private void updateUI() {

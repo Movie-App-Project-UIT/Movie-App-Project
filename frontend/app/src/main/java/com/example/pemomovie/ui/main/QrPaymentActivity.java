@@ -181,44 +181,7 @@ public class QrPaymentActivity extends AppCompatActivity {
             });
         }
 
-        // Test Buttons
-        androidx.cardview.widget.CardView btnTestSuccess = findViewById(R.id.btnTestSuccess);
-        if (btnTestSuccess != null) {
-            btnTestSuccess.setOnClickListener(v -> {
-                Toast.makeText(this, "Đang gửi tín hiệu giả lập thanh toán lên Server...", Toast.LENGTH_SHORT).show();
-                ApiClient.getApiService().simulateSuccess(selectedPlanId) // Gửi ID gói thực tế
-                    .enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.isSuccessful()) {
-                                // Gọi Server thành công, chuyển sang màn hình loading
-                                Intent intent = new Intent(QrPaymentActivity.this, PaymentProcessingActivity.class);
-                                intent.putExtra("SELECTED_PLAN_ID", selectedPlanId);
-                                intent.putExtra("SELECTED_PLAN_NAME", selectedPlanName);
-                                intent.putExtra("SELECTED_PLAN_DURATION", selectedPlanDuration);
-                                intent.putExtra("PLAN_PRICE", planPriceStr);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Toast.makeText(QrPaymentActivity.this, "Lỗi Server khi nâng cấp VIP", Toast.LENGTH_SHORT).show();
-                            }
-                        }
 
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(QrPaymentActivity.this, "Không thể kết nối Backend", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-            });
-        }
-
-        androidx.cardview.widget.CardView btnTestFailure = findViewById(R.id.btnTestFailure);
-        if (btnTestFailure != null) {
-            btnTestFailure.setOnClickListener(v -> {
-                Toast.makeText(QrPaymentActivity.this, "Giao dịch thất bại hoặc bị hủy. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }
 
         txtTimer = findViewById(R.id.txtTimer);
         startTimer();

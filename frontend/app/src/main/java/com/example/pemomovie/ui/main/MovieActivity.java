@@ -43,6 +43,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieActivity extends AppCompatActivity {
+    private com.example.pemomovie.utils.GlobalHeaderHelper globalHeaderHelper;
 
     private LinearLayout btnSortOptions;
     private TextView txtCurrentSort;
@@ -97,7 +98,8 @@ public class MovieActivity extends AppCompatActivity {
 
     private void initViews() {
         // Khởi tạo thanh tìm kiếm chung
-        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
+        globalHeaderHelper = new com.example.pemomovie.utils.GlobalHeaderHelper(this);
+        globalHeaderHelper.setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
 
         tabLayoutMediaType = findViewById(R.id.tabLayoutMediaType);
         btnToggleFilter = findViewById(R.id.btnToggleFilter);
@@ -336,5 +338,13 @@ public class MovieActivity extends AppCompatActivity {
                 Toast.makeText(MovieActivity.this, "Lỗi tải phim", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (globalHeaderHelper != null) {
+            globalHeaderHelper.fetchNotifications();
+        }
     }
 }

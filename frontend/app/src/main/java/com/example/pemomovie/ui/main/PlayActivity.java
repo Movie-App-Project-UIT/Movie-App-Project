@@ -25,9 +25,13 @@ import android.widget.ScrollView;
 import android.media.AudioManager;
 import android.widget.SeekBar;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.example.pemomovie.utils.DialogHelper;
+import com.example.pemomovie.ui.main.UpgradePremiumActivity;
 
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
@@ -160,7 +164,28 @@ public class PlayActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
+                    if (response.code() == 402) {
+                        android.app.Dialog dialog = DialogHelper.showConfirmDialog(
+                            PlayActivity.this,
+                            "Yêu cầu tài khoản VIP",
+                            "Bạn cần nâng cấp tài khoản VIP để xem phim này.",
+                            "Nâng cấp ngay",
+                            "Để sau",
+                            () -> {
+                                Intent intent = new Intent(PlayActivity.this, UpgradePremiumActivity.class);
+                                startActivity(intent);
+                                finish();
+                            },
+                            () -> {
+                                finish();
+                            }
+                        );
+                        if (dialog != null) {
+                            dialog.setOnCancelListener(dialogInterface -> finish());
+                        }
+                    } else {
+                        Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
             @Override
@@ -223,6 +248,7 @@ public class PlayActivity extends AppCompatActivity {
         apiService.getPlayableEpisodeUrl(movieId, episodeId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (isDestroyed()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String videoUrl = response.body().string().trim();
@@ -236,7 +262,28 @@ public class PlayActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
+                    if (response.code() == 402) {
+                        android.app.Dialog dialog = DialogHelper.showConfirmDialog(
+                            PlayActivity.this,
+                            "Yêu cầu tài khoản VIP",
+                            "Bạn cần nâng cấp tài khoản VIP để xem tập phim này.",
+                            "Nâng cấp ngay",
+                            "Để sau",
+                            () -> {
+                                Intent intent = new Intent(PlayActivity.this, UpgradePremiumActivity.class);
+                                startActivity(intent);
+                                finish();
+                            },
+                            () -> {
+                                finish();
+                            }
+                        );
+                        if (dialog != null) {
+                            dialog.setOnCancelListener(dialogInterface -> finish());
+                        }
+                    } else {
+                        Toast.makeText(PlayActivity.this, "Không thể lấy link video (có thể do chưa có VIP)", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
             @Override

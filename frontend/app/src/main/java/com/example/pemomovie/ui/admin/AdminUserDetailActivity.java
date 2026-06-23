@@ -122,8 +122,39 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         txtUserName.setText(currentUser.getUsername() != null ? currentUser.getUsername() : "No name");
         txtUserEmail.setText(currentUser.getEmail());
         
-        if (currentUser.getAvatarUrl() != null && !currentUser.getAvatarUrl().isEmpty()) {
-            Glide.with(this).load(currentUser.getAvatarUrl()).into(imgAvatar);
+        String avatarUrl = currentUser.getAvatarUrl();
+        if (avatarUrl != null) {
+            avatarUrl = avatarUrl.trim();
+            if (avatarUrl.startsWith("\"") && avatarUrl.endsWith("\"")) {
+                avatarUrl = avatarUrl.substring(1, avatarUrl.length() - 1);
+            }
+            avatarUrl = avatarUrl.trim();
+            if ("null".equalsIgnoreCase(avatarUrl) || "undefined".equalsIgnoreCase(avatarUrl)) {
+                avatarUrl = null;
+            }
+        }
+        if (avatarUrl != null && !avatarUrl.trim().isEmpty()) {
+            if (avatarUrl.startsWith("/")) {
+                String baseUrl = com.example.pemomovie.BuildConfig.BASE_URL;
+                if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                avatarUrl = baseUrl + avatarUrl;
+            }
+            imgAvatar.setImageTintList(null);
+            imgAvatar.setColorFilter(null);
+            imgAvatar.clearColorFilter();
+            imgAvatar.setPadding(0, 0, 0, 0);
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .circleCrop()
+                    .into(imgAvatar);
+        } else {
+            imgAvatar.setImageResource(R.drawable.ic_profile);
+            imgAvatar.setImageTintList(android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(this, R.color.gray_text_light)));
+            float density = getResources().getDisplayMetrics().density;
+            int paddingPx = (int) (12 * density + 0.5f);
+            imgAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
         }
 
         if ("PREMIUM".equals(currentUser.getTier())) {

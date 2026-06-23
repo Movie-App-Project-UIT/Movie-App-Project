@@ -52,6 +52,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
+    private com.example.pemomovie.utils.GlobalHeaderHelper globalHeaderHelper;
 
     private androidx.viewpager2.widget.ViewPager2 bannerViewPager;
     private RecyclerView sectionListHome;
@@ -65,17 +66,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, 0, systemBars.right, 0);
-            
-            View header = findViewById(R.id.globalHeaderInclude);
-            if (header != null) {
-                header.setPadding(0, systemBars.top, 0, 0);
-            }
-            
-            View bottomNav = findViewById(R.id.bottomNavInclude);
-            if (bottomNav != null) {
-                bottomNav.setPadding(0, 0, 0, systemBars.bottom);
-            }
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
@@ -89,7 +80,8 @@ public class HomeActivity extends AppCompatActivity {
 
         NavigationHelper.setupBottomNavigation(this);
         // Khởi tạo Global Header mới
-        new com.example.pemomovie.utils.GlobalHeaderHelper(this).setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
+        globalHeaderHelper = new com.example.pemomovie.utils.GlobalHeaderHelper(this);
+        globalHeaderHelper.setupGlobalHeader(findViewById(R.id.globalHeaderInclude));
 
         sliderRunnable = () -> {
             if (bannerViewPager != null && bannerViewPager.getAdapter() != null) {
@@ -195,6 +187,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         if (handler != null && sliderRunnable != null) {
             handler.postDelayed(sliderRunnable, 5000);
+        }
+        if (globalHeaderHelper != null) {
+            globalHeaderHelper.fetchNotifications();
         }
     }
 }

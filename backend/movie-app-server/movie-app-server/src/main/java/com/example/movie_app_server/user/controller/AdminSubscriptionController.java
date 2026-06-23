@@ -93,8 +93,7 @@ public class AdminSubscriptionController {
     @GetMapping("/eligible-users")
     public ResponseEntity<List<User>> getEligibleUsers(@RequestParam(required = false) Boolean isPremium,
                                                        @RequestParam(required = false) String search) {
-        // Find users with filters
-        return ResponseEntity.ok(userRepository.searchAndFilterUsers(isPremium, search));
+        return ResponseEntity.ok(userRepository.searchAndFilterUsers(isPremium, search, org.springframework.data.domain.Pageable.unpaged()).getContent());
     }
 
     @PostMapping("/{id}/gift")
