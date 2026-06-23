@@ -60,7 +60,10 @@ public interface ApiService {
     Call<com.example.pemomovie.dto.AdminDashboardStatsDto> getDashboardStats();
 
     @GET("/api/v1/admin/movies")
-    Call<List<MediaItemDto>> getAllMoviesAdmin();
+    Call<com.example.pemomovie.dto.PageResponseDto<MediaItemDto>> getAllMoviesAdmin(
+        @retrofit2.http.Query("page") int page,
+        @retrofit2.http.Query("size") int size
+    );
 
     @GET("/api/v1/admin/movies/{id}")
     Call<com.example.pemomovie.dto.MediaDetailResponse> getMediaDetailAdmin(@retrofit2.http.Path("id") Long id);
@@ -118,7 +121,12 @@ public interface ApiService {
     Call<Void> toggleSubscriptionStatus(@retrofit2.http.Path("id") Long id);
 
     @GET("/api/v1/admin/users")
-    Call<List<com.example.pemomovie.dto.AdminUserDto>> getUsers(@retrofit2.http.Query("isPremium") Boolean isPremium, @retrofit2.http.Query("search") String search);
+    Call<com.example.pemomovie.dto.PageResponseDto<com.example.pemomovie.dto.AdminUserDto>> getUsers(
+        @retrofit2.http.Query("isPremium") Boolean isPremium, 
+        @retrofit2.http.Query("search") String search,
+        @retrofit2.http.Query("page") int page,
+        @retrofit2.http.Query("size") int size
+    );
 
     @GET("/api/v1/admin/users/{id}/details")
     Call<com.example.pemomovie.dto.AdminUserDetailDto> getUserDetails(@retrofit2.http.Path("id") Long id);

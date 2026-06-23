@@ -353,41 +353,45 @@
                     android:textStyle="bold"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
+
+                <EditText
+                    android:id="@+id/etSubtitleLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Ngôn ngữ phụ đề (Ví dụ: vi, en)"
+                    android:textColorHint="#9CA3AF"
+                    android:background="@drawable/bg_input_field"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="8dp"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <EditText
-                        android:id="@+id/etSubtitleLanguage"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="50dp"
-                        android:hint="Ngôn ngữ (VD: vi, en)"
-                        android:textColorHint="#9CA3AF"
-                        android:background="@drawable/bg_input_field"
-                        android:textColor="@color/white"
-                        android:paddingHorizontal="16dp"/>
+                    android:layout_marginBottom="16dp">
 
                     <Button
                         android:id="@+id/btnUploadSubtitle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="50dp"
-                        android:layout_marginStart="8dp"
                         android:backgroundTint="#3B82F6"
-                        android:text="Thêm file SRT"
+                        android:text="Upload SRT/VTT"
                         android:textColor="@color/white"
+                        android:textStyle="bold"
                         app:cornerRadius="8dp"/>
 
                     <Button
                         android:id="@+id/btnUploadDriveSubtitle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="50dp"
                         android:layout_marginStart="8dp"
                         android:backgroundTint="#8B5CF6"
-                        android:text="Link Drive"
+                        android:text="Thêm từ Drive"
                         android:textColor="@color/white"
+                        android:textStyle="bold"
                         app:cornerRadius="8dp"/>
                 </LinearLayout>
 

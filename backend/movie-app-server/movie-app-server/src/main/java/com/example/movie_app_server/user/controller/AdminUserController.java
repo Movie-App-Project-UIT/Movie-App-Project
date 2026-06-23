@@ -30,13 +30,14 @@ public class AdminUserController {
     private final AdminHistoryService adminHistoryService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(
+    public ResponseEntity<org.springframework.data.domain.Page<User>> getAllUsers(
             @RequestParam(required = false) Boolean isPremium,
-            @RequestParam(required = false) String search) {
+            @RequestParam(required = false) String search,
+            @org.springframework.data.web.PageableDefault(size = 20, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable) {
         if (isPremium == null && (search == null || search.trim().isEmpty())) {
-            return ResponseEntity.ok(userRepository.findAll());
+            return ResponseEntity.ok(userRepository.findAll(pageable));
         }
-        return ResponseEntity.ok(userRepository.searchAndFilterUsers(isPremium, search));
+        return ResponseEntity.ok(userRepository.searchAndFilterUsers(isPremium, search, pageable));
     }
 
     @GetMapping("/{id}")

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "472197560087-em0diefakdehg6ifn7beg6qq8vq9m0fk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pemomovie",
+            "certificate_hash": "9d779fde15b4c1ba85ad5243d702ab589d498b0e"
+          }
+        },
+        {
           "client_id": "472197560087-k8aj0atuh2s3tajlprmoqnpjggi2055f.apps.googleusercontent.com",
           "client_type": 3
         }

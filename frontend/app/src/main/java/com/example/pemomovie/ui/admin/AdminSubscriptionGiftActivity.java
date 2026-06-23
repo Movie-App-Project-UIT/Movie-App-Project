@@ -46,9 +46,18 @@ public class AdminSubscriptionGiftActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_subscription_gift);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutHeader), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+            
+            View header = findViewById(R.id.layoutHeader);
+            if (header != null) {
+                header.setPadding(header.getPaddingLeft(), systemBars.top, header.getPaddingRight(), header.getPaddingBottom());
+            }
+            
+            View rvEligibleUsers = findViewById(R.id.rvEligibleUsers);
+            if (rvEligibleUsers != null) {
+                rvEligibleUsers.setPadding(rvEligibleUsers.getPaddingLeft(), rvEligibleUsers.getPaddingTop(), rvEligibleUsers.getPaddingRight(), systemBars.bottom);
+            }
             return insets;
         });
 
@@ -118,20 +127,20 @@ public class AdminSubscriptionGiftActivity extends AppCompatActivity {
 
     private void loadEligibleUsers() {
         progressBar.setVisibility(View.VISIBLE);
-        apiService.getUsers(currentPremiumFilter, currentSearchQuery.isEmpty() ? null : currentSearchQuery)
-            .enqueue(new Callback<List<AdminUserDto>>() {
+        apiService.getUsers(currentPremiumFilter, currentSearchQuery.isEmpty() ? null : currentSearchQuery, 0, 1000)
+            .enqueue(new Callback<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>>() {
                 @Override
-                public void onResponse(Call<List<AdminUserDto>> call, Response<List<AdminUserDto>> response) {
+                public void onResponse(Call<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> call, Response<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> response) {
                     progressBar.setVisibility(View.GONE);
                     if (response.isSuccessful() && response.body() != null) {
-                        adapter.setUsers(response.body());
+                        adapter.setUsers(response.body().getContent());
                     } else {
                         Toast.makeText(AdminSubscriptionGiftActivity.this, "Lỗi khi tải danh sách người dùng", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<List<AdminUserDto>> call, Throwable t) {
+                public void onFailure(Call<com.example.pemomovie.dto.PageResponseDto<AdminUserDto>> call, Throwable t) {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(AdminSubscriptionGiftActivity.this, "Lỗi mạng", Toast.LENGTH_SHORT).show();
                 }

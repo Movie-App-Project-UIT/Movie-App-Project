@@ -102,10 +102,16 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.e("SignUpActivity", "Đăng ký thất bại: " + errMsg, exception);
                             
                             String vietnameseErrMsg = errMsg;
-                            if (errMsg.contains("already in use") || errMsg.contains("collision")) {
+                            if (errMsg.toLowerCase().contains("already in use") || errMsg.toLowerCase().contains("collision")) {
                                 vietnameseErrMsg = "Địa chỉ email này đã được đăng ký bởi một tài khoản khác!";
-                            } else if (errMsg.contains("network") || errMsg.contains("timeout")) {
-                                vietnameseErrMsg = "Kết nối mạng thất bại. Vui lòng kiểm tra internet của máy ảo.";
+                            } else if (errMsg.toLowerCase().contains("badly formatted")) {
+                                vietnameseErrMsg = "Định dạng email không hợp lệ!";
+                            } else if (errMsg.toLowerCase().contains("weak password")) {
+                                vietnameseErrMsg = "Mật khẩu quá yếu! Hãy sử dụng ít nhất 6 ký tự.";
+                            } else if (errMsg.toLowerCase().contains("network") || errMsg.toLowerCase().contains("timeout")) {
+                                vietnameseErrMsg = "Kết nối mạng thất bại. Vui lòng kiểm tra lại đường truyền internet.";
+                            } else {
+                                vietnameseErrMsg = "Đã xảy ra lỗi đăng ký, vui lòng thử lại sau.";
                             }
                             
                             showErrorDialog(vietnameseErrMsg);

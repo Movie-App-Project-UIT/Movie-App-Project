@@ -19,6 +19,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
 
     private Context context;
     private List<Section> sectionList;
+    private final RecyclerView.RecycledViewPool sharedPool = new RecyclerView.RecycledViewPool();
 
     public SectionAdapter(Context context, List<Section> sectionList) {
         this.context = context;
@@ -29,7 +30,12 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
     @Override
     public SectionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.section_item, parent, false);
-        return new SectionViewHolder(view);
+        SectionViewHolder holder = new SectionViewHolder(view);
+        holder.movieRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        holder.movieRecycler.setRecycledViewPool(sharedPool);
+        holder.posterAdapter = new PosterAdapter(context, new java.util.ArrayList<>());
+        holder.movieRecycler.setAdapter(holder.posterAdapter);
+        return holder;
     }
 
     @Override
@@ -37,9 +43,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         Section section = sectionList.get(position);
         holder.sectionTitle.setText(section.getTitle());
 
-        PosterAdapter posterAdapter = new PosterAdapter(context, section.getMovies());
-        holder.movieRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        holder.movieRecycler.setAdapter(posterAdapter);
+        holder.posterAdapter.updateData(section.getMovies());
 
         com.example.pemomovie.custom.GradientTextView.applyHorizontalGradient(
                 holder.sectionSeeAll,
@@ -64,6 +68,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         TextView sectionTitle;
         TextView sectionSeeAll;
         RecyclerView movieRecycler;
+        PosterAdapter posterAdapter;
 
         public SectionViewHolder(@NonNull View itemView) {
             super(itemView);

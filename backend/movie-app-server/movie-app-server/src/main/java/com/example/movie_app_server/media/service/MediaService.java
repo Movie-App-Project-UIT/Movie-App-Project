@@ -119,15 +119,10 @@ public class MediaService {
                 .map(this::convertToItemDto)
                 .collect(Collectors.toList());
 
-        // Nếu hệ thống mới chạy chưa có lượt xem nào → dùng danh sách theo lượt xem giả lập làm mặc định
+        // Nếu hệ thống mới chạy chưa có lượt xem nào → dùng danh sách theo lượt xem nhiều nhất (có phân trang)
         if (trending.isEmpty()) {
-            trending = mediaRepository.findAll().stream()
-                    .filter(m -> !m.isDeleted())
+            trending = mediaRepository.findTop10ByIsDeletedFalseOrderByViewCountDesc().stream()
                     .map(this::convertToItemDto)
-                    .sorted((a, b) -> Integer.compare(
-                            b.getViewCount() != null ? b.getViewCount() : 0,
-                            a.getViewCount() != null ? a.getViewCount() : 0))
-                    .limit(10)
                     .collect(Collectors.toList());
         }
 
@@ -159,9 +154,10 @@ public class MediaService {
     }
 
     public void incrementViewCount(Long mediaId) {
-        Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND));
-        media.setViewCount((media.getViewCount() == null ? 0 : media.getViewCount()) + 1);
-        mediaRepository.save(media);
+        if (!mediaRepository.existsById(mediaId)) {
+            throw new AppException("Không tìm thấy phim", HttpStatus.NOT_FOUND);
+        }
+        mediaRepository.incrementViewCount(mediaId);
     }
 
     public MediaDetailResponse convertToDetailResponse(Media media) {

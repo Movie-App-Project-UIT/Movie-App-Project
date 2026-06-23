@@ -17,7 +17,10 @@ import java.util.List;
 @Entity
 @Table(name = "media", indexes = {
         @Index(name = "idx_media_type", columnList = "media_type"),
-        @Index(name = "idx_tmdb_id", columnList = "tmdb_id")
+        @Index(name = "idx_tmdb_id", columnList = "tmdb_id"),
+        @Index(name = "idx_is_deleted", columnList = "is_deleted"),
+        @Index(name = "idx_title", columnList = "title"),
+        @Index(name = "idx_created_at", columnList = "created_at")
 })
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

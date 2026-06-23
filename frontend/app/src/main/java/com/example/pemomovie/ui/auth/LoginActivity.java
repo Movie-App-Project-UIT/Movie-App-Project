@@ -129,7 +129,18 @@ public class LoginActivity extends AppCompatActivity {
                         String photo = (user != null && user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : "";
                         syncUserWithBackend(email, name, photo);
                     } else {
-                        Toast.makeText(LoginActivity.this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        String errMsg = task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định";
+                        String vietnameseErrMsg = errMsg;
+                        if (errMsg.toLowerCase().contains("invalid credential") || errMsg.toLowerCase().contains("user not found") || errMsg.toLowerCase().contains("wrong password")) {
+                            vietnameseErrMsg = "Email hoặc mật khẩu không chính xác!";
+                        } else if (errMsg.toLowerCase().contains("badly formatted")) {
+                            vietnameseErrMsg = "Định dạng email không hợp lệ!";
+                        } else if (errMsg.toLowerCase().contains("network") || errMsg.toLowerCase().contains("timeout")) {
+                            vietnameseErrMsg = "Kết nối mạng thất bại. Vui lòng kiểm tra lại đường truyền internet.";
+                        } else {
+                            vietnameseErrMsg = "Đã xảy ra lỗi đăng nhập, vui lòng thử lại sau.";
+                        }
+                        Toast.makeText(LoginActivity.this, vietnameseErrMsg, Toast.LENGTH_LONG).show();
                     }
                 });
     }

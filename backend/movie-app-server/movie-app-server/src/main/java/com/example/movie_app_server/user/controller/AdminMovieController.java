@@ -30,10 +30,10 @@ public class AdminMovieController {
 
     @GetMapping
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public ResponseEntity<List<MediaItemDto>> getAllMovies() {
-        List<MediaItemDto> movies = mediaRepository.findAll().stream()
-                .map(mediaService::convertToItemDto)
-                .toList();
+    public ResponseEntity<org.springframework.data.domain.Page<MediaItemDto>> getAllMovies(
+            @org.springframework.data.web.PageableDefault(size = 20, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable) {
+        org.springframework.data.domain.Page<MediaItemDto> movies = mediaRepository.findAll(pageable)
+                .map(mediaService::convertToItemDto);
         return ResponseEntity.ok(movies);
     }
 
@@ -61,7 +61,7 @@ public class AdminMovieController {
     }
 
     @GetMapping("/preview-tmdb")
-    public ResponseEntity<?> previewFromTmdb(@RequestParam Integer tmdbId, @RequestParam(required = false) String type) {
+    public ResponseEntity<MediaDetailResponse> previewFromTmdb(@RequestParam Integer tmdbId, @RequestParam(required = false) String type) {
         try {
             Media media;
             if ("TV_SERIES".equalsIgnoreCase(type)) {
@@ -77,9 +77,7 @@ public class AdminMovieController {
             }
             return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
         } catch (Exception e) {
-            java.io.StringWriter sw = new java.io.StringWriter();
-            e.printStackTrace(new java.io.PrintWriter(sw));
-            return ResponseEntity.internalServerError().body(sw.toString());
+            throw new com.example.movie_app_server.common.exception.AppException("Lỗi khi đồng bộ từ TMDB: ID không tồn tại hoặc lỗi mạng.", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
     }
 

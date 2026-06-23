@@ -51,9 +51,18 @@ public class AdminMovieActivity extends AppCompatActivity {
         androidx.activity.EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_movie);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutHeader), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+            
+            View header = findViewById(R.id.layoutHeader);
+            if (header != null) {
+                header.setPadding(header.getPaddingLeft(), systemBars.top, header.getPaddingRight(), header.getPaddingBottom());
+            }
+            
+            View bottomNav = findViewById(R.id.adminBottomNavInclude);
+            if (bottomNav != null) {
+                bottomNav.setPadding(0, 0, 0, systemBars.bottom);
+            }
             return insets;
         });
 
@@ -211,12 +220,12 @@ public class AdminMovieActivity extends AppCompatActivity {
 
     private void loadMovies() {
         progressBar.setVisibility(View.VISIBLE);
-        apiService.getAllMoviesAdmin().enqueue(new Callback<List<MediaItemDto>>() {
+        apiService.getAllMoviesAdmin(0, 1000).enqueue(new Callback<com.example.pemomovie.dto.PageResponseDto<MediaItemDto>>() {
             @Override
-            public void onResponse(Call<List<MediaItemDto>> call, Response<List<MediaItemDto>> response) {
+            public void onResponse(Call<com.example.pemomovie.dto.PageResponseDto<MediaItemDto>> call, Response<com.example.pemomovie.dto.PageResponseDto<MediaItemDto>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    allMovies = response.body();
+                    allMovies = response.body().getContent();
                     filterListByTab();
                 } else {
                     Toast.makeText(AdminMovieActivity.this, "Lỗi khi tải danh sách phim", Toast.LENGTH_SHORT).show();
@@ -224,7 +233,7 @@ public class AdminMovieActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<MediaItemDto>> call, Throwable t) {
+            public void onFailure(Call<com.example.pemomovie.dto.PageResponseDto<MediaItemDto>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(AdminMovieActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
