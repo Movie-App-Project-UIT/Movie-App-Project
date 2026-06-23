@@ -1,52 +1,64 @@
-# Movie App Project
+# PeMo - Ứng dụng xem phim trực tuyến (Movie App)
 
-Dự án ứng dụng xem phim với Backend viết bằng Spring Boot và Frontend là ứng dụng di động Android (Java).
+Đây là dự án ứng dụng xem phim trực tuyến trên nền tảng Android, kết nối với Backend được xây dựng bằng Spring Boot. 
 
-## Cấu trúc dự án
-- `backend/movie-app-server/`: Chứa mã nguồn máy chủ (Spring Boot).
-- `frontend/app/`: Chứa mã nguồn ứng dụng di động Android.
-
-## Yêu cầu môi trường
-1. **Java JDK 17+**
-2. **Android Studio** (Phiên bản mới nhất)
-3. **MySQL Server** (Đang chạy ở cổng 3306)
+Dự án bao gồm 2 phần chính:
+- **Frontend**: Ứng dụng Android (Ngôn ngữ Java).
+- **Backend**: Server API Spring Boot (Ngôn ngữ Java), sử dụng cơ sở dữ liệu TiDB Cloud (MySQL).
 
 ---
 
-## Hướng dẫn cài đặt Backend
+## 🛠 Yêu cầu hệ thống (Prerequisites)
 
-### 1. Chuẩn bị Cơ sở dữ liệu (Database)
-- Đảm bảo bạn đã cài đặt và khởi động MySQL.
-- Bạn cần tạo trước một Schema tên là `movieapp` hoặc cấu hình `createDatabaseIfNotExist=true` sẽ tự động tạo.
-- Cấu hình tài khoản đăng nhập MySQL trong file `backend/movie-app-server/movie-app-server/src/main/resources/application.properties`:
-  ```properties
-  spring.datasource.username=root
-  spring.datasource.password=123456 hoặc tùy chỉnh mật khẩu MySQL của bạn
-  ```
-
-### 2. Dữ liệu phim (Data Seeder)
-- Dự án sử dụng API của **TMDB** để tự động kéo dữ liệu về DB khi khởi động.
-- Nếu không có mạng hoặc không kết nối được TMDB, dự án có sẵn cơ chế **MockDataSeeder** để tạo các bộ phim mẫu (Your Name, Interstellar, Deadpool & Wolverine...) để test.
-- Bạn có thể cấu hình Token TMDB, Cloudinary, VNPay, Momo tại `application.properties`.
-
-### 3. Khởi động Backend
-- Mở thư mục `backend/movie-app-server/` bằng IntelliJ IDEA hoặc Eclipse.
-- Chạy file `MovieAppServerApplication.java`.
-- Server sẽ khởi động mặc định ở cổng `8080`. Chú ý:
-  + Hiện tại `spring.jpa.hibernate.ddl-auto=update` nên dữ liệu sẽ KHÔNG bị mất khi khởi động lại Backend.
-  + Hệ thống đã được cấu hình tự động lấy phim từ TMDB (`TmdbDataSeeder` có quyền ưu tiên cao nhất `@Order(1)`). Nếu DB đã có phim, hệ thống sẽ bỏ qua việc tải thêm.
-  + Để lấy lại dữ liệu mới nhất (bao gồm cả ngôn ngữ, thể loại chuẩn), hãy xóa (Drop) Database `movieapp` trong MySQL rồi chạy lại Backend.
-  + Nếu kết nối mạng / VPN bình thường, phim thật từ TMDB sẽ được nạp. Nếu lỗi, `MockDataSeeder` sẽ nạp 4 phim giả để dự phòng.
+Để chạy được dự án này, máy tính cần cài đặt sẵn:
+- **Android Studio** (Phiên bản mới nhất, khuyên dùng Koala/Ladybug trở lên).
+- **IntelliJ IDEA** (Hoặc Eclipse) để chạy Backend.
+- **Java Development Kit (JDK)** bản 11 hoặc 17.
+- **Máy ảo Android (Emulator)** hoặc thiết bị thật có hệ điều hành Android 7.0 (API 24) trở lên.
+- Có kết nối Internet ổn định (vì Backend sử dụng Database Cloud và các dịch vụ lưu trữ bên ngoài).
 
 ---
 
-## Hướng dẫn cài đặt Frontend (Android)
+## 🚀 Hướng dẫn khởi chạy Backend (Spring Boot)
 
-1. Mở thư mục `frontend/` bằng **Android Studio**.
-2. Đợi Gradle đồng bộ (Sync) xong các thư viện.
-3. Đảm bảo cấu hình IP kết nối tới Backend chính xác trong file cấu hình mạng của app (Ví dụ: `ApiClient` hoặc file XML Network Security) nếu bạn định chạy trên điện thoại thật. Nếu chạy máy ảo, có thể dùng `10.0.2.2`.
-4. Chọn máy ảo (Emulator) hoặc cắm thiết bị thật vào và bấm **Run (Shift + F10)**.
+1. Mở phần mềm **IntelliJ IDEA**.
+2. Chọn **Open** và trỏ tới đường dẫn thư mục: `backend/movie-app-server/movie-app-server`.
+3. Chờ một lúc để **Maven** tự động tải xuống các thư viện cần thiết.
+4. **Cấu hình (Không bắt buộc thay đổi):**
+   - Project đang sử dụng **TiDB Cloud** (Cloud Database), vì vậy **KHÔNG CẦN** phải cài đặt hay chạy MySQL cục bộ trên máy. Cấu hình kết nối đã có sẵn trong file `src/main/resources/application.properties`.
+   - Các API Key của TMDB (lấy dữ liệu phim), Cloudinary & ImageKit (lưu trữ ảnh/video), và VNPay Sandbox (thanh toán) cũng đã được nhúng sẵn vào file cấu hình.
+5. Tìm đến file `MovieAppServerApplication.java` (trong package `com.example.movie_app_server`).
+6. Nhấn chuột phải chọn **Run 'MovieAppServerApplication'** (hoặc biểu tượng Tam giác xanh).
+7. Đợi log console báo `Started MovieAppServerApplication...`. Server mặc định sẽ chạy ở địa chỉ `http://localhost:8080`.
 
-## Lưu ý chung
-- Không đưa các file `build/`, file cấu hình cục bộ của IDE (`.idea/`, `.gradle/`) lên Git. Đã có `.gitignore` xử lý việc này.
-- Khi làm việc với thanh điều hướng hay giao diện tràn viền (Edge-to-Edge), chú ý các thiết lập `WindowInsets` để tránh bị cắt xén UI.
+---
+
+## 📱 Hướng dẫn khởi chạy Frontend (Android App)
+
+1. Mở phần mềm **Android Studio**.
+2. Chọn **Open** và trỏ tới thư mục gốc dự án, Android Studio sẽ tự động nhận diện module `frontend/app`.
+3. Chờ Android Studio tiến hành **Gradle Sync** (tải thư viện) cho đến khi hoàn tất và không có báo lỗi (thường mất 2-5 phút).
+4. **Kiểm tra file cấu hình môi trường:**
+   - Mở file `frontend/app/build.gradle.kts` (Module :app).
+   - Tìm đến thẻ `buildTypes -> debug` và chắc chắn dòng `BASE_URL` đang được trỏ tới máy ảo localhost:
+     ```kotlin
+     buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
+     ```
+     *(Lưu ý: Địa chỉ `10.0.2.2` là IP chuẩn để máy ảo Android kết nối ngược về `localhost:8080` của máy tính đang chạy Backend).*
+5. Trên thanh công cụ trên cùng, chọn một **máy ảo (Emulator)**.
+6. Nhấn nút **Run 'app'** (Biểu tượng tam giác xanh).
+7. App sẽ được build và tự động khởi chạy trên máy ảo.
+
+### ⚠️ Lưu ý về tính năng Đăng nhập (Authentication)
+Ứng dụng sử dụng Firebase Authentication.
+- **Đăng nhập bằng Email/Mật khẩu:** Hoạt động bình thường ở mọi máy. (Giảng viên có thể sử dụng chức năng Đăng ký tài khoản mới bằng Email để test hệ thống ngay lập tức).
+- **Đăng nhập bằng Google:** Do chính sách bảo mật của Google, tính năng này bắt buộc máy tính compile code (máy tính của bạn/giảng viên) phải khai báo mã `SHA-1` trên Firebase Console của dự án. Do đó, nếu tải code về một máy tính lạ, nút "Đăng nhập Google" có thể báo Lỗi 10 (Developer Error). Đây là tính năng bảo mật hệ thống chứ không phải lỗi code, vui lòng sử dụng tính năng **Đăng ký / Đăng nhập bằng Email** thay thế để test tính năng ứng dụng.
+
+---
+
+## 📂 Cấu trúc dự án
+
+- **`backend/`**: Chứa mã nguồn Server Spring Boot, các Model, Repository, Service, và Controller xử lý logic nghiệp vụ và bảo mật (JWT + Firebase Token).
+- **`frontend/`**: Chứa mã nguồn Android Client. Bao gồm các Activity, Fragment, Adapter, và Retrofit interfaces (nằm trong package `com.example.pemomovie`).
+
+Chúc bạn có trải nghiệm tốt với dự án này!
