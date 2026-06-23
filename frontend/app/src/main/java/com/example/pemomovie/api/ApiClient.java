@@ -15,7 +15,7 @@ public class ApiClient {
     public static Retrofit getClient() {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(new AuthInterceptor())
@@ -32,9 +32,29 @@ public class ApiClient {
                     .writeTimeout(300, TimeUnit.SECONDS)
                     .build();
 
+            com.google.gson.Gson gson = new com.google.gson.GsonBuilder()
+                    .registerTypeAdapter(com.example.pemomovie.dto.PageResponseDto.class, new com.google.gson.JsonDeserializer<com.example.pemomovie.dto.PageResponseDto<?>>() {
+                        @Override
+                        public com.example.pemomovie.dto.PageResponseDto<?> deserialize(com.google.gson.JsonElement json, java.lang.reflect.Type typeOfT, com.google.gson.JsonDeserializationContext context) throws com.google.gson.JsonParseException {
+                            com.example.pemomovie.dto.PageResponseDto<Object> page = new com.example.pemomovie.dto.PageResponseDto<>();
+                            if (json.isJsonArray()) {
+                                java.lang.reflect.ParameterizedType pType = (java.lang.reflect.ParameterizedType) typeOfT;
+                                java.lang.reflect.Type elementType = pType.getActualTypeArguments()[0];
+                                java.lang.reflect.Type listType = com.google.gson.reflect.TypeToken.getParameterized(java.util.List.class, elementType).getType();
+                                java.util.List<Object> content = context.deserialize(json, listType);
+                                page.setContent(content);
+                            } else if (json.isJsonObject()) {
+                                com.google.gson.Gson defaultGson = new com.google.gson.Gson();
+                                return defaultGson.fromJson(json, typeOfT);
+                            }
+                            return page;
+                        }
+                    })
+                    .create();
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(client)
                     .build();
         }

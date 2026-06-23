@@ -121,24 +121,15 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void showSuccessDialog(String message) {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Thành công")
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
+        com.example.pemomovie.utils.DialogHelper.showSuccessDialog(this, "Thành công", message, () -> {
+            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void showErrorDialog(String message) {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Lỗi đăng ký")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .show();
+        com.example.pemomovie.utils.DialogHelper.showErrorDialog(this, "Lỗi đăng ký", message, null);
     }
 
     private void syncUserWithBackend(String email, String username, String avatarUrl) {

@@ -364,27 +364,27 @@ public class DetailActivity extends AppCompatActivity {
                         LinearLayout btnPlayDetailNew2 = findViewById(R.id.btnPlayDetailNew);
                         if (btnPlayDetailNew2 != null) {
                             btnPlayDetailNew2.setOnClickListener(v -> {
-                                android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(DetailActivity.this)
-                                        .setTitle("Tiếp tục xem phim")
-                                        .setMessage("Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?")
-                                        .setPositiveButton("Xem tiếp", (d, which) -> {
+                                com.example.pemomovie.utils.DialogHelper.showConfirmDialog(
+                                        DetailActivity.this,
+                                        "Tiếp tục xem phim",
+                                        "Bạn đang xem dở bộ phim này. Bạn muốn xem tiếp hay bắt đầu lại từ đầu?",
+                                        "Xem tiếp",
+                                        "Từ đầu",
+                                        () -> {
                                             Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
                                             intent.putExtra("MOVIE_ID", detail.getId());
                                             if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
                                             intent.putExtra("START_POSITION", (long) progress);
                                             startActivity(intent);
-                                        })
-                                        .setNegativeButton("Từ đầu", (d, which) -> {
+                                        },
+                                        () -> {
                                             Intent intent = new Intent(DetailActivity.this, PlayActivity.class);
                                             intent.putExtra("MOVIE_ID", detail.getId());
                                             if (history.getEpisode() != null) intent.putExtra("EPISODE_ID", history.getEpisode().getId());
                                             intent.putExtra("START_POSITION", 0L);
                                             startActivity(intent);
-                                        })
-                                        .create();
-                                    dialog.show();
-                                    dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
-                                    dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.parseColor("#F7328E"));
+                                        }
+                                );
                             });
                         }
                     }

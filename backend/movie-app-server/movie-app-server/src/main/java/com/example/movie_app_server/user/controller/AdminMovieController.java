@@ -77,7 +77,8 @@ public class AdminMovieController {
             }
             return ResponseEntity.ok(mediaService.convertToDetailResponse(media));
         } catch (Exception e) {
-            throw new com.example.movie_app_server.common.exception.AppException("Lỗi khi đồng bộ từ TMDB: ID không tồn tại hoặc lỗi mạng.", org.springframework.http.HttpStatus.BAD_REQUEST);
+            e.printStackTrace();
+            throw new com.example.movie_app_server.common.exception.AppException("Lỗi khi đồng bộ từ TMDB: " + e.getClass().getSimpleName() + " - " + e.getMessage(), org.springframework.http.HttpStatus.BAD_REQUEST);
         }
     }
 

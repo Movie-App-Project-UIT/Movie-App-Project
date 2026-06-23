@@ -16,7 +16,11 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -78,7 +82,26 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_admin_movie_detail);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            
+            View header = findViewById(R.id.layoutHeader);
+            if (header != null) {
+                header.setPadding(header.getPaddingLeft(), systemBars.top, header.getPaddingRight(), header.getPaddingBottom());
+            }
+            
+            View layoutBottom = findViewById(R.id.layoutBottom);
+            if (layoutBottom != null) {
+                layoutBottom.setPadding(layoutBottom.getPaddingLeft(), layoutBottom.getPaddingTop(), layoutBottom.getPaddingRight(), systemBars.bottom);
+            } else {
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+            }
+            
+            return insets;
+        });
 
         apiService = ApiClient.getApiService();
 
@@ -290,19 +313,22 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private void handleMediaTypeChange(android.widget.RadioGroup group, int checkedId) {
         if (previewData != null) {
             if (checkedId == R.id.rbMovie && "TV_SERIES".equals(previewData.getMediaType()) && !isCreateMode && episodeList.size() > 1) {
-                new androidx.appcompat.app.AlertDialog.Builder(this)
-                        .setTitle("Cảnh báo")
-                        .setMessage("Đổi sang Phim lẻ sẽ làm ẩn đi dữ liệu của các tập khác, chỉ giữ lại tập 1. Bạn có chắc chắn muốn tiếp tục?")
-                        .setPositiveButton("Đồng ý", (dialog, which) -> {
+                com.example.pemomovie.utils.DialogHelper.showConfirmDialog(
+                        this,
+                        "Cảnh báo",
+                        "Đổi sang Phim lẻ sẽ làm ẩn đi dữ liệu của các tập khác, chỉ giữ lại tập 1. Bạn có chắc chắn muốn tiếp tục?",
+                        "Đồng ý",
+                        "Hủy",
+                        () -> {
                             previewData.setMediaType("MOVIE");
                             populateUI(previewData, etVideoUrl.getText().toString());
-                        })
-                        .setNegativeButton("Hủy", (dialog, which) -> {
+                        },
+                        () -> {
                             rgMediaType.setOnCheckedChangeListener(null);
                             rbTvSeries.setChecked(true);
                             rgMediaType.setOnCheckedChangeListener(this::handleMediaTypeChange);
-                        })
-                        .show();
+                        }
+                );
                 return;
             }
             previewData.setMediaType(checkedId == R.id.rbTvSeries ? "TV_SERIES" : "MOVIE");

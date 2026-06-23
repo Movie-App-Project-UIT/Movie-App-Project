@@ -47,6 +47,47 @@ public class AdminGiftUserAdapter extends RecyclerView.Adapter<AdminGiftUserAdap
         holder.txtUserName.setText(user.getUsername() != null ? user.getUsername() : "No name");
         holder.txtUserEmail.setText(user.getEmail());
 
+        if (holder.imgAvatar != null) {
+            String avatarUrl = user.getAvatarUrl();
+            if (avatarUrl != null) {
+                avatarUrl = avatarUrl.trim();
+                if (avatarUrl.startsWith("\"") && avatarUrl.endsWith("\"")) {
+                    avatarUrl = avatarUrl.substring(1, avatarUrl.length() - 1);
+                }
+                avatarUrl = avatarUrl.trim();
+                if ("null".equalsIgnoreCase(avatarUrl) || "undefined".equalsIgnoreCase(avatarUrl)) {
+                    avatarUrl = null;
+                }
+            }
+            if (avatarUrl != null && !avatarUrl.trim().isEmpty()) {
+                if (avatarUrl.startsWith("/")) {
+                    String baseUrl = com.example.pemomovie.BuildConfig.BASE_URL;
+                    if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                    avatarUrl = baseUrl + avatarUrl;
+                }
+                holder.imgAvatar.setImageTintList(null);
+                holder.imgAvatar.setColorFilter(null);
+                holder.imgAvatar.clearColorFilter();
+                holder.imgAvatar.setPadding(0, 0, 0, 0);
+                holder.imgAvatar.setBackgroundResource(R.drawable.bg_circle_button);
+                holder.imgAvatar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#374151")));
+                com.bumptech.glide.Glide.with(context)
+                        .load(avatarUrl)
+                        .placeholder(R.drawable.ic_avatar)
+                        .error(R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(holder.imgAvatar);
+            } else {
+                holder.imgAvatar.setImageResource(R.drawable.ic_avatar);
+                holder.imgAvatar.setImageTintList(android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(context, R.color.gray_text_light)));
+                holder.imgAvatar.setBackgroundResource(R.drawable.bg_circle_button);
+                holder.imgAvatar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#374151")));
+                float density = context.getResources().getDisplayMetrics().density;
+                int paddingPx = (int) (8 * density + 0.5f);
+                holder.imgAvatar.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+            }
+        }
+
         if ("PREMIUM".equals(user.getTier())) {
             holder.lblPremiumStatus.setText("PREMIUM");
             holder.lblPremiumStatus.setTextColor(Color.parseColor("#F59E0B")); // Gold
@@ -81,6 +122,7 @@ public class AdminGiftUserAdapter extends RecyclerView.Adapter<AdminGiftUserAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtUserName, txtUserEmail, lblPremiumStatus;
+        android.widget.ImageView imgAvatar;
         CheckBox cbSelect;
 
         public ViewHolder(@NonNull View itemView) {
@@ -89,6 +131,7 @@ public class AdminGiftUserAdapter extends RecyclerView.Adapter<AdminGiftUserAdap
             txtUserEmail = itemView.findViewById(R.id.txtUserEmail);
             lblPremiumStatus = itemView.findViewById(R.id.lblPremiumStatus);
             cbSelect = itemView.findViewById(R.id.cbSelect);
+            imgAvatar = itemView.findViewById(R.id.imgAvatar);
         }
     }
 }
